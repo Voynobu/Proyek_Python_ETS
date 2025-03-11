@@ -1,0 +1,87 @@
+from PyQt5 import QtCore, QtGui, QtWidgets
+
+
+class Ui_windowLoginAdmin(object):
+    def setupUi(self, windowLoginAdmin):
+        windowLoginAdmin.setObjectName("windowLoginAdmin")
+        windowLoginAdmin.setFixedSize(800, 600)
+        self.centralwidget = QtWidgets.QWidget(windowLoginAdmin)
+        self.centralwidget.setObjectName("centralwidget")
+
+        # Label Judul
+        self.label = QtWidgets.QLabel(self.centralwidget)
+        self.label.setGeometry(QtCore.QRect(240, 10, 331, 131))
+        font = QtGui.QFont()
+        font.setFamily("8514oem")
+        font.setBold(True)
+        font.setItalic(False)
+        font.setUnderline(False)
+        font.setWeight(75)
+        font.setStrikeOut(False)
+        font.setKerning(False)
+        self.label.setFont(font)
+        self.label.setFrameShape(QtWidgets.QFrame.NoFrame)
+        self.label.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.label.setAlignment(QtCore.Qt.AlignCenter)
+        self.label.setObjectName("label")
+
+        # Tombol Kembali
+        self.pushButton = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton.setGeometry(QtCore.QRect(0, 0, 121, 41))
+        font = QtGui.QFont()
+        font.setBold(True)
+        font.setWeight(75)
+        self.pushButton.setFont(font)
+        self.pushButton.setObjectName("pushButton")
+
+        # Label "Login Admin"
+        self.label_4 = QtWidgets.QLabel(self.centralwidget)
+        self.label_4.setGeometry(QtCore.QRect(330, 120, 141, 31))
+        font = QtGui.QFont()
+        font.setFamily("8514oem")
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_4.setFont(font)
+        self.label_4.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_4.setObjectName("label_4")
+
+        # Tombol Tambah Admin
+        self.tambahAdminButton = QtWidgets.QPushButton(self.centralwidget)
+        self.tambahAdminButton.setGeometry(QtCore.QRect(270, 200, 251, 81))
+        self.tambahAdminButton.setObjectName("tambahAdminButton")
+
+        # Tombol Login Admin
+        self.loginAdminButton = QtWidgets.QPushButton(self.centralwidget)
+        self.loginAdminButton.setGeometry(QtCore.QRect(270, 300, 251, 81))
+        self.loginAdminButton.setObjectName("loginAdminButton")
+
+        windowLoginAdmin.setCentralWidget(self.centralwidget)
+        self.menubar = QtWidgets.QMenuBar(windowLoginAdmin)
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 26))
+        self.menubar.setObjectName("menubar")
+        windowLoginAdmin.setMenuBar(self.menubar)
+        self.statusbar = QtWidgets.QStatusBar(windowLoginAdmin)
+        self.statusbar.setObjectName("statusbar")
+        windowLoginAdmin.setStatusBar(self.statusbar)
+
+        self.retranslateUi(windowLoginAdmin)
+        QtCore.QMetaObject.connectSlotsByName(windowLoginAdmin)
+
+    def retranslateUi(self, windowLoginAdmin):
+        _translate = QtCore.QCoreApplication.translate
+        windowLoginAdmin.setWindowTitle(_translate("windowLoginAdmin", "Login Admin"))
+        self.label.setText(_translate("windowLoginAdmin", "Pendaftaran Rumah Sakit"))
+        self.pushButton.setText(_translate("windowLoginAdmin", "Kembali"))
+        self.label_4.setText(_translate("windowLoginAdmin", "Login Admin"))
+        self.tambahAdminButton.setText(_translate("windowLoginAdmin", "Tambah Admin"))
+        self.loginAdminButton.setText(_translate("windowLoginAdmin", "Login Admin"))
+
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    windowLoginAdmin = QtWidgets.QMainWindow()
+    ui = Ui_windowLoginAdmin()
+    ui.setupUi(windowLoginAdmin)
+    windowLoginAdmin.show()
+    sys.exit(app.exec_())
