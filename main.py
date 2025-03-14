@@ -1,10 +1,10 @@
 # Entry point program utama 
 from PyQt5 import QtWidgets
-from mainWindow import Ui_MainWindow
-from WindowLoginUser import Ui_windowDaftarUser
-from windowLoginUser import Ui_windowLoginUser
-from windowPendaftaran import Ui_MainWindow as Ui_windowPendaftaran
-from daftarUser import Register, load_users, save_users, is_username_taken
+from Window.MainWindow import Ui_MainWindow
+from Window.WindowLoginUser import Ui_windowDaftarUser
+from Window.WindowLoginUser import Ui_windowLoginUser
+from Window.WindowPendaftaranUser import Ui_MainWindow as Ui_windowPendaftaran
+from Controllers.UserController import Register, load_users, save_users, is_username_taken
 import sys
 
 class MainApplication(QtWidgets.QMainWindow):
