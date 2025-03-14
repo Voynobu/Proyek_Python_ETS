@@ -1,6 +1,7 @@
 # Author      : Nauval Khairiyan
 # NIM/Kelas   : 241524021 / 1A-D4
 # Description : Validasi input data
+import re
 
 def validate_nik(nik):
     """Memvalidasi NIK (harus 16 digit angka)."""
