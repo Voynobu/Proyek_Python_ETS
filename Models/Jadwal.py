@@ -4,7 +4,6 @@
 
 import json
 from datetime import datetime, time
-from Utils.FileHandler import load_data, save_data
 
 class Jadwal:
     def __init__(self, dokter, hari, jam_awal, jam_akhir):
