@@ -1,9 +1,9 @@
+# WindowSplashScreen.py
 #Nama: Rangga Muhamad Fajar
 #Kelas: 1A - D4
 #NIM: 241524026
-# window_splash.py
 #Desc: - Pembuatan splash screen sebagai tampilan awal aplikasi.
-#      - Splash screen akan menampilkan gambar selama 3 detik sebelum masuk ke WindowWelcome.
+#      - Menampilkan gambar splash selama 3 detik sebelum beralih ke WindowWelcome.
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 import os
@@ -12,19 +12,23 @@ from WindowWelcome import WindowWelcome
 class WindowSplashScreen(QtWidgets.QDialog):
     def __init__(self):
         super().__init__()
+        # Hilangkan border window
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
         self.setFixedSize(1600, 900)
         
         self.label = QtWidgets.QLabel(self)
         self.label.setGeometry(0, 0, 1600, 900)
+        # Muat gambar splash screen
         self.load_image(self.label, "C:/Users/Rangga/Documents/KULIAH/SEMESTER 2/PROYEK 1/TUBES PRA ETS/LOGIN/1.png")
         self.label.setScaledContents(True)
         
+        # Timer untuk splash screen selama 3 detik
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(self.show_welcome_window)
         self.timer.start(3000)
     
     def load_image(self, widget, image_path):
+        # Periksa ketersediaan file gambar dan muat jika ada
         if os.path.exists(image_path):
             pixmap = QtGui.QPixmap(image_path)
             widget.setPixmap(pixmap)
@@ -33,6 +37,7 @@ class WindowSplashScreen(QtWidgets.QDialog):
             print(f"Error: Splash image not found -> {image_path}")
     
     def show_welcome_window(self):
+        # Setelah timer habis, buka WindowWelcome dan tutup splash screen
         self.timer.stop()
         self.welcome = WindowWelcome()
         self.welcome.show()
