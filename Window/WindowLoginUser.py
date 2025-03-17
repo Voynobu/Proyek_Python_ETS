@@ -3,10 +3,11 @@
 #Kelas: 1A - D4
 #NIM: 241524026
 #Desc: - Tampilan login untuk user.
-#      - Memeriksa email dan password dari file 'users.txt'.
+#      - Memeriksa username dan password dari file 'users.txt'.
 #      - Jika berhasil, membuka MainWindow (halaman utama aplikasi).
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from daftarUser import login_user
 import os
 
 class Ui_Dialog(object):
@@ -112,7 +113,7 @@ class WindowLoginUser(QtWidgets.QDialog):
         # Tombol Back kembali ke WindowWelcome
         self.ui.pushButton_2.clicked.connect(self.back_to_welcome)
         # Tombol Login melakukan proses verifikasi login
-        self.ui.pushButton.clicked.connect(self.login_user)
+        self.ui.pushButton.clicked.connect(self.handle_login)
     
     def back_to_welcome(self):
         from WindowWelcome import WindowWelcome
@@ -120,34 +121,23 @@ class WindowLoginUser(QtWidgets.QDialog):
         self.welcome.show()
         self.close()
     
-    def login_user(self):
-        # Ambil input email dan password
-        email = self.ui.lineEdit.text().strip()
+    def handle_login(self):
+        # Ambil input username dan password
+        username = self.ui.lineEdit.text().strip()
         password = self.ui.lineEdit_2.text().strip()
-        if not email or not password:
+        
+        if not username or not password:
             QtWidgets.QMessageBox.warning(self, "Error", "Email dan Password harus diisi!")
-            return
-        if not os.path.exists("users.txt"):
-            QtWidgets.QMessageBox.warning(self, "Error", "Belum ada user terdaftar!")
-            return
-        login_success = False
-        with open("users.txt", "r") as f:
-            for line in f:
-                parts = line.strip().split(";")
-                if len(parts) == 3:
-                    # parts[0] = nama, parts[1] = email, parts[2] = password
-                    if email == parts[1] and password == parts[2]:
-                        login_success = True
-                        break
-        if login_success:
+        elif login_user(username,password) != "Login berhasil!":
+            QtWidgets.QMessageBox.warning(self, "Error", login_user(username,password))
+        else:
             QtWidgets.QMessageBox.information(self, "Sukses", "Login berhasil!")
             # Buka MainWindow sebagai halaman utama aplikasi
             from MainWindow import MainWindow
             self.main_win = MainWindow()
             self.main_win.show()
-            self.close()
-        else:
-            QtWidgets.QMessageBox.warning(self, "Error", "Email atau Password salah!")
+            self.close()    
+
 
 if __name__ == "__main__":
     import sys

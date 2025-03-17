@@ -7,6 +7,7 @@
 #      - Data user disimpan ke file 'users.txt'.
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from daftarUser import register_user 
 import os
 
 class Ui_Dialog(object):
@@ -23,7 +24,7 @@ class Ui_Dialog(object):
         
         # Field untuk Nama
         self.lineEdit = QtWidgets.QLineEdit(Dialog)
-        self.lineEdit.setGeometry(QtCore.QRect(200, 350, 521, 51))
+        self.lineEdit.setGeometry(QtCore.QRect(200, 390, 521, 61))
         self.lineEdit.setStyleSheet("""
             QLineEdit {
                 color: black;
@@ -31,31 +32,16 @@ class Ui_Dialog(object):
                 border-bottom: 4px solid #a6a6a6;
                 font-size: 20px;
             }
-            QLineEdit:focus {
+            QLineEdit:focus {   
                 border-bottom: 4px solid #ffbd59;
             }
         """)
-        self.lineEdit.setPlaceholderText("Masukkan Nama Lengkap Anda!")
-        
-        # Field untuk Email
-        self.lineEdit_2 = QtWidgets.QLineEdit(Dialog)
-        self.lineEdit_2.setGeometry(QtCore.QRect(200, 450, 521, 51))
-        self.lineEdit_2.setStyleSheet("""
-            QLineEdit {
-                color: black;
-                border: none;
-                border-bottom: 4px solid #a6a6a6;
-                font-size: 20px;
-            }
-            QLineEdit:focus {
-                border-bottom: 4px solid #ffbd59;
-            }
-        """)
-        self.lineEdit_2.setPlaceholderText("Masukkan Email Anda!")
+        self.lineEdit.setPlaceholderText("Masukkan Username")
+
         
         # Field untuk Password
         self.lineEdit_3 = QtWidgets.QLineEdit(Dialog)
-        self.lineEdit_3.setGeometry(QtCore.QRect(200, 550, 521, 51))
+        self.lineEdit_3.setGeometry(QtCore.QRect(200, 520, 521, 61))
         self.lineEdit_3.setStyleSheet("""
             QLineEdit {
                 color: black;
@@ -67,7 +53,7 @@ class Ui_Dialog(object):
                 border-bottom: 4px solid #ffbd59;
             }
         """)
-        self.lineEdit_3.setPlaceholderText("Masukkan Password Anda!")
+        self.lineEdit_3.setPlaceholderText("Masukkan Password")
         self.lineEdit_3.setEchoMode(QtWidgets.QLineEdit.Password)
         
         # Tombol untuk melihat password
@@ -94,9 +80,8 @@ class Ui_Dialog(object):
         # Atur urutan tampilan widget
         self.label.raise_()
         self.pushButton.raise_()
-        self.lineEdit.raise_()
-        self.lineEdit_2.raise_()
         self.pushButton_2.raise_()
+        self.lineEdit.raise_()
         self.lineEdit_3.raise_()
         self.show_password_button.raise_()
         
@@ -130,7 +115,7 @@ class WindowSignUp(QtWidgets.QDialog):
         # Hubungkan tombol Back untuk kembali ke WindowWelcome
         self.ui.pushButton_2.clicked.connect(self.back_to_welcome)
         # Hubungkan tombol Sign Up untuk mendaftarkan user
-        self.ui.pushButton.clicked.connect(self.register_user)
+        self.ui.pushButton.clicked.connect(self.handle_register)
     
     def back_to_welcome(self):
         from WindowWelcome import WindowWelcome
@@ -138,22 +123,17 @@ class WindowSignUp(QtWidgets.QDialog):
         self.welcome.show()
         self.close()
     
-    def register_user(self):
+    def handle_register(self):
         # Ambil data input user
         name = self.ui.lineEdit.text().strip()
-        email = self.ui.lineEdit_2.text().strip()
         password = self.ui.lineEdit_3.text().strip()
-        if not name or not email or not password:
+
+        if not name or not password:
             QtWidgets.QMessageBox.warning(self, "Error", "Semua field harus diisi!")
-            return
-        # Simpan data user ke file users.txt (format: name;email;password)
-        try:
-            with open("users.txt", "a") as f:
-                f.write(f"{name};{email};{password}\n")
+        elif register_user(name, password) != "Registrasi berhasil!":
+            QtWidgets.QMessageBox.warning(self, "Error", register_user(name, password))
+        else:
             QtWidgets.QMessageBox.information(self, "Sukses", "Pendaftaran berhasil! Silakan login.")
-            self.back_to_welcome()
-        except Exception as e:
-            QtWidgets.QMessageBox.warning(self, "Error", f"Terjadi kesalahan: {str(e)}")
 
 if __name__ == "__main__":
     import sys
