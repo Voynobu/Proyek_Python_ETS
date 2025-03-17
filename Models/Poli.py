@@ -3,7 +3,7 @@
 #Deskripsi : class untuk Poli
 
 import json
-from Utils.file_handler import load_data
+from Utils.FileHandler import load_data
 
 class Poli:
     def __init__(self, nama_poli):
