@@ -11,7 +11,6 @@ class Pasien:
         self.poli = poli
         self.dokter = dokter
         self.tanggal_temu = tanggal_temu
-        self.pembayaran = pembayaran  # Hanya untuk Asuransi dan Mandiri
 
     def get_info(self):
-        return f"{self.nama},{self.nik},{self.jenis_pendaftaran},{self.poli},{self.dokter},{self.tanggal_temu},{self.pembayaran or '-'}"
+        return f"{self.nama},{self.nik},{self.jenis_pendaftaran},{self.poli},{self.dokter},{self.tanggal_temu}"
