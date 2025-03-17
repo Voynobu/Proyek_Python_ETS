@@ -8,4 +8,4 @@ class Dokter:
         self.spesialis = spesialis
     
     def __str__(self):
-        return f"{self.nama}({self.spesialis})"
+        return f"{self.nama} ({self.spesialis})"
