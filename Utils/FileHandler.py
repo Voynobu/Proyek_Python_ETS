@@ -1,6 +1,6 @@
 # Author      : Nauval Khairiyan
 # NIM/Kelas   : 241524021 / 1A-D4
-# Description : Fungsi baca/tulis file
+# Description : Fungsi baca/tulis file untuk membaca & menulis data pasien dan dokter.
 
 import json
 import os
