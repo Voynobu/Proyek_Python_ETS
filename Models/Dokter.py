@@ -1,6 +1,6 @@
 #Author : Zaidan Zulkaisi Setiaji
 #NIM/Kelas : 241524031/1A-D4
-#Deskripsi : class untuk dokter
+#Deskripsi : class untuk JadwalPoli
 
 class Dokter:
     def __init__(self, nama, spesialis):
