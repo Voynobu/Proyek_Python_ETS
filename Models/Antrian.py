@@ -1,6 +1,6 @@
-name      :
-nim       :
-deskripsi :
+#name      : Muhamad Dino Dermawan
+#nim       : 241524015
+#deskripsi : class untuk nomor antrian
 
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QPushButton, QComboBox, QMessageBox
