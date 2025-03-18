@@ -1,6 +1,6 @@
-#author  : Muhamad Dino Dermawan
-#nim     : 241524015
-
+#author    : Muhamad Dino Dermawan
+#nim       : 241524015
+#deskripsi : nomorAntrian
 
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QPushButton, QComboBox, QMessageBox
