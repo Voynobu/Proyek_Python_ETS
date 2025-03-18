@@ -1,3 +1,7 @@
+#author  : Muhamad Dino Dermawan
+#nim     : 241524015
+
+
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QPushButton, QComboBox, QMessageBox
 from PyQt5.QtCore import Qt
