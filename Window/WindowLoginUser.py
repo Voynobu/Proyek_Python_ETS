@@ -9,6 +9,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from daftarUser import login_user
 import os
+from WindowMenuUser import WindowMenuUser
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
@@ -19,7 +20,7 @@ class Ui_Dialog(object):
         # Set background untuk login user
         self.label = QtWidgets.QLabel(Dialog)
         self.label.setGeometry(QtCore.QRect(-4, 0, 1611, 901))
-        self.label.setPixmap(QtGui.QPixmap("C:/Users/Rangga/Documents/KULIAH/SEMESTER 2/PROYEK 1/TUBES PRA ETS/LOGIN/BACKGROUND/3.png"))
+        self.label.setPixmap(QtGui.QPixmap("C:/Users/Rangga/Documents/KULIAH/SEMESTER 2/PROYEK 1/TUBES PRA ETS/ASSETS/BACKGROUND/3.png"))
         self.label.setScaledContents(True)
         
         # Field untuk Email
@@ -36,7 +37,7 @@ class Ui_Dialog(object):
                 border-bottom: 4px solid #ffbd59;
             }
         """)
-        self.lineEdit.setPlaceholderText("Masukkan Email Anda!")
+        self.lineEdit.setPlaceholderText("Masukkan Username Anda!")
         
         # Field untuk Password
         self.lineEdit_2 = QtWidgets.QLineEdit(Dialog)

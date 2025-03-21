@@ -19,7 +19,7 @@ class Ui_Dialog(object):
         # Atur background sign-up
         self.label = QtWidgets.QLabel(Dialog)
         self.label.setGeometry(QtCore.QRect(-4, 0, 1611, 901))
-        self.label.setPixmap(QtGui.QPixmap("C:/Users/Rangga/Documents/KULIAH/SEMESTER 2/PROYEK 1/TUBES PRA ETS/LOGIN/BACKGROUND/4.png"))
+        self.label.setPixmap(QtGui.QPixmap("C:/Users/Rangga/Documents/KULIAH/SEMESTER 2/PROYEK 1/TUBES PRA ETS/ASSETS/BACKGROUND/4.png"))
         self.label.setScaledContents(True)
         
         # Field untuk Nama
@@ -58,7 +58,7 @@ class Ui_Dialog(object):
         
         # Tombol untuk melihat password
         self.show_password_button = QtWidgets.QPushButton(Dialog)
-        self.show_password_button.setGeometry(QtCore.QRect(688, 555, 40, 40))
+        self.show_password_button.setGeometry(QtCore.QRect(676, 520, 61, 61))
         self.show_password_button.setStyleSheet("border: none;")
         self.show_password_button.setIcon(QtGui.QIcon("C:/Users/Rangga/Documents/KULIAH/SEMESTER 2/PROYEK 1/TUBES PRA ETS/BUTTON/BUTTON/EYE.png"))
         self.show_password_button.setIconSize(QtCore.QSize(30, 30))

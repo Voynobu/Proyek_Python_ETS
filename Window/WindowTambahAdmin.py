@@ -1,12 +1,15 @@
-# Tampilan admin (edit poli, dokter, biaya)
-# WindowLoginAdmin.py
-#Nama: Rangga Muhamad Fajar
-#Kelas: 1A - D4
-#NIM: 241524026
-#Desc: - Tampilan login untuk admin.
-#      - Memeriksa email dan password dan jika berhasil membuka MainWindow.
+# WindowTambahAdmin.py
+# Nama: Rangga Muhamad Fajar
+# Kelas: 1A - D4
+# NIM: 241524026
+# Desc: - Tampilan login untuk user.
+#       - Memeriksa username dan password dari file 'daftarUsers.json'.
+#       - Jika berhasil, membuka WindowMenuUser sebagai halaman utama user.
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from daftarUser import login_user 
+import os
+from WindowMenuUser import WindowMenuUser
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
@@ -14,10 +17,10 @@ class Ui_Dialog(object):
         Dialog.resize(1600, 900)
         Dialog.setWindowFlags(QtCore.Qt.FramelessWindowHint)
         
-        # Set background untuk login admin
+        # Set background untuk login user
         self.label = QtWidgets.QLabel(Dialog)
         self.label.setGeometry(QtCore.QRect(-4, 0, 1611, 901))
-        self.label.setPixmap(QtGui.QPixmap("C:/Users/Rangga/Documents/KULIAH/SEMESTER 2/PROYEK 1/TUBES PRA ETS/ASSETS/BACKGROUND/2.png"))
+        self.label.setPixmap(QtGui.QPixmap("C:/Users/Rangga/Documents/KULIAH/SEMESTER 2/PROYEK 1/TUBES PRA ETS/ASSETS/BACKGROUND/7.png"))
         self.label.setScaledContents(True)
         
         # Field untuk Email
@@ -53,6 +56,7 @@ class Ui_Dialog(object):
         self.lineEdit_2.setPlaceholderText("Masukkan Password Anda!")
         self.lineEdit_2.setEchoMode(QtWidgets.QLineEdit.Password)
         
+        # Tombol untuk melihat password
         self.show_password_button = QtWidgets.QPushButton(Dialog)
         self.show_password_button.setGeometry(QtCore.QRect(676, 520, 61, 61))
         self.show_password_button.setStyleSheet("border: none;")
@@ -85,34 +89,56 @@ class Ui_Dialog(object):
     
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", "Login Admin"))
+        Dialog.setWindowTitle(_translate("Dialog", "Login User"))
     
     def toggle_password(self):
+        # Ubah mode tampilan password
         if self.show_password_button.isChecked():
             self.lineEdit_2.setEchoMode(QtWidgets.QLineEdit.Normal)
         else:
             self.lineEdit_2.setEchoMode(QtWidgets.QLineEdit.Password)
     
     def add_hover_effect(self, button):
+        # Efek hover untuk tombol
         effect = QtWidgets.QGraphicsOpacityEffect()
         button.setGraphicsEffect(effect)
         button.enterEvent = lambda event: effect.setOpacity(0.7)
         button.leaveEvent = lambda event: effect.setOpacity(1.0)
 
-# Kelas pembungkus untuk WindowLoginAdmin
-class WindowLoginAdmin(QtWidgets.QDialog):
+# Kelas pembungkus untuk WindowLoginUser
+class WindowLoginUser(QtWidgets.QDialog):
     def __init__(self):
         super().__init__()
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
         # Tombol Back kembali ke WindowWelcome
         self.ui.pushButton_2.clicked.connect(self.back_to_welcome)
+        # Tombol Login melakukan proses verifikasi login
+        self.ui.pushButton.clicked.connect(self.handle_login)
     
     def back_to_welcome(self):
         from WindowWelcome import WindowWelcome
         self.welcome = WindowWelcome()
         self.welcome.show()
         self.close()
+    
+    def handle_login(self):
+        # Ambil input username dan password
+        username = self.ui.lineEdit.text().strip()
+        password = self.ui.lineEdit_2.text().strip()
+        
+        if not username or not password:
+            QtWidgets.QMessageBox.warning(self, "Error", "Username dan Password harus diisi!")
+        elif login_user(username, password) != "Login berhasil!":
+            QtWidgets.QMessageBox.warning(self, "Error", login_user(username, password))
+        else:
+            QtWidgets.QMessageBox.information(self, "Sukses", "Login berhasil!")
+
+            self.menu_user = WindowMenuUser()
+            self.menu_user.show()
+
+            self.close()
+
 
 if __name__ == "__main__":
     import sys
