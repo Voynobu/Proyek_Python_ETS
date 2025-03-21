@@ -1,13 +1,15 @@
 # WindowLoginUser.py
-#Nama: Rangga Muhamad Fajar
-#Kelas: 1A - D4
-#NIM: 241524026
-#Desc: - Tampilan login untuk user.
-#      - Memeriksa email dan password dari file 'users.txt'.
-#      - Jika berhasil, membuka MainWindow (halaman utama aplikasi).
+# Nama: Rangga Muhamad Fajar
+# Kelas: 1A - D4
+# NIM: 241524026
+# Desc: - Tampilan login untuk user.
+#       - Memeriksa username dan password dari file 'daftarUsers.json'.
+#       - Jika berhasil, membuka WindowMenuUser sebagai halaman utama user.
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from daftarUser import login_user 
 import os
+from WindowMenuUser import WindowMenuUser
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
@@ -18,7 +20,7 @@ class Ui_Dialog(object):
         # Set background untuk login user
         self.label = QtWidgets.QLabel(Dialog)
         self.label.setGeometry(QtCore.QRect(-4, 0, 1611, 901))
-        self.label.setPixmap(QtGui.QPixmap("C:/Users/Rangga/Documents/KULIAH/SEMESTER 2/PROYEK 1/TUBES PRA ETS/LOGIN/BACKGROUND/3.png"))
+        self.label.setPixmap(QtGui.QPixmap("C:/Users/Rangga/Documents/KULIAH/SEMESTER 2/PROYEK 1/TUBES PRA ETS/ASSETS/BACKGROUND/3.png"))
         self.label.setScaledContents(True)
         
         # Field untuk Email
@@ -35,7 +37,7 @@ class Ui_Dialog(object):
                 border-bottom: 4px solid #ffbd59;
             }
         """)
-        self.lineEdit.setPlaceholderText("Masukkan Email Anda!")
+        self.lineEdit.setPlaceholderText("Masukkan Username Anda!")
         
         # Field untuk Password
         self.lineEdit_2 = QtWidgets.QLineEdit(Dialog)
@@ -112,7 +114,7 @@ class WindowLoginUser(QtWidgets.QDialog):
         # Tombol Back kembali ke WindowWelcome
         self.ui.pushButton_2.clicked.connect(self.back_to_welcome)
         # Tombol Login melakukan proses verifikasi login
-        self.ui.pushButton.clicked.connect(self.login_user)
+        self.ui.pushButton.clicked.connect(self.handle_login)
     
     def back_to_welcome(self):
         from WindowWelcome import WindowWelcome
@@ -120,34 +122,22 @@ class WindowLoginUser(QtWidgets.QDialog):
         self.welcome.show()
         self.close()
     
-    def login_user(self):
-        # Ambil input email dan password
-        email = self.ui.lineEdit.text().strip()
+    def handle_login(self):
+        # Ambil input username dan password
+        username = self.ui.lineEdit.text().strip()
         password = self.ui.lineEdit_2.text().strip()
-        if not email or not password:
-            QtWidgets.QMessageBox.warning(self, "Error", "Email dan Password harus diisi!")
-            return
-        if not os.path.exists("users.txt"):
-            QtWidgets.QMessageBox.warning(self, "Error", "Belum ada user terdaftar!")
-            return
-        login_success = False
-        with open("users.txt", "r") as f:
-            for line in f:
-                parts = line.strip().split(";")
-                if len(parts) == 3:
-                    # parts[0] = nama, parts[1] = email, parts[2] = password
-                    if email == parts[1] and password == parts[2]:
-                        login_success = True
-                        break
-        if login_success:
-            QtWidgets.QMessageBox.information(self, "Sukses", "Login berhasil!")
-            # Buka MainWindow sebagai halaman utama aplikasi
-            from MainWindow import MainWindow
-            self.main_win = MainWindow()
-            self.main_win.show()
-            self.close()
+        
+        if not username or not password:
+            QtWidgets.QMessageBox.warning(self, "Error", "Username dan Password harus diisi!")
+        elif login_user(username, password) != "Login berhasil!":
+            QtWidgets.QMessageBox.warning(self, "Error", login_user(username, password))
         else:
-            QtWidgets.QMessageBox.warning(self, "Error", "Email atau Password salah!")
+            QtWidgets.QMessageBox.information(self, "Sukses", "Login berhasil!")
+
+            self.menu_user = WindowMenuUser()
+            self.menu_user.show()
+
+            self.close()
 
 if __name__ == "__main__":
     import sys
