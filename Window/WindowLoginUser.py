@@ -1,13 +1,13 @@
 # WindowLoginUser.py
-#Nama: Rangga Muhamad Fajar
-#Kelas: 1A - D4
-#NIM: 241524026
-#Desc: - Tampilan login untuk user.
-#      - Memeriksa username dan password dari file 'daftarUsers.json'.
-#      - Jika berhasil, membuka MainWindow (halaman utama aplikasi).
+# Nama: Rangga Muhamad Fajar
+# Kelas: 1A - D4
+# NIM: 241524026
+# Desc: - Tampilan login untuk user.
+#       - Memeriksa username dan password dari file 'daftarUsers.json'.
+#       - Jika berhasil, membuka WindowMenuUser sebagai halaman utama user.
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from daftarUser import login_user
+from daftarUser import login_user 
 import os
 from WindowMenuUser import WindowMenuUser
 
@@ -128,17 +128,16 @@ class WindowLoginUser(QtWidgets.QDialog):
         password = self.ui.lineEdit_2.text().strip()
         
         if not username or not password:
-            QtWidgets.QMessageBox.warning(self, "Error", "Email dan Password harus diisi!")
-        elif login_user(username,password) != "Login berhasil!":
-            QtWidgets.QMessageBox.warning(self, "Error", login_user(username,password))
+            QtWidgets.QMessageBox.warning(self, "Error", "Username dan Password harus diisi!")
+        elif login_user(username, password) != "Login berhasil!":
+            QtWidgets.QMessageBox.warning(self, "Error", login_user(username, password))
         else:
             QtWidgets.QMessageBox.information(self, "Sukses", "Login berhasil!")
-            # Buka MainWindow sebagai halaman utama aplikasi
-            from MainWindow import MainWindow
-            self.main_win = MainWindow()
-            self.main_win.show()
-            self.close()    
 
+            self.menu_user = WindowMenuUser()
+            self.menu_user.show()
+
+            self.close()
 
 if __name__ == "__main__":
     import sys

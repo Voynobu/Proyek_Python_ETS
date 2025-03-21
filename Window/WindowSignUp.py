@@ -36,7 +36,7 @@ class Ui_Dialog(object):
                 border-bottom: 4px solid #ffbd59;
             }
         """)
-        self.lineEdit.setPlaceholderText("Masukkan Username")
+        self.lineEdit.setPlaceholderText("Masukkan Username Anda!")
 
         
         # Field untuk Password
@@ -53,7 +53,7 @@ class Ui_Dialog(object):
                 border-bottom: 4px solid #ffbd59;
             }
         """)
-        self.lineEdit_3.setPlaceholderText("Masukkan Password")
+        self.lineEdit_3.setPlaceholderText("Masukkan Password Anda!")
         self.lineEdit_3.setEchoMode(QtWidgets.QLineEdit.Password)
         
         # Tombol untuk melihat password

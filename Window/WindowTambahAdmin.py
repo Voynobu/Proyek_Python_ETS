@@ -37,7 +37,7 @@ class Ui_Dialog(object):
                 border-bottom: 4px solid #ffbd59;
             }
         """)
-        self.lineEdit.setPlaceholderText("Masukkan Email Anda!")
+        self.lineEdit.setPlaceholderText("Masukkan Username Anda!")
         
         # Field untuk Password
         self.lineEdit_2 = QtWidgets.QLineEdit(Dialog)
