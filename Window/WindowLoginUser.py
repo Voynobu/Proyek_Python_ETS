@@ -3,7 +3,7 @@
 #Kelas: 1A - D4
 #NIM: 241524026
 #Desc: - Tampilan login untuk user.
-#      - Memeriksa username dan password dari file 'users.txt'.
+#      - Memeriksa username dan password dari file 'daftarUsers.json'.
 #      - Jika berhasil, membuka MainWindow (halaman utama aplikasi).
 
 from PyQt5 import QtCore, QtGui, QtWidgets

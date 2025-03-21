@@ -21,50 +21,41 @@ class Register:
         """Membuat hash SHA-256 dari password"""
         return hashlib.sha256(password.encode()).hexdigest()
 
-def register_user():
-    """Fungsi untuk pendaftaran pengguna baru."""
-    username = input("Masukkan username: ")
+def register_user(username, password):
+    """Fungsi untuk pendaftaran pengguna baru dengan return message."""
     if not is_valid_username(username):
-        print("Username tidak boleh mengandung spasi!")
-        return
+        return "Username tidak boleh mengandung spasi!"
     
-    password = input("Masukkan password: ")
-    if not is_valid_password(password):
-        print("Password harus minimal 8 karakter, mengandung setidaknya 1 huruf besar dan 1 simbol!")
-        return
+    elif not is_valid_password(password):
+        return "Password harus minimal 8 karakter, mengandung setidaknya 1 huruf besar dan 1 simbol!"
     
-    if is_username_taken(username):
-        print("Username sudah terdaftar!")
-        return
+    elif is_username_taken(username):
+        return "Username sudah terdaftar!"
     
-    new_user = Register(username, password)
-    users = load_users()
-    users.append({
+    else:
+        new_user = Register(username, password)
+        users = load_users()
+        users.append({
         "username": new_user.username,
         "password": new_user.password
-    })
-    
-    save_users(users)
-    print("Registrasi berhasil!")
+        })
+        save_users(users)
+        return "Registrasi berhasil!"
 
-def login_user():
+def login_user(username, password):
     """Fungsi untuk login pengguna"""
-    username = input("Masukkan username: ")
-    password = input("Masukkan password: ")
-    
+
     users = load_users()
     for user in users:
         if user["username"] == username:
             # Verifikasi password
             hashed_input = Register.hash_password(password)
             if user["password"] == hashed_input:
-                print("Login berhasil!")
-                return
+                return "Login berhasil!"
             else:
-                print("Password salah!")
-                return
+                return "Password salah!"
     
-    print("Username tidak ditemukan!")
+    return("Username tidak ditemukan!")
 
 def is_valid_password(password):
     """Cek apakah password memenuhi syarat minimal."""
