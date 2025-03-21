@@ -13,14 +13,14 @@ class HoverButton(QtWidgets.QPushButton):
         super().__init__(parent)
         self.effect = QtWidgets.QGraphicsOpacityEffect(self)
         self.setGraphicsEffect(self.effect)
-        self.effect.setOpacity(1.0)  # Opasitas normal
+        self.effect.setOpacity(1.0)
 
     def enterEvent(self, event):
-        self.effect.setOpacity(0.7)  # Turunkan opasitas saat hover (misal 70%)
+        self.effect.setOpacity(0.7) 
         super().enterEvent(event)
 
     def leaveEvent(self, event):
-        self.effect.setOpacity(1.0)  # Kembalikan opasitas normal
+        self.effect.setOpacity(1.0)
         super().leaveEvent(event)
 
 

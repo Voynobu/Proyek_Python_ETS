@@ -1,10 +1,3 @@
-# WindowMenuAdmin.py
-# Nama: Rangga Muhamad Fajar
-# Kelas: 1A - D4
-# NIM: 241524026
-# Desc: - Tampilan menu utama bagi admin setelah berhasil login.
-#       - Menampilkan tombol untuk mengedit poli dan dokter.
-
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 class WindowMenuAdmin(QtWidgets.QDialog):
@@ -28,27 +21,36 @@ class WindowMenuAdmin(QtWidgets.QDialog):
         self.pushButton_2 = self.create_button(10, 20, 111, 101, "BACK.png", self.back_to_login)
 
     def create_button(self, x, y, width, height, image_name, action=None):
+        """
+        Membuat tombol dengan efek hover.
+        """
         button = QtWidgets.QPushButton(self)
         button.setGeometry(QtCore.QRect(x, y, width, height))
         button.setStyleSheet(f"border-image: url(C:/Users/Rangga/Documents/KULIAH/SEMESTER 2/PROYEK 1/TUBES PRA ETS/ASSETS/BUTTON/{image_name});")
         button.setText("")
 
-        # Tambahkan efek hover dengan mengubah transparansi
-        effect = QtWidgets.QGraphicsOpacityEffect()
-        button.setGraphicsEffect(effect)
-
-        def on_enter(event):
-            effect.setOpacity(0.7)  # Kurangi opacity saat hover
-        def on_leave(event):
-            effect.setOpacity(1.0)  # Kembalikan opacity saat tidak hover
-
-        button.enterEvent = on_enter
-        button.leaveEvent = on_leave
+        # Tambahkan efek hover
+        self.add_hover_effect(button)
 
         if action:
             button.clicked.connect(action)
 
         return button
+
+    def add_hover_effect(self, button):
+        """
+        Menambahkan efek hover pada tombol.
+        """
+        button.enterEvent = lambda event: self.set_button_opacity(button, 0.7)  # Saat cursor masuk
+        button.leaveEvent = lambda event: self.set_button_opacity(button, 1.0)  # Saat cursor keluar
+
+    def set_button_opacity(self, button, opacity):
+        """
+        Mengatur opacity tombol.
+        """
+        effect = QtWidgets.QGraphicsOpacityEffect(button)
+        effect.setOpacity(opacity)
+        button.setGraphicsEffect(effect)
 
     def back_to_login(self):
         """Fungsi kembali ke halaman login admin."""

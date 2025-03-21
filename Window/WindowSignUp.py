@@ -101,11 +101,14 @@ class Ui_Dialog(object):
     
     def add_hover_effect(self, button):
         # Tambahkan efek hover pada tombol
-        effect = QtWidgets.QGraphicsOpacityEffect()
+        button.enterEvent = lambda event: self.set_button_opacity(button, 0.7)
+        button.leaveEvent = lambda event: self.set_button_opacity(button, 1.0)
+
+    def set_button_opacity(self, button, opacity):
+        # Terapkan efek opacity pada tombol
+        effect = QtWidgets.QGraphicsOpacityEffect(button)
+        effect.setOpacity(opacity)
         button.setGraphicsEffect(effect)
-        button.enterEvent = lambda event: effect.setOpacity(0.7)
-        button.leaveEvent = lambda event: effect.setOpacity(1.0)
-        
 # Kelas pembungkus untuk WindowSignUp
 class WindowSignUp(QtWidgets.QDialog):
     def __init__(self):

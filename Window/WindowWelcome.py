@@ -8,6 +8,25 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 import os
 
+class HoverButton(QtWidgets.QPushButton):
+    def __init__(self, parent=None, image_path=""):
+        super().__init__(parent)
+        self.effect = QtWidgets.QGraphicsOpacityEffect()
+        self.setGraphicsEffect(self.effect)
+        self.effect.setOpacity(1.0)  # default opacity
+        self.image_path = image_path
+        self.setStyleSheet(f"QPushButton {{ border-image: url('{self.image_path}'); }}")
+        self.setMouseTracking(True)  # aktifkan mouse tracking agar enterEvent berfungsi
+
+    def enterEvent(self, event):
+        self.effect.setOpacity(0.7)
+        super().enterEvent(event)
+
+    def leaveEvent(self, event):
+        self.effect.setOpacity(1.0)
+        super().leaveEvent(event)
+
+
 class WindowWelcome(QtWidgets.QDialog):
     def __init__(self):
         super().__init__()
@@ -45,29 +64,19 @@ class WindowWelcome(QtWidgets.QDialog):
         QtCore.QMetaObject.connectSlotsByName(Dialog)
     
     def create_button(self, parent, x, y, width, height, image_path):
-        button = QtWidgets.QPushButton(parent)
+        button = HoverButton(parent, image_path=image_path)
         button.setGeometry(QtCore.QRect(x, y, width, height))
-        self.load_image(button, image_path)
-        button.setObjectName("pushButton")
-        
-        # Tambahkan efek opacity saat hover
-        effect = QtWidgets.QGraphicsOpacityEffect()
-        button.setGraphicsEffect(effect)
-        button.enterEvent = lambda event: effect.setOpacity(0.7)
-        button.leaveEvent = lambda event: effect.setOpacity(1.0)
         
         # Tentukan fungsi klik berdasarkan gambar tombol
         if "BUTTON_LOGIN/1.png" in image_path:
-            # Buka WindowLoginUser (gambar dokter)
             button.clicked.connect(self.open_login_user)
         elif "BUTTON_LOGIN/2.png" in image_path:
-            # Buka WindowLoginAdmin (gambar paramedis)
             button.clicked.connect(self.open_login_admin)
         elif "BUTTON_LOGIN/3.png" in image_path:
-            # Buka WindowSignUp
             button.clicked.connect(self.open_sign_up_window)
         
         return button
+
     
     def load_image(self, widget, image_path):
         # Muat gambar jika file ditemukan, atur style untuk tombol jika bukan label

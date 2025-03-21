@@ -94,10 +94,15 @@ class Ui_Dialog(object):
             self.lineEdit_2.setEchoMode(QtWidgets.QLineEdit.Password)
     
     def add_hover_effect(self, button):
-        effect = QtWidgets.QGraphicsOpacityEffect()
+        # Tambahkan efek hover pada tombol
+        button.enterEvent = lambda event: self.set_button_opacity(button, 0.7)
+        button.leaveEvent = lambda event: self.set_button_opacity(button, 1.0)
+
+    def set_button_opacity(self, button, opacity):
+        # Terapkan efek opacity pada tombol
+        effect = QtWidgets.QGraphicsOpacityEffect(button)
+        effect.setOpacity(opacity)
         button.setGraphicsEffect(effect)
-        button.enterEvent = lambda event: effect.setOpacity(0.7)
-        button.leaveEvent = lambda event: effect.setOpacity(1.0)
 
 # Kelas pembungkus untuk WindowLoginAdmin
 class WindowLoginAdmin(QtWidgets.QDialog):
