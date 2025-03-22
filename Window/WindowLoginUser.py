@@ -7,7 +7,7 @@
 #       - Jika berhasil, membuka WindowMenuUser sebagai halaman utama user.
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from daftarUser import login_user 
+from Register import Register, login_user 
 import os
 from WindowMenuUser import WindowMenuUser
 
@@ -134,7 +134,7 @@ class WindowLoginUser(QtWidgets.QDialog):
         else:
             QtWidgets.QMessageBox.information(self, "Sukses", "Login berhasil!")
 
-            self.menu_user = WindowMenuUser()
+            self.menu_user = WindowMenuUser(username)
             self.menu_user.show()
 
             self.close()

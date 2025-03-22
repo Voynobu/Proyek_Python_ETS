@@ -8,12 +8,13 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 class WindowMenuUser(QtWidgets.QDialog):
-    def __init__(self):
+    def __init__(self, username):
         super().__init__()
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint)  # Menghilangkan border window
         self.setFixedSize(1600, 900)
         self.initUI()
         self.oldPos = None  # Untuk mendukung dragging window
+        self.username = username
 
     def initUI(self):
         # Background
@@ -24,6 +25,7 @@ class WindowMenuUser(QtWidgets.QDialog):
 
         # Tombol-tombol dengan efek hover
         self.pushButton = self.create_button(1012, 170, 557, 328, "PENDAFTARAN.png")
+        self.pushButton.clicked.connect(self.open_pendaftaran)
         self.pushButton_3 = self.create_button(686, 171, 331, 329, "RIWAYAT.png")
         self.pushButton_4 = self.create_button(673, 514, 512, 337, "LIHAT_POLI.png")
         self.pushButton_5 = self.create_button(1166, 520, 404, 329, "BATAL_DAFTAR.png")
@@ -62,9 +64,16 @@ class WindowMenuUser(QtWidgets.QDialog):
         self.login_win.show()
         self.close()
 
+    def open_pendaftaran(self):
+        from WindowPendaftaranPasien import WindowPendaftaranPasien
+        self.pendaftaran_window = WindowPendaftaranPasien(self.username)
+        self.pendaftaran_window.show()
+        self.close()
+        
+    
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
-    window = WindowMenuUser()
+    window = WindowMenuUser("test")
     window.show()
     sys.exit(app.exec_())

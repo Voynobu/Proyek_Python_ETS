@@ -1,0 +1,24 @@
+{
+    "ivan": [
+        {
+            "nama": "ivan",
+            "jenis_kelamin": "Pria",
+            "tanggal_lahir": "29-07-2025",
+            "jenis_layanan": "Mandiri",
+            "poli": "umum",
+            "dokter": "dokter anwar",
+            "tanggal_temu": "sakit perut",
+            "keluhan": "23-03-2025"
+        },
+        {
+            "nama": "test",
+            "jenis_kelamin": "Pria",
+            "tanggal_lahir": "22-03-2025",
+            "jenis_layanan": "Mandiri",
+            "poli": "mata",
+            "dokter": "dokter azhar",
+            "tanggal_temu": "tesst",
+            "keluhan": "23-03-2025"
+        }
+    ]
+}
