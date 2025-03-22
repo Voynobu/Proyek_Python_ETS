@@ -1,4 +1,3 @@
-# Tampilan admin (edit poli, dokter, biaya)
 # WindowEditJadwal.py
 # Nama: Rangga Muhamad Fajar
 # Kelas: 1A - D4
@@ -14,14 +13,14 @@ class HoverButton(QtWidgets.QPushButton):
         super().__init__(parent)
         self.effect = QtWidgets.QGraphicsOpacityEffect(self)
         self.setGraphicsEffect(self.effect)
-        self.effect.setOpacity(1.0)  # Opasitas normal
+        self.effect.setOpacity(1.0)
 
     def enterEvent(self, event):
-        self.effect.setOpacity(0.7)  # Turunkan opasitas saat hover (misal 70%)
+        self.effect.setOpacity(0.7) 
         super().enterEvent(event)
 
     def leaveEvent(self, event):
-        self.effect.setOpacity(1.0)  # Kembalikan opasitas normal
+        self.effect.setOpacity(1.0)
         super().leaveEvent(event)
 
 
@@ -45,6 +44,7 @@ class Ui_Dialog(object):
             "}"
         )
         self.lineEdit_2.setObjectName("lineEdit_2")
+        self.lineEdit_2.setPlaceholderText("Masukkan Jam Awal (Format: HH:MM)")
         
         self.lineEdit_1 = QtWidgets.QLineEdit(Dialog)
         self.lineEdit_1.setGeometry(QtCore.QRect(154, 554, 648, 51))
@@ -60,6 +60,7 @@ class Ui_Dialog(object):
             "}"
         )
         self.lineEdit_1.setObjectName("lineEdit_1")
+        self.lineEdit_1.setPlaceholderText("Masukkan Hari (Contoh: Monday)")
         
         # Gunakan HoverButton sebagai push button dengan efek hover
         self.pushButton_4 = HoverButton(Dialog)
@@ -91,6 +92,7 @@ class Ui_Dialog(object):
             "}"
         )
         self.lineEdit_3.setObjectName("lineEdit_3")
+        self.lineEdit_3.setPlaceholderText("Masukkan Jam Akhir (Format: HH:MM)")
         
         self.pushButton_1 = HoverButton(Dialog)
         self.pushButton_1.setGeometry(QtCore.QRect(848, 364, 601, 129))
@@ -151,11 +153,14 @@ class Ui_Dialog(object):
             "}"
         )
         self.comboBox_2.setObjectName("comboBox_2")
-        self.comboBox_2.addItem("")
-        self.comboBox_2.addItem("")
-        self.comboBox_2.addItem("")
-        self.comboBox_2.addItem("")
-        self.comboBox_2.addItem("")
+        self.comboBox_2.addItem("Pilih Poli")
+        self.comboBox_2.addItem("POLI JANTUNG")
+        self.comboBox_2.addItem("POLI MATA")
+        self.comboBox_2.addItem("POLI THT-KL")
+        self.comboBox_2.addItem("POLI SARAF")
+        self.comboBox_2.addItem("POLI ANAK")
+        self.comboBox_2.setCurrentIndex(0)
+        self.comboBox_2.model().item(0).setEnabled(False)
         
         self.comboBox_3 = QtWidgets.QComboBox(Dialog)
         self.comboBox_3.setGeometry(QtCore.QRect(154, 467, 648, 51))
@@ -186,11 +191,14 @@ class Ui_Dialog(object):
             "}"
         )
         self.comboBox_3.setObjectName("comboBox_3")
-        self.comboBox_3.addItem("")
-        self.comboBox_3.addItem("")
-        self.comboBox_3.addItem("")
-        self.comboBox_3.addItem("")
-        self.comboBox_3.addItem("")
+        self.comboBox_3.addItem("Pilih Dokter")
+        self.comboBox_3.addItem("Dr. Asep (Kardiolog)")
+        self.comboBox_3.addItem("Dr. Ahmad (Oftalmolog)")
+        self.comboBox_3.addItem("Dr. Messi (Spesialis THT-KH)")
+        self.comboBox_3.addItem("Dr. Jajang (Neurolog)")
+        self.comboBox_3.addItem("Dr. Radhit (Pediatrik Gawat Darurat)")
+        self.comboBox_3.setCurrentIndex(0)
+        self.comboBox_3.model().item(0).setEnabled(False)
         
         # Atur urutan tampilan widget
         self.label.raise_()
@@ -210,19 +218,6 @@ class Ui_Dialog(object):
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "Splash Screen"))
-        self.lineEdit_2.setText(_translate("Dialog", "Masukkan Jam Awal (Format: HH:MM)"))
-        self.lineEdit_1.setText(_translate("Dialog", "Masukkan Hari (Contoh: Monday)"))
-        self.lineEdit_3.setText(_translate("Dialog", "Masukkan Jam Akhir (Format: HH:MM)"))
-        self.comboBox_2.setItemText(0, _translate("Dialog", "POLI JANTUNG"))
-        self.comboBox_2.setItemText(1, _translate("Dialog", "POLI MATA"))
-        self.comboBox_2.setItemText(2, _translate("Dialog", "POLI THT-KL"))
-        self.comboBox_2.setItemText(3, _translate("Dialog", "POLI SARAF"))
-        self.comboBox_2.setItemText(4, _translate("Dialog", "POLI ANAK"))
-        self.comboBox_3.setItemText(0, _translate("Dialog", "Dr. Asep (Kardiolog)"))
-        self.comboBox_3.setItemText(1, _translate("Dialog", "Dr. Ahmad (Oftalmolog)"))
-        self.comboBox_3.setItemText(2, _translate("Dialog", "Dr. Messi (Spesialis THT-KH)"))
-        self.comboBox_3.setItemText(3, _translate("Dialog", "Dr. Jajang (Neurolog)"))
-        self.comboBox_3.setItemText(4, _translate("Dialog", "Dr. Radhit (Pediatrik Gawat Darurat)"))
 
 if __name__ == "__main__":
     import sys

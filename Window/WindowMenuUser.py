@@ -1,10 +1,3 @@
-# WindowMenuUser.py
-# Nama: Rangga Muhamad Fajar
-# Kelas: 1A - D4
-# NIM: 241524026
-# Desc: - Tampilan menu utama bagi user setelah berhasil login.
-#       - Menampilkan beberapa tombol menu: Pendaftaran, Riwayat, Lihat Poli, dan Batalkan Pendaftaran.
-
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 class WindowMenuUser(QtWidgets.QDialog):
@@ -40,22 +33,28 @@ class WindowMenuUser(QtWidgets.QDialog):
         button.setStyleSheet(f"border-image: url(C:/Users/Rangga/Documents/KULIAH/SEMESTER 2/PROYEK 1/TUBES PRA ETS/ASSETS/BUTTON/{image_name});")
         button.setText("")
 
-        # Tambahkan efek hover dengan mengubah transparansi
-        effect = QtWidgets.QGraphicsOpacityEffect()
-        button.setGraphicsEffect(effect)
-
-        def on_enter(event):
-            effect.setOpacity(0.7)  # Kurangi opacity saat hover
-        def on_leave(event):
-            effect.setOpacity(1.0)  # Kembalikan opacity saat tidak hover
-
-        button.enterEvent = on_enter
-        button.leaveEvent = on_leave
+        # Tambahkan efek hover
+        self.add_hover_effect(button)
 
         if action:
             button.clicked.connect(action)
 
         return button
+
+    def add_hover_effect(self, button):
+        """
+        Menambahkan efek hover pada tombol.
+        """
+        button.enterEvent = lambda event: self.set_button_opacity(button, 0.7)  # Saat cursor masuk
+        button.leaveEvent = lambda event: self.set_button_opacity(button, 1.0)  # Saat cursor keluar
+
+    def set_button_opacity(self, button, opacity):
+        """
+        Mengatur opacity tombol.
+        """
+        effect = QtWidgets.QGraphicsOpacityEffect(button)
+        effect.setOpacity(opacity)
+        button.setGraphicsEffect(effect)
 
     def back_to_login(self):
         """Fungsi kembali ke halaman login user."""
