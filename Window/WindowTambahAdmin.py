@@ -6,27 +6,36 @@
 #       - Memeriksa username dan password dari file 'daftarUsers.json'.
 #       - Jika berhasil, membuka WindowMenuUser sebagai halaman utama user.
 
+#Nama : Muhamad Dino Dermawan
+#Nim  : 241526015
+
 from PyQt5 import QtCore, QtGui, QtWidgets
-from daftarUser import login_user 
+import json
 import os
-from WindowMenuUser import WindowMenuUser
 
-class Ui_Dialog(object):
-    def setupUi(self, Dialog):
-        Dialog.setObjectName("Dialog")
-        Dialog.resize(1600, 900)
-        Dialog.setWindowFlags(QtCore.Qt.FramelessWindowHint)
-        
-        # Set background untuk login user
-        self.label = QtWidgets.QLabel(Dialog)
-        self.label.setGeometry(QtCore.QRect(-4, 0, 1611, 901))
-        self.label.setPixmap(QtGui.QPixmap("C:/ASSETS/BACKGROUND/7.png"))
-        self.label.setScaledContents(True)
-        
-        # Field untuk Email
-        self.lineEdit = QtWidgets.QLineEdit(Dialog)
-        self.lineEdit.setGeometry(QtCore.QRect(200, 390, 521, 61))
-        self.lineEdit.setStyleSheet("""
+class Ui_WindowTambahAdmin(object):
+    def __init__(self, parent_window=None):
+        self.parent_window = parent_window
+
+    def setupUi(self, windowTambahAdmin):
+        self.windowTambahAdmin = windowTambahAdmin
+        windowTambahAdmin.setObjectName("windowTambahAdmin")
+        windowTambahAdmin.resize(1600, 900)
+        windowTambahAdmin.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+
+        self.centralwidget = QtWidgets.QWidget(windowTambahAdmin)
+
+        # Background
+        self.bg = QtWidgets.QLabel(self.centralwidget)
+        self.bg.setGeometry(QtCore.QRect(0, 0, 1600, 900))
+        self.bg.setPixmap(QtGui.QPixmap("C:/ASSETS/BACKGROUND/7.png"))
+        self.bg.setScaledContents(True)
+
+        # Input Username
+        self.input_username = QtWidgets.QLineEdit(self.centralwidget)
+        self.input_username.setGeometry(QtCore.QRect(200, 390, 521, 61))
+        self.input_username.setPlaceholderText("Masukkan Username")
+        self.input_username.setStyleSheet("""
             QLineEdit {
                 color: black;
                 border: none;
@@ -37,12 +46,13 @@ class Ui_Dialog(object):
                 border-bottom: 4px solid #ffbd59;
             }
         """)
-        self.lineEdit.setPlaceholderText("Masukkan Username Anda!")
-        
-        # Field untuk Password
-        self.lineEdit_2 = QtWidgets.QLineEdit(Dialog)
-        self.lineEdit_2.setGeometry(QtCore.QRect(200, 520, 521, 61))
-        self.lineEdit_2.setStyleSheet("""
+
+        # Input Password
+        self.input_password = QtWidgets.QLineEdit(self.centralwidget)
+        self.input_password.setGeometry(QtCore.QRect(200, 520, 521, 61))
+        self.input_password.setPlaceholderText("Masukkan Password")
+        self.input_password.setEchoMode(QtWidgets.QLineEdit.Password)
+        self.input_password.setStyleSheet("""
             QLineEdit {
                 color: black;
                 border: none;
@@ -53,102 +63,97 @@ class Ui_Dialog(object):
                 border-bottom: 4px solid #ffbd59;
             }
         """)
-        self.lineEdit_2.setPlaceholderText("Masukkan Password Anda!")
-        self.lineEdit_2.setEchoMode(QtWidgets.QLineEdit.Password)
-        
-        # Tombol untuk melihat password
-        self.show_password_button = QtWidgets.QPushButton(Dialog)
-        self.show_password_button.setGeometry(QtCore.QRect(676, 520, 61, 61))
-        self.show_password_button.setStyleSheet("border: none;")
-        self.show_password_button.setIcon(QtGui.QIcon("C:/ASSETS/BUTTON/EYE.png"))
-        self.show_password_button.setIconSize(QtCore.QSize(40, 40))
-        self.show_password_button.setCheckable(True)
-        self.show_password_button.clicked.connect(self.toggle_password)
-        
-        # Tombol Login
-        self.pushButton = QtWidgets.QPushButton(Dialog)
-        self.pushButton.setGeometry(QtCore.QRect(330, 660, 251, 91))
-        self.pushButton.setStyleSheet("border-image: url(C:/ASSETS/BUTTON/LOGIN.png);")
-        self.add_hover_effect(self.pushButton)
-        
-        # Tombol Back
-        self.pushButton_2 = QtWidgets.QPushButton(Dialog)
-        self.pushButton_2.setGeometry(QtCore.QRect(10, 20, 111, 101))
-        self.pushButton_2.setStyleSheet("border-image: url(C:/ASSETS/BUTTON/BACK.png);")
-        self.add_hover_effect(self.pushButton_2)
-        
-        self.label.raise_()
-        self.pushButton.raise_()
-        self.lineEdit.raise_()
-        self.lineEdit_2.raise_()
-        self.show_password_button.raise_()
-        self.pushButton_2.raise_()
-        
-        self.retranslateUi(Dialog)
-        QtCore.QMetaObject.connectSlotsByName(Dialog)
-    
-    def retranslateUi(self, Dialog):
-        _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", "Login User"))
-    
+
+        # Show/Hide Password Button
+        self.btn_show_password = QtWidgets.QPushButton(self.centralwidget)
+        self.btn_show_password.setGeometry(QtCore.QRect(676, 520, 61, 61))
+        self.btn_show_password.setStyleSheet("border: none;")
+        self.btn_show_password.setIcon(QtGui.QIcon("C:/ASSETS/BUTTON/EYE.png"))
+        self.btn_show_password.setIconSize(QtCore.QSize(40, 40))
+        self.btn_show_password.setCheckable(True)
+        self.btn_show_password.clicked.connect(self.toggle_password)
+
+        # Save Admin Button
+        self.btn_simpan = QtWidgets.QPushButton(self.centralwidget)
+        self.btn_simpan.setGeometry(QtCore.QRect(330, 660, 251, 91))
+        self.btn_simpan.setStyleSheet("border-image: url(C:/ASSETS/BUTTON/LOGIN.png);")
+        self.add_hover_effect(self.btn_simpan)
+        self.btn_simpan.clicked.connect(self.simpanAdmin)
+
+        # Back Button
+        self.btn_kembali = QtWidgets.QPushButton(self.centralwidget)
+        self.btn_kembali.setGeometry(QtCore.QRect(10, 20, 111, 101))
+        self.btn_kembali.setStyleSheet("border-image: url(C:/ASSETS/BUTTON/BACK.png);")
+        self.add_hover_effect(self.btn_kembali)
+        self.btn_kembali.clicked.connect(self.kembali)
+
+        windowTambahAdmin.setCentralWidget(self.centralwidget)
+
     def toggle_password(self):
-        # Ubah mode tampilan password
-        if self.show_password_button.isChecked():
-            self.lineEdit_2.setEchoMode(QtWidgets.QLineEdit.Normal)
+        if self.btn_show_password.isChecked():
+            self.input_password.setEchoMode(QtWidgets.QLineEdit.Normal)
         else:
-            self.lineEdit_2.setEchoMode(QtWidgets.QLineEdit.Password)
-    
+            self.input_password.setEchoMode(QtWidgets.QLineEdit.Password)
+
     def add_hover_effect(self, button):
-        # Tambahkan efek hover pada tombol
-        button.enterEvent = lambda event: self.set_button_opacity(button, 0.7)
-        button.leaveEvent = lambda event: self.set_button_opacity(button, 1.0)
-
-    def set_button_opacity(self, button, opacity):
-        # Terapkan efek opacity pada tombol
         effect = QtWidgets.QGraphicsOpacityEffect(button)
-        effect.setOpacity(opacity)
         button.setGraphicsEffect(effect)
+        button.enterEvent = lambda event: effect.setOpacity(0.7)
+        button.leaveEvent = lambda event: effect.setOpacity(1.0)
 
-# Kelas pembungkus untuk WindowLoginUser
-class WindowLoginUser(QtWidgets.QDialog):
-    def __init__(self):
-        super().__init__()
-        self.ui = Ui_Dialog()
-        self.ui.setupUi(self)
-        # Tombol Back kembali ke WindowWelcome
-        self.ui.pushButton_2.clicked.connect(self.back_to_welcome)
-        # Tombol Login melakukan proses verifikasi login
-        self.ui.pushButton.clicked.connect(self.handle_login)
-    
-    def back_to_welcome(self):
-        from WindowWelcome import WindowWelcome
-        self.welcome = WindowWelcome()
-        self.welcome.show()
-        self.close()
-    
-    def handle_login(self):
-        # Ambil input username dan password
-        username = self.ui.lineEdit.text().strip()
-        password = self.ui.lineEdit_2.text().strip()
-        
+    def simpanAdmin(self):
+        username = self.input_username.text().strip()
+        password = self.input_password.text().strip()
+
         if not username or not password:
-            QtWidgets.QMessageBox.warning(self, "Error", "Username dan Password harus diisi!")
-        elif login_user(username, password) != "Login berhasil!":
-            QtWidgets.QMessageBox.warning(self, "Error", login_user(username, password))
-        else:
-            QtWidgets.QMessageBox.information(self, "Sukses", "Login berhasil!")
+            QtWidgets.QMessageBox.warning(None, "Gagal", "Username dan password tidak boleh kosong.")
+            return
 
-            self.menu_user = WindowMenuUser()
-            self.menu_user.show()
+        if self.username_sudah_ada(username):
+            QtWidgets.QMessageBox.warning(None, "Gagal", "Username sudah ada.")
+            return
 
-            self.close()
+        self.simpan_ke_json(username, password)
+        QtWidgets.QMessageBox.information(None, "Sukses", "Admin baru berhasil ditambahkan.")
+        self.input_username.clear()
+        self.input_password.clear()
+
+    def username_sudah_ada(self, username):
+        if not os.path.exists("admins.json"):
+            return False
+
+        with open("admins.json", "r") as file:
+            data = json.load(file)
+
+        return any(admin["username"] == username for admin in data.get("admins", []))
+
+    def simpan_ke_json(self, username, password):
+        try:
+            if not os.path.exists("admins.json"):
+                data = {"admins": []}
+            else:
+                with open("admins.json", "r") as file:
+                    data = json.load(file)
+
+            data["admins"].append({"username": username, "password": password})
+
+            with open("admins.json", "w") as file:
+                json.dump(data, file, indent=4)
+
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(None, "Error", f"Gagal menyimpan data: {e}")
+
+    def kembali(self):
+        self.windowTambahAdmin.close()
+        if self.parent_window:
+            self.parent_window.enableWindow()
 
 
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
-    Dialog = QtWidgets.QDialog()
-    ui = Ui_Dialog()
-    ui.setupUi(Dialog)
-    Dialog.show()
+    windowTambahAdmin = QtWidgets.QMainWindow()
+    ui = Ui_WindowTambahAdmin()
+    ui.setupUi(windowTambahAdmin)
+    windowTambahAdmin.show()
     sys.exit(app.exec_())
