@@ -3,7 +3,7 @@
 # Kelas: 1A - D4
 # NIM: 241524026
 # Desc: - Program ini merupakan antarmuka utama menu admin untuk sistem pendaftaran rumah sakit.
-#       - Program menampilkan background dan tombol-tombol interaktif untuk mengelola jadwal poli dan data admin.
+#       - Program menampilkan tombol-tombol interaktif untuk mengelola jadwal, poli, dokter dan data admin.
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 

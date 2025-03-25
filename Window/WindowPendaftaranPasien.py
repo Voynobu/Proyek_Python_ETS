@@ -114,10 +114,11 @@ class WindowPendaftaranPasien(QDialog):
         # Tombol Daftar (Submit) dengan gambar melalui styleSheet (HoverButton)
         self.daftar = HoverButton(self)
         self.daftar.setGeometry(QtCore.QRect(686, 741, 282, 88))
-        self.daftar.setStyleSheet("border-image: url(C:/ASSETS/BUTTON/SUBMIT.png); background: transparent; border: none;")
+        self.daftar.setStyleSheet("border-image: url(C:/ASSETS/BUTTON/DAFTAR.png); background: transparent; border: none;")
         self.daftar.clicked.connect(self.daftar_pasien)
         
         self.loadData()
+        
     
     def loadData(self):
         """Membaca file JSON dan mengisi dropdown poliklinik."""
