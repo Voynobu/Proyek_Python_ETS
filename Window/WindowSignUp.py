@@ -7,7 +7,7 @@
 #      - Data user disimpan ke file 'users.txt'.
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from daftarUser import register_user 
+from Register import register_user 
 import os
 
 class Ui_Dialog(object):

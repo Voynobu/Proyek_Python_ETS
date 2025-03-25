@@ -217,7 +217,7 @@ class Ui_Dialog(object):
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", "Splash Screen"))
+        Dialog.setWindowTitle(_translate("Dialog", "Window Edit Jadwal"))
 
 if __name__ == "__main__":
     import sys
