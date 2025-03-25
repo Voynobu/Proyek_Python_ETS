@@ -28,7 +28,7 @@ class WindowPendaftaranPasien(QWidget):
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
         self.label_background = QtWidgets.QLabel(self)
         self.label_background.setGeometry(QtCore.QRect(0, 0, 1600, 900))
-        self.label_background.setPixmap(QtGui.QPixmap("C:/Users/Rangga/Documents/KULIAH/SEMESTER 2/PROYEK 1/TUBES PRA ETS/ASSETS/BACKGROUND/8.png"))
+        self.label_background.setPixmap(QtGui.QPixmap("C:/ASSETS/BACKGROUND/8.png"))
         self.label_background.setScaledContents(True)
         self.label_background.setObjectName("label_background")
 
@@ -91,7 +91,7 @@ class WindowPendaftaranPasien(QWidget):
         # Tombol Back dengan transparansi
         self.label_back = QtWidgets.QLabel(self)
         self.label_back.setGeometry(QtCore.QRect(10, 20, 134, 103))
-        self.label_back.setPixmap(QtGui.QPixmap("C:/Users/Rangga/Documents/KULIAH/SEMESTER 2/PROYEK 1/TUBES PRA ETS/ASSETS/BUTTON/BACK.png"))
+        self.label_back.setPixmap(QtGui.QPixmap("C:/ASSETS/BUTTON/BACK.png"))
 
         self.back = QtWidgets.QPushButton(self)
         self.back.setGeometry(QtCore.QRect(11, 22, 134, 103))
@@ -101,7 +101,7 @@ class WindowPendaftaranPasien(QWidget):
         # Tombol Daftar dengan transparansi
         self.label_daftar = QtWidgets.QLabel(self)
         self.label_daftar.setGeometry(QtCore.QRect(680, 740, 291, 91))
-        self.label_daftar.setPixmap(QtGui.QPixmap("C:/Users/Rangga/Documents/KULIAH/SEMESTER 2/PROYEK 1/TUBES PRA ETS/ASSETS/BUTTON/SUBMIT.png"))
+        self.label_daftar.setPixmap(QtGui.QPixmap("C:/ASSETS/BUTTON/SUBMIT.png"))
 
         self.daftar = QtWidgets.QPushButton(self)
         self.daftar.setGeometry(QtCore.QRect(686, 741, 282, 88))

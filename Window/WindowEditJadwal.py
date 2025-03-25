@@ -66,7 +66,7 @@ class Ui_Dialog(object):
         self.pushButton_4 = HoverButton(Dialog)
         self.pushButton_4.setGeometry(QtCore.QRect(10, 20, 111, 101))
         self.pushButton_4.setStyleSheet(
-            "border-image: url(C:/Users/Rangga/Documents/KULIAH/SEMESTER 2/PROYEK 1/TUBES PRA ETS/ASSETS/BUTTON/BACK.png);"
+            "border-image: url(C:/ASSETS/BUTTON/BACK.png);"
         )
         self.pushButton_4.setText("")
         self.pushButton_4.setObjectName("pushButton_4")
@@ -74,7 +74,7 @@ class Ui_Dialog(object):
         self.label = QtWidgets.QLabel(Dialog)
         self.label.setGeometry(QtCore.QRect(-4, 0, 1611, 901))
         self.label.setText("")
-        self.label.setPixmap(QtGui.QPixmap("C:/Users/Rangga/Documents/KULIAH/SEMESTER 2/PROYEK 1/TUBES PRA ETS/ASSETS//BACKGROUND/9.png"))
+        self.label.setPixmap(QtGui.QPixmap("C:/ASSETS//BACKGROUND/9.png"))
         self.label.setScaledContents(True)
         self.label.setObjectName("label")
         
@@ -98,7 +98,7 @@ class Ui_Dialog(object):
         self.pushButton_1.setGeometry(QtCore.QRect(848, 364, 601, 129))
         self.pushButton_1.setStyleSheet(
             "QPushButton {"
-            "    border-image: url(C:/Users/Rangga/Documents/KULIAH/SEMESTER 2/PROYEK 1/TUBES PRA ETS/ASSETS/BUTTON/TAMBAH_JADWAL.png);"
+            "    border-image: url(C:/ASSETS/BUTTON/TAMBAH_JADWAL.png);"
             "}"
         )
         self.pushButton_1.setText("")
@@ -108,7 +108,7 @@ class Ui_Dialog(object):
         self.pushButton_2.setGeometry(QtCore.QRect(848, 507, 601, 129))
         self.pushButton_2.setStyleSheet(
             "QPushButton {"
-            "    border-image: url(C:/Users/Rangga/Documents/KULIAH/SEMESTER 2/PROYEK 1/TUBES PRA ETS/ASSETS/BUTTON/UPDATE_JADWAL.png);"
+            "    border-image: url(C:/ASSETS/BUTTON/UPDATE_JADWAL.png);"
             "}"
         )
         self.pushButton_2.setText("")
@@ -118,7 +118,7 @@ class Ui_Dialog(object):
         self.pushButton_3.setGeometry(QtCore.QRect(848, 652, 601, 129))
         self.pushButton_3.setStyleSheet(
             "QPushButton {"
-            "    border-image: url(C:/Users/Rangga/Documents/KULIAH/SEMESTER 2/PROYEK 1/TUBES PRA ETS/ASSETS/BUTTON/HAPUS_JADWAL.png);"
+            "    border-image: url(C:/ASSETS/BUTTON/HAPUS_JADWAL.png);"
             "}"
         )
         self.pushButton_3.setText("")
@@ -146,7 +146,7 @@ class Ui_Dialog(object):
             "    subcontrol-position: center right;"
             "}"
             "QComboBox::down-arrow {"
-            "    image: url(C:/Users/Rangga/Documents/KULIAH/SEMESTER 2/PROYEK 1/TUBES PRA ETS/ASSETS/BUTTON/ARROW.png);"
+            "    image: url(C:/ASSETS/BUTTON/ARROW.png);"
             "    width: 50px;"
             "    height: 50px;"
             "    margin-right: 20px;"

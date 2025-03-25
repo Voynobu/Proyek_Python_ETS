@@ -14,12 +14,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setWindowTitle("Main Window")
         self.setGeometry(100, 100, 1600, 900)
         self.initUI()
-    
-    def initUI(self):
-        # Menampilkan label selamat datang di tengah window
-        label = QtWidgets.QLabel("Selamat Datang di Aplikasi!", self)
-        label.setAlignment(QtCore.Qt.AlignCenter)
-        self.setCentralWidget(label)
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)

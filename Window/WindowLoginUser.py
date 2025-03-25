@@ -20,7 +20,7 @@ class Ui_Dialog(object):
         # Set background untuk login user
         self.label = QtWidgets.QLabel(Dialog)
         self.label.setGeometry(QtCore.QRect(-4, 0, 1611, 901))
-        self.label.setPixmap(QtGui.QPixmap("C:/Users/Rangga/Documents/KULIAH/SEMESTER 2/PROYEK 1/TUBES PRA ETS/ASSETS/BACKGROUND/3.png"))
+        self.label.setPixmap(QtGui.QPixmap("C:/ASSETS/BACKGROUND/3.png"))
         self.label.setScaledContents(True)
         
         # Field untuk Email
@@ -60,7 +60,7 @@ class Ui_Dialog(object):
         self.show_password_button = QtWidgets.QPushButton(Dialog)
         self.show_password_button.setGeometry(QtCore.QRect(676, 520, 61, 61))
         self.show_password_button.setStyleSheet("border: none;")
-        self.show_password_button.setIcon(QtGui.QIcon("C:/Users/Rangga/Documents/KULIAH/SEMESTER 2/PROYEK 1/TUBES PRA ETS/BUTTON/BUTTON/EYE.png"))
+        self.show_password_button.setIcon(QtGui.QIcon("C:/ASSETS/BUTTON/EYE.png"))
         self.show_password_button.setIconSize(QtCore.QSize(40, 40))
         self.show_password_button.setCheckable(True)
         self.show_password_button.clicked.connect(self.toggle_password)
@@ -68,13 +68,13 @@ class Ui_Dialog(object):
         # Tombol Login
         self.pushButton = QtWidgets.QPushButton(Dialog)
         self.pushButton.setGeometry(QtCore.QRect(330, 660, 251, 91))
-        self.pushButton.setStyleSheet("border-image: url(C:/Users/Rangga/Documents/KULIAH/SEMESTER 2/PROYEK 1/TUBES PRA ETS/BUTTON/BUTTON/LOGIN.png);")
+        self.pushButton.setStyleSheet("border-image: url(C:/ASSETS/BUTTON/LOGIN.png);")
         self.add_hover_effect(self.pushButton)
         
         # Tombol Back
         self.pushButton_2 = QtWidgets.QPushButton(Dialog)
         self.pushButton_2.setGeometry(QtCore.QRect(10, 20, 111, 101))
-        self.pushButton_2.setStyleSheet("border-image: url(C:/Users/Rangga/Documents/KULIAH/SEMESTER 2/PROYEK 1/TUBES PRA ETS/BUTTON/BUTTON/BACK.png);")
+        self.pushButton_2.setStyleSheet("border-image: url(C:/ASSETS/BUTTON/BACK.png);")
         self.add_hover_effect(self.pushButton_2)
         
         self.label.raise_()

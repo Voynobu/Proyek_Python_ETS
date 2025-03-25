@@ -1,3 +1,10 @@
+# WindowMenuAdmin.py
+# Nama: Rangga Muhamad Fajar
+# Kelas: 1A - D4
+# NIM: 241524026
+# Desc: - Program ini merupakan antarmuka utama menu admin untuk sistem pendaftaran rumah sakit.
+#       - Program menampilkan background dan tombol-tombol interaktif untuk mengelola jadwal poli dan data admin.
+
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 class WindowMenuAdmin(QtWidgets.QDialog):
@@ -12,7 +19,7 @@ class WindowMenuAdmin(QtWidgets.QDialog):
         # Background
         self.label = QtWidgets.QLabel(self)
         self.label.setGeometry(QtCore.QRect(-4, 0, 1611, 901))
-        self.label.setPixmap(QtGui.QPixmap("C:/Users/Rangga/Documents/KULIAH/SEMESTER 2/PROYEK 1/TUBES PRA ETS/ASSETS/BACKGROUND/6.png"))
+        self.label.setPixmap(QtGui.QPixmap("C:/ASSETS/BACKGROUND/6.png"))
         self.label.setScaledContents(True)
 
         # Tombol-tombol dengan efek hover
@@ -26,7 +33,7 @@ class WindowMenuAdmin(QtWidgets.QDialog):
         """
         button = QtWidgets.QPushButton(self)
         button.setGeometry(QtCore.QRect(x, y, width, height))
-        button.setStyleSheet(f"border-image: url(C:/Users/Rangga/Documents/KULIAH/SEMESTER 2/PROYEK 1/TUBES PRA ETS/ASSETS/BUTTON/{image_name});")
+        button.setStyleSheet(f"border-image: url(C:/ASSETS/BUTTON/{image_name});")
         button.setText("")
 
         # Tambahkan efek hover

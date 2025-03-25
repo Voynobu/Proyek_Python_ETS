@@ -22,12 +22,12 @@ class WindowSplashScreen(QtWidgets.QDialog):
         self.label = QtWidgets.QLabel(self)
         self.label.setGeometry(0, 0, 1600, 900)
 
-        image_path = "C:/Users/Rangga/Documents/KULIAH/SEMESTER 2/PROYEK 1/TUBES PRA ETS/ASSETS/BACKGROUND/SPLASH.png"
+        image_path = "C:/ASSETS/BACKGROUND/SPLASH.png"
         self.load_image(self.label, image_path)
         self.label.setScaledContents(True)
 
         self.player = QMediaPlayer()
-        sound_path = "C:/Users/Rangga/Documents/KULIAH/SEMESTER 2/PROYEK 1/TUBES PRA ETS/ASSETS/SOUND/SOUND_SPLASHSCREEN.mp3"
+        sound_path = "C:/ASSETS/SOUND/SOUND_SPLASHSCREEN.mp3"
         
         if os.path.exists(sound_path):
             self.player.setMedia(QMediaContent(QtCore.QUrl.fromLocalFile(sound_path)))  # ✅ Pakai setMedia()

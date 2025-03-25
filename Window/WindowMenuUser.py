@@ -1,3 +1,12 @@
+# WindowMenuAdmin.py
+# Nama: Rangga Muhamad Fajar
+# Kelas: 1A - D4
+# NIM: 241524026
+# Desc: - Program ini berfungsi sebagai menu utama bagi pengguna 
+#         untuk mengakses fitur riwayat kunjungan, 
+#         melakukan pendaftaran pasien, melihat daftar poli, dan 
+#         membatalkan pendaftaran dalam sistem rumah sakit.
+
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 class WindowMenuUser(QtWidgets.QDialog):
@@ -13,7 +22,7 @@ class WindowMenuUser(QtWidgets.QDialog):
         # Background
         self.label = QtWidgets.QLabel(self)
         self.label.setGeometry(QtCore.QRect(-4, 0, 1611, 901))
-        self.label.setPixmap(QtGui.QPixmap("C:/Users/Rangga/Documents/KULIAH/SEMESTER 2/PROYEK 1/TUBES PRA ETS/LOGIN/BACKGROUND/5.png"))
+        self.label.setPixmap(QtGui.QPixmap("C:/ASSETS/BACKGROUND/5.png"))
         self.label.setScaledContents(True)
 
         # Tombol-tombol dengan efek hover
@@ -30,7 +39,7 @@ class WindowMenuUser(QtWidgets.QDialog):
         """
         button = QtWidgets.QPushButton(self)
         button.setGeometry(QtCore.QRect(x, y, width, height))
-        button.setStyleSheet(f"border-image: url(C:/Users/Rangga/Documents/KULIAH/SEMESTER 2/PROYEK 1/TUBES PRA ETS/ASSETS/BUTTON/{image_name});")
+        button.setStyleSheet(f"border-image: url(C:/ASSETS/BUTTON/{image_name});")
         button.setText("")
 
         # Tambahkan efek hover

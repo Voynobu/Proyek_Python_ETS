@@ -34,20 +34,20 @@ class Ui_Dialog(object):
         self.label = QtWidgets.QLabel(Dialog)
         self.label.setGeometry(QtCore.QRect(-4, 0, 1611, 901))
         self.label.setText("")
-        self.label.setPixmap(QtGui.QPixmap("../ASSETS/RESULT/EDIT_POLI.png"))
+        self.label.setPixmap(QtGui.QPixmap("C:/ASSETS/BACKGROUND/../ASSETS/RESULT/EDIT_POLI.png"))
         self.label.setScaledContents(True)
         self.label.setObjectName("label")
         self.pushButton_1 = QtWidgets.QPushButton(Dialog)
         self.pushButton_1.setGeometry(QtCore.QRect(911, 547, 591, 87))
         self.pushButton_1.setStyleSheet("QPushButton{\n"
-"    border-image: url(C:/Users/Rangga/Documents/KULIAH/SEMESTER 2/PROYEK 1/TUBES PRA ETS/ASSETS/BUTTON/TAMBAH_POLI.png);\n"
+"    border-image: url(C:/ASSETS/BUTTON/TAMBAH_POLI.png);\n"
 "}")
         self.pushButton_1.setText("")
         self.pushButton_1.setObjectName("pushButton_1")
         self.pushButton_2 = QtWidgets.QPushButton(Dialog)
         self.pushButton_2.setGeometry(QtCore.QRect(911, 663, 591, 87))
         self.pushButton_2.setStyleSheet("QPushButton{\n"
-"    border-image: url(C:/Users/Rangga/Documents/KULIAH/SEMESTER 2/PROYEK 1/TUBES PRA ETS/ASSETS/BUTTON/HAPUS_POLI.png);\n"
+"    border-image: url(C:/ASSETS/BUTTON/HAPUS_POLI.png);\n"
 "}")
         self.pushButton_2.setText("")
         self.pushButton_2.setObjectName("pushButton_2")
