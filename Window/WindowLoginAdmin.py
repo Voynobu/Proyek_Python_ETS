@@ -9,6 +9,7 @@
 #Nama : Muhamad Dino Dermawan
 #Nim : 241524015
 #desc :  -menghubungkan ke WindowMenuAdmin 
+#        -validasi username&password
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 import json
