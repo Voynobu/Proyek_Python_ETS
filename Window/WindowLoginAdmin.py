@@ -25,7 +25,7 @@ class Ui_Dialog(object):
         # Background
         self.label = QtWidgets.QLabel(windowLoginAdmin)
         self.label.setGeometry(QtCore.QRect(-4, 0, 1611, 901))
-        self.label.setPixmap(QtGui.QPixmap("C:/Users/muhamad dino/Desktop/SEMESTER 2/PENGEMBANGAN PERANGKAT LUNAK DESKTOP/TubesUTS/ASSETS/ASSETS/BACKGROUND/2.png"))
+        self.label.setPixmap(QtGui.QPixmap("C:/ASSETS/BACKGROUND/2.png"))
         self.label.setScaledContents(True)
 
         # Username field
@@ -65,7 +65,7 @@ class Ui_Dialog(object):
         self.show_password_button = QtWidgets.QPushButton(windowLoginAdmin)
         self.show_password_button.setGeometry(QtCore.QRect(676, 520, 61, 61))
         self.show_password_button.setStyleSheet("border: none;")
-        self.show_password_button.setIcon(QtGui.QIcon("C:/Users/muhamad dino/Desktop/SEMESTER 2/PENGEMBANGAN PERANGKAT LUNAK DESKTOP/TubesUTS/ASSETS/ASSETS/BUTTON/EYE.png"))
+        self.show_password_button.setIcon(QtGui.QIcon("C:/ASSETS/BUTTON/EYE.png"))
         self.show_password_button.setIconSize(QtCore.QSize(40, 40))
         self.show_password_button.setCheckable(True)
         self.show_password_button.clicked.connect(self.toggle_password)
@@ -73,14 +73,14 @@ class Ui_Dialog(object):
         # Login Button
         self.pushButton = QtWidgets.QPushButton(windowLoginAdmin)
         self.pushButton.setGeometry(QtCore.QRect(330, 660, 251, 91))
-        self.pushButton.setStyleSheet("border-image: url(C:/Users/muhamad dino/Desktop/SEMESTER 2/PENGEMBANGAN PERANGKAT LUNAK DESKTOP/TubesUTS/ASSETS/ASSETS/BUTTON/LOGIN.png);")
+        self.pushButton.setStyleSheet("border-image: url(C:/ASSETS/BUTTON/LOGIN.png);")
         self.add_hover_effect(self.pushButton)
         self.pushButton.clicked.connect(lambda: self.login(windowLoginAdmin))  # Pass window reference
 
         # Back Button
         self.pushButton_2 = QtWidgets.QPushButton(windowLoginAdmin)
         self.pushButton_2.setGeometry(QtCore.QRect(10, 20, 111, 101))
-        self.pushButton_2.setStyleSheet("border-image: url(C:/Users/muhamad dino/Desktop/SEMESTER 2/PENGEMBANGAN PERANGKAT LUNAK DESKTOP/TubesUTS/ASSETS/ASSETS/BUTTON/BACK.png);")
+        self.pushButton_2.setStyleSheet("border-image: url(C:/ASSETS/BUTTON/BACK.png);")
         self.add_hover_effect(self.pushButton_2)
         self.pushButton_2.clicked.connect(windowLoginAdmin.close)
 
