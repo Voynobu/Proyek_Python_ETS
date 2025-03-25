@@ -8,7 +8,7 @@ import json
 import os
 from pathlib import Path
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QWidget, QApplication, QCalendarWidget, QDateEdit, QMessageBox
+from PyQt5.QtWidgets import QDialog, QApplication, QCalendarWidget, QDateEdit, QMessageBox
 from PyQt5.QtCore import QDate
 from Pasien import simpan_data
 from Register import load_users
@@ -16,7 +16,23 @@ from Register import load_users
 BASE_DIR = Path(__file__).parent.parent  # Naik satu level ke folder ETS
 POLIKLINIK_FILE = BASE_DIR / "Data" / "poliklinik_data.json"
 
-class WindowPendaftaranPasien(QWidget):
+class HoverButton(QtWidgets.QPushButton):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setMouseTracking(True)
+        self.installEventFilter(self)
+        self.opacity_effect = QtWidgets.QGraphicsOpacityEffect(self)
+        self.setGraphicsEffect(self.opacity_effect)
+        self.opacity_effect.setOpacity(1.0)
+    
+    def eventFilter(self, obj, event):
+        if event.type() == QtCore.QEvent.HoverEnter:
+            self.opacity_effect.setOpacity(0.7)
+        elif event.type() == QtCore.QEvent.HoverLeave:
+            self.opacity_effect.setOpacity(1.0)
+        return super().eventFilter(obj, event)
+
+class WindowPendaftaranPasien(QDialog):
     def __init__(self, username):
         super().__init__()
         self.username = username
@@ -24,15 +40,18 @@ class WindowPendaftaranPasien(QWidget):
     
     def setupUi(self):
         self.setObjectName("Form")
-        self.resize(1600, 900)
+        self.setFixedSize(1600, 900)  # Ukuran window disamakan dengan WindowMenuAdmin/User
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+        
+        # Label background
         self.label_background = QtWidgets.QLabel(self)
-        self.label_background.setGeometry(QtCore.QRect(0, 0, 1600, 900))
+        self.label_background.setGeometry(QtCore.QRect(-4, 0, 1611, 901))
         self.label_background.setPixmap(QtGui.QPixmap("C:/ASSETS/BACKGROUND/8.png"))
         self.label_background.setScaledContents(True)
-        self.label_background.setObjectName("label_background")
-
-        # Membuat input transparan
+        self.label_background.lower()
+        self.label_background.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents)
+        
+        # Input fields
         self.keluhan = QtWidgets.QLineEdit(self)
         self.keluhan.setGeometry(QtCore.QRect(636, 515, 377, 184))
         self.keluhan.setStyleSheet("background: transparent; border: none;")
@@ -46,11 +65,9 @@ class WindowPendaftaranPasien(QWidget):
         self.poli = QtWidgets.QComboBox(self)
         self.poli.setGeometry(QtCore.QRect(91, 514, 516, 58))
         self.poli.currentTextChanged.connect(self.updateDokter)
-        # self.poli.setStyleSheet("background: transparent; border: none;")
 
         self.dokter = QtWidgets.QComboBox(self)
         self.dokter.setGeometry(QtCore.QRect(91, 641, 514, 58))
-        # self.dokter.setStyleSheet("background: transparent; border: none;")
         self.dokter.setPlaceholderText("Pilih dokter")
 
         self.pilih_jadwal = QDateEdit(self)
@@ -88,24 +105,16 @@ class WindowPendaftaranPasien(QWidget):
         self.jenis_layanan.addItems(["Mandiri", "Asuransi", "BPJS"])
         self.jenis_layanan.setStyleSheet("background: transparent; border: none;")
 
-        # Tombol Back dengan transparansi
-        self.label_back = QtWidgets.QLabel(self)
-        self.label_back.setGeometry(QtCore.QRect(10, 20, 134, 103))
-        self.label_back.setPixmap(QtGui.QPixmap("C:/ASSETS/BUTTON/BACK.png"))
-
-        self.back = QtWidgets.QPushButton(self)
-        self.back.setGeometry(QtCore.QRect(11, 22, 134, 103))
-        self.back.setStyleSheet("background: transparent; border: none;")
+        # Tombol Back dengan gambar melalui styleSheet (HoverButton)
+        self.back = HoverButton(self)
+        self.back.setGeometry(QtCore.QRect(10, 20, 111, 101))
+        self.back.setStyleSheet("border-image: url(C:/ASSETS/BUTTON/BACK.png); background: transparent; border: none;")
         self.back.clicked.connect(self.back_to_menu)
 
-        # Tombol Daftar dengan transparansi
-        self.label_daftar = QtWidgets.QLabel(self)
-        self.label_daftar.setGeometry(QtCore.QRect(680, 740, 291, 91))
-        self.label_daftar.setPixmap(QtGui.QPixmap("C:/ASSETS/BUTTON/SUBMIT.png"))
-
-        self.daftar = QtWidgets.QPushButton(self)
+        # Tombol Daftar (Submit) dengan gambar melalui styleSheet (HoverButton)
+        self.daftar = HoverButton(self)
         self.daftar.setGeometry(QtCore.QRect(686, 741, 282, 88))
-        self.daftar.setStyleSheet("background: transparent; border: none;")
+        self.daftar.setStyleSheet("border-image: url(C:/ASSETS/BUTTON/SUBMIT.png); background: transparent; border: none;")
         self.daftar.clicked.connect(self.daftar_pasien)
         
         self.loadData()
@@ -115,17 +124,13 @@ class WindowPendaftaranPasien(QWidget):
         with open(POLIKLINIK_FILE, "r") as file:
             data = json.load(file)
             self.poliklinik_data = data.get("poliklinik", {})
-        
         self.poli.clear()
         self.poli.addItems(self.poliklinik_data.keys())
-        
-        # Set default dokter list
         self.updateDokter()
     
     def updateDokter(self):
         """Mengupdate daftar dokter berdasarkan poliklinik yang dipilih."""
         selectedPoliklinik = self.poli.currentText()
-        
         self.dokter.clear()
         if selectedPoliklinik in self.poliklinik_data:
             self.dokter.addItems(self.poliklinik_data[selectedPoliklinik])
@@ -135,7 +140,7 @@ class WindowPendaftaranPasien(QWidget):
         self.menu_user = WindowMenuUser(self.username)
         self.menu_user.show()
         self.close()
-        
+    
     def update_calendar_tanggal_lahir(self, date):
         self.calendar_tanggal_lahir.setSelectedDate(date)
         self.calendar_tanggal_lahir.show()
@@ -158,29 +163,25 @@ class WindowPendaftaranPasien(QWidget):
             return
         if self.pilih_jadwal.date() <= QDate.currentDate():
             QMessageBox.warning(self, "Peringatan", "Tanggal pendaftaran harus minimal hari esok!")
-            return  
-        
+            return
         nama = self.Nama.text()
         jenis_kelamin = "Pria" if self.pria.isChecked() else "Wanita" if self.wanita.isChecked() else ""
         poli = self.poli.currentText()
         dokter = self.dokter.currentText()
         jenis_layanan = self.jenis_layanan.currentText()
         keluhan = self.keluhan.text()
-        tanggal_lahir = self.tanggal_lahir.date().toString("dd-MM-yyyy")  # Format "dd-MM-yyyy"
+        tanggal_lahir = self.tanggal_lahir.date().toString("dd-MM-yyyy")
         pilih_jadwal = self.pilih_jadwal.date().toString("dd-MM-yyyy")
-
         if not (nama and jenis_kelamin and poli and dokter and keluhan):
             QMessageBox.warning(self, "Peringatan", "Semua field harus diisi sebelum mendaftar!")
-            return  # Hentikan proses pendaftaran
-    
+            return
         simpan_data(nama, jenis_kelamin, tanggal_lahir, jenis_layanan, poli, dokter, keluhan, pilih_jadwal, self.username)
         QMessageBox.information(self, "Sukses", "Pendaftaran berhasil!")
         self.close()
         self.back_to_menu()
-    
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = WindowPendaftaranPasien("Guest")
     window.show()
     sys.exit(app.exec_())
-

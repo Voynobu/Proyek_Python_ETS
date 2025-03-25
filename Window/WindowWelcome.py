@@ -51,10 +51,10 @@ class WindowWelcome(QtWidgets.QDialog):
                                             "C:/ASSETS/BUTTON/SIGN_UP_PJ.png")
         # Tombol Login Admin (gambar BUTTON_LOGIN/2.png)
         self.pushButton_2 = self.create_button(Dialog, 210, 550, 431, 121,
-                                            "C:/ASSETS/BUTTON/LOGIN_AS_ADMIN.png")
+                                            "C:/ASSETS/BUTTON/LOGIN_AS_USER.png")
         # Tombol Login User (gambar BUTTON_LOGIN/1.png)
         self.pushButton_3 = self.create_button(Dialog, 210, 440, 431, 121,
-                                            "C:/ASSETS/BUTTON/LOGIN_AS_USER.png")
+                                            "C:/ASSETS/BUTTON/LOGIN_AS_ADMIN.png")
         # Tombol Exit
         self.pushButton_4 = self.create_button(Dialog, 1500, 20, 91, 101,
                                             "C:/ASSETS/BUTTON/CLOSEAPP.png")
@@ -68,9 +68,9 @@ class WindowWelcome(QtWidgets.QDialog):
         button.setGeometry(QtCore.QRect(x, y, width, height))
         
         # Tentukan fungsi klik berdasarkan gambar tombol
-        if "BUTTON/LOGIN_AS_USER.png" in image_path:
+        if "BUTTON/LOGIN_AS_ADMIN.png" in image_path:
             button.clicked.connect(self.open_login_user)
-        elif "BUTTON/LOGIN_AS_ADMIN.png" in image_path:
+        elif "BUTTON/LOGIN_AS_USER.png" in image_path:
             button.clicked.connect(self.open_login_admin)
         elif "BUTTON/SIGN_UP_PJ.png" in image_path:
             button.clicked.connect(self.open_sign_up_window)

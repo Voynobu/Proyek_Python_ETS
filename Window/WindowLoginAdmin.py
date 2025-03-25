@@ -14,7 +14,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 import json
 import os
-from WindowMenuAdmin import Ui_WindowMenuAdmin  # Nama file dan kelas diperbarui
+from WindowMenuAdmin import WindowMenuAdmin
 
 class Ui_Dialog(object):
     def setupUi(self, windowLoginAdmin):  # Perubahan nama dari windowAdminLogin
@@ -110,7 +110,17 @@ class Ui_Dialog(object):
             self.lineEdit_2.setEchoMode(QtWidgets.QLineEdit.Normal)
         else:
             self.lineEdit_2.setEchoMode(QtWidgets.QLineEdit.Password)
+    def add_hover_effect(self, button):
+        # Tambahkan efek hover pada tombol
+        button.enterEvent = lambda event: self.set_button_opacity(button, 0.7)
+        button.leaveEvent = lambda event: self.set_button_opacity(button, 1.0)
 
+    def set_button_opacity(self, button, opacity):
+        # Terapkan efek opacity pada tombol
+        effect = QtWidgets.QGraphicsOpacityEffect(button)
+        effect.setOpacity(opacity)
+        button.setGraphicsEffect(effect)
+        
     def login(self):
         username = self.lineEdit.text()
         password = self.lineEdit_2.text()
@@ -137,7 +147,7 @@ class Ui_Dialog(object):
     def open_window_login_admin(self):
         try:
             self.windowLoginAdmin = QtWidgets.QMainWindow()
-            self.ui = Ui_WindowMenuAdmin()  # Nama kelas diperbarui
+            self.ui = WindowMenuAdmin()  # Nama kelas diperbarui
             self.ui.setupUi(self.windowLoginAdmin)
             self.windowLoginAdmin.show()
             self.window().close()
