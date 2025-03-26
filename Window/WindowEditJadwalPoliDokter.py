@@ -11,15 +11,33 @@ import datetime
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 
-class HoverOpacityFilter(QtCore.QObject):
-    def eventFilter(self, obj, event):
-        if event.type() == QtCore.QEvent.Enter:
-            if obj.graphicsEffect():
-                obj.graphicsEffect().setOpacity(0.7)
-        elif event.type() == QtCore.QEvent.Leave:
-            if obj.graphicsEffect():
-                obj.graphicsEffect().setOpacity(1.0)
-        return super().eventFilter(obj, event)
+class HoverButton(QtWidgets.QPushButton):
+    def __init__(self, parent=None, image_path=""):
+        super().__init__(parent)
+        self.opacity_effect = QtWidgets.QGraphicsOpacityEffect(self)
+        self.setGraphicsEffect(self.opacity_effect)
+        self.opacity_animation = QtCore.QPropertyAnimation(self.opacity_effect, b"opacity")
+        self.opacity_animation.setDuration(200)
+        self.opacity_effect.setOpacity(1.0)
+        if image_path:
+            self.setStyleSheet(
+                f"QPushButton {{ border-image: url('{image_path}'); background: transparent; border: none; }}"
+            )
+        self.setMouseTracking(True)
+
+    def enterEvent(self, event):
+        self.opacity_animation.stop()
+        self.opacity_animation.setStartValue(self.opacity_effect.opacity())
+        self.opacity_animation.setEndValue(0.7)
+        self.opacity_animation.start()
+        super().enterEvent(event)
+
+    def leaveEvent(self, event):
+        self.opacity_animation.stop()
+        self.opacity_animation.setStartValue(self.opacity_effect.opacity())
+        self.opacity_animation.setEndValue(1.0)
+        self.opacity_animation.start()
+        super().leaveEvent(event)
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
@@ -28,12 +46,8 @@ class Ui_Dialog(object):
         Dialog.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 
         # ------ BACK BUTTON ------
-        self.pushButton_4 = QtWidgets.QPushButton(Dialog)
+        self.pushButton_4 = HoverButton(Dialog, image_path="C:/Users/Rangga/Documents/KULIAH/SEMESTER 2/PROYEK 1/TUBES PRA ETS/ASSETS/BUTTON/BACK.png")
         self.pushButton_4.setGeometry(QtCore.QRect(10, 20, 111, 101))
-        self.pushButton_4.setStyleSheet(
-            "border-image: url(C:/Users/Rangga/Documents/KULIAH/SEMESTER 2/"
-            "PROYEK 1/TUBES PRA ETS/ASSETS/BUTTON/BACK.png);"
-        )
         self.pushButton_4.setText("")
         self.pushButton_4.setObjectName("pushButton_4")
 
@@ -46,13 +60,8 @@ class Ui_Dialog(object):
         self.label.setObjectName("label")
 
         # ------ BUTTON EDIT JADWAL ------
-        self.pushButton_1 = QtWidgets.QPushButton(Dialog)
+        self.pushButton_1 = HoverButton(Dialog, image_path="C:/ASSETS/BUTTON/EDIT_JADWAL.png")
         self.pushButton_1.setGeometry(QtCore.QRect(-2, 219, 411, 201))
-        self.pushButton_1.setStyleSheet(
-            "QPushButton{"
-            "    border-image: url(C:/ASSETS/BUTTON/EDIT_JADWAL.png);"
-            "}"
-        )
         self.pushButton_1.setText("")
         self.pushButton_1.setObjectName("pushButton_1")
 
@@ -77,24 +86,14 @@ class Ui_Dialog(object):
         self.tableView.setObjectName("tableView")
 
         # ------ BUTTON EDIT POLI ------
-        self.pushButton_2 = QtWidgets.QPushButton(Dialog)
+        self.pushButton_2 = HoverButton(Dialog, image_path="C:/ASSETS/BUTTON/EDIT_POLI.png")
         self.pushButton_2.setGeometry(QtCore.QRect(-2, 444, 411, 201))
-        self.pushButton_2.setStyleSheet(
-            "QPushButton{"
-            "    border-image: url(C:/ASSETS/BUTTON/EDIT_POLI.png);"
-            "}"
-        )
         self.pushButton_2.setText("")
         self.pushButton_2.setObjectName("pushButton_2")
 
         # ------ BUTTON EDIT DOKTER ------
-        self.pushButton_3 = QtWidgets.QPushButton(Dialog)
+        self.pushButton_3 = HoverButton(Dialog, image_path="C:/ASSETS/BUTTON/EDIT_DOK.png")
         self.pushButton_3.setGeometry(QtCore.QRect(-7, 669, 421, 201))
-        self.pushButton_3.setStyleSheet(
-            "QPushButton{"
-            "    border-image: url(C:/ASSETS/BUTTON/EDIT_DOK.png);"
-            "}"
-        )
         self.pushButton_3.setText("")
         self.pushButton_3.setObjectName("pushButton_3")
 
@@ -113,7 +112,7 @@ class Ui_Dialog(object):
         )
         self.label_datetime.setObjectName("label_datetime")
 
-        # Z-order
+        # Z-order: pastikan background berada di bawah
         self.label.raise_()
         self.pushButton_4.raise_()
         self.pushButton_1.raise_()
@@ -153,13 +152,7 @@ class Ui_Dialog(object):
         header.setSectionResizeMode(4, QtWidgets.QHeaderView.Stretch)
         header.setSectionResizeMode(5, QtWidgets.QHeaderView.Stretch)
 
-        # Efek hover push button
-        self.addHoverOpacity(self.pushButton_1)
-        self.addHoverOpacity(self.pushButton_2)
-        self.addHoverOpacity(self.pushButton_3)
-        self.addHoverOpacity(self.pushButton_4)
-
-        # Isi data contoh
+        # Contoh data
         self.loadData()
 
         # Timer update waktu
@@ -167,14 +160,6 @@ class Ui_Dialog(object):
         self.timer.timeout.connect(self.updateDateTime)
         self.timer.start(1000)
         self.updateDateTime()
-
-    def addHoverOpacity(self, button):
-        effect = QtWidgets.QGraphicsOpacityEffect(button)
-        effect.setOpacity(1.0)
-        button.setGraphicsEffect(effect)
-
-        hoverFilter = HoverOpacityFilter(button)
-        button.installEventFilter(hoverFilter)
 
     def initTable(self):
         self.model = QStandardItemModel()
@@ -200,16 +185,15 @@ class Ui_Dialog(object):
             self.model.appendRow(items)
 
     def updateDateTime(self):
-        """Update label waktu: DAY | YYYY-MM-DD | HH:MM:SS"""
         now = QtCore.QDateTime.currentDateTime()
-        day_of_week = now.toString("dddd").upper()      # TUESDAY
-        date_str    = now.toString("yyyy-MM-dd")        # 2025-03-13
-        time_str    = now.toString("HH:mm:ss")          # 10:44:51
+        day_of_week = now.toString("dddd").upper()      # Contoh: TUESDAY
+        date_str    = now.toString("yyyy-MM-dd")         # Contoh: 2025-03-13
+        time_str    = now.toString("HH:mm:ss")           # Contoh: 10:44:51
         self.label_datetime.setText(f"{day_of_week} | {date_str} | {time_str}")
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", "Splash Screen"))
+        Dialog.setWindowTitle(_translate("Dialog", "Window Edit Jadwal Poli Dokter"))
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)

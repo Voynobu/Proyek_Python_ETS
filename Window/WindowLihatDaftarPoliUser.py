@@ -1,10 +1,9 @@
-# WindowCancel.py
+# WindowLihatDaftarPoliUser.py
 # Nama: Rangga Muhamad Fajar
 # Kelas: 1A - D4
 # NIM: 241524026
-# Desc: - Program ini digunakan untuk membatalkan pendaftaran pasien di rumah sakit.
+# Desc: - Program ini digunakan untuk melihat daftar poli di rumah sakit.
 
-import sys
 import json
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
@@ -49,6 +48,7 @@ class Ui_Dialog(object):
         self.pushButton_3.setText("")
         self.pushButton_3.setObjectName("pushButton_3")
         
+        # Background
         self.label = QtWidgets.QLabel(Dialog)
         self.label.setGeometry(QtCore.QRect(-4, 0, 1611, 901))
         self.label.setText("")
@@ -56,6 +56,7 @@ class Ui_Dialog(object):
         self.label.setScaledContents(True)
         self.label.setObjectName("label")
         
+        # Tabel untuk menampilkan data poli
         self.tableView = QtWidgets.QTableView(Dialog)
         self.tableView.setGeometry(QtCore.QRect(124, 210, 1359, 602))
         self.tableView.setStyleSheet(
@@ -63,22 +64,55 @@ class Ui_Dialog(object):
             "    background-color: #0cc0df; \n"
             "    color: white; \n"
             "    padding: 8px;\n"
-            "}\n"
+            "}"
         )
         self.tableView.setObjectName("tableView")
         
+        # Pastikan tampilan tombol dan tabel berada di atas background
         self.label.raise_()
         self.pushButton_3.raise_()
         self.tableView.raise_()
 
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
-
+        
+        # Inisialisasi model tabel dan load data (misalnya, dari file JSON)
+        self.initModel()
+        self.loadData()
+        
+    def initModel(self):
+        self.model = QStandardItemModel()
+        self.model.setHorizontalHeaderLabels(["NO", "NAMA POLI"])
+        self.tableView.setModel(self.model)
+    
+    def loadData(self):
+        file_path = "poliklinik_data.json"
+        try:
+            with open(file_path, "r") as file:
+                data = json.load(file)
+            poliklinik_data = data.get("poliklinik", {})
+            
+            self.model.setRowCount(0)
+            row_num = 0
+            for poli_name in poliklinik_data.keys():
+                if poli_name.strip():
+                    item_no = QStandardItem(str(row_num + 1))
+                    item_no.setTextAlignment(QtCore.Qt.AlignCenter)
+                    
+                    item_poli = QStandardItem(poli_name.capitalize())
+                    item_poli.setTextAlignment(QtCore.Qt.AlignCenter)
+                    
+                    self.model.appendRow([item_no, item_poli])
+                    row_num += 1
+        except Exception as e:
+            print("Error membaca file JSON:", e)
+    
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", "Splash Screen"))
+        Dialog.setWindowTitle(_translate("Dialog", "Lihat Daftar Poli"))
 
 if __name__ == "__main__":
+    import sys
     app = QtWidgets.QApplication(sys.argv)
     Dialog = QtWidgets.QDialog()
     ui = Ui_Dialog()

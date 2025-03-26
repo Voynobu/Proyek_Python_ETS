@@ -2,16 +2,48 @@
 # Nama: Rangga Muhamad Fajar
 # Kelas: 1A - D4
 # NIM: 241524026
-# Desc: - Tampilan login untuk user.
-#       - Memeriksa username dan password dari file 'daftarUsers.json'.
-#       - Jika berhasil, membuka WindowMenuUser sebagai halaman utama user.
+# Desc: - Tampilan untuk menambah admin baru.
 
 #Nama : Muhamad Dino Dermawan
 #Nim  : 241526015
 
+# WindowTambahAdmin.py
+# Nama: Rangga Muhamad Fajar
+# Kelas: 1A - D4
+# NIM: 241524026
+# Desc: - Tampilan login untuk user.
+#       - Memeriksa username dan password dari file 'daftarUsers.json'.
+#       - Jika berhasil, membuka WindowMenuUser sebagai halaman utama user.
+#
+# Nama : Muhamad Dino Dermawan
+# Nim  : 241526015
+
 from PyQt5 import QtCore, QtGui, QtWidgets
 import json
 import os
+
+class HoverButton(QtWidgets.QPushButton):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.opacity_effect = QtWidgets.QGraphicsOpacityEffect(self)
+        self.setGraphicsEffect(self.opacity_effect)
+        self.opacity_animation = QtCore.QPropertyAnimation(self.opacity_effect, b"opacity")
+        self.opacity_animation.setDuration(200)
+        self.opacity_effect.setOpacity(1.0)
+
+    def enterEvent(self, event):
+        self.opacity_animation.stop()
+        self.opacity_animation.setStartValue(self.opacity_effect.opacity())
+        self.opacity_animation.setEndValue(0.7)
+        self.opacity_animation.start()
+        super().enterEvent(event)
+
+    def leaveEvent(self, event):
+        self.opacity_animation.stop()
+        self.opacity_animation.setStartValue(self.opacity_effect.opacity())
+        self.opacity_animation.setEndValue(1.0)
+        self.opacity_animation.start()
+        super().leaveEvent(event)
 
 class Ui_WindowTambahAdmin(object):
     def __init__(self, parent_window=None):
@@ -73,18 +105,16 @@ class Ui_WindowTambahAdmin(object):
         self.btn_show_password.setCheckable(True)
         self.btn_show_password.clicked.connect(self.toggle_password)
 
-        # Save Admin Button
-        self.btn_simpan = QtWidgets.QPushButton(self.centralwidget)
+        # Save Admin Button (menggunakan HoverButton)
+        self.btn_simpan = HoverButton(self.centralwidget)
         self.btn_simpan.setGeometry(QtCore.QRect(330, 660, 251, 91))
         self.btn_simpan.setStyleSheet("border-image: url(C:/ASSETS/BUTTON/LOGIN.png);")
-        self.add_hover_effect(self.btn_simpan)
         self.btn_simpan.clicked.connect(self.simpanAdmin)
 
-        # Back Button
-        self.btn_kembali = QtWidgets.QPushButton(self.centralwidget)
+        # Back Button (menggunakan HoverButton)
+        self.btn_kembali = HoverButton(self.centralwidget)
         self.btn_kembali.setGeometry(QtCore.QRect(10, 20, 111, 101))
         self.btn_kembali.setStyleSheet("border-image: url(C:/ASSETS/BUTTON/BACK.png);")
-        self.add_hover_effect(self.btn_kembali)
         self.btn_kembali.clicked.connect(self.kembali)
 
         windowTambahAdmin.setCentralWidget(self.centralwidget)
@@ -94,12 +124,6 @@ class Ui_WindowTambahAdmin(object):
             self.input_password.setEchoMode(QtWidgets.QLineEdit.Normal)
         else:
             self.input_password.setEchoMode(QtWidgets.QLineEdit.Password)
-
-    def add_hover_effect(self, button):
-        effect = QtWidgets.QGraphicsOpacityEffect(button)
-        button.setGraphicsEffect(effect)
-        button.enterEvent = lambda event: effect.setOpacity(0.7)
-        button.leaveEvent = lambda event: effect.setOpacity(1.0)
 
     def simpanAdmin(self):
         username = self.input_username.text().strip()

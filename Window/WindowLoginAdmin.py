@@ -1,20 +1,46 @@
-# Tampilan admin (edit poli, dokter, biaya)
 # WindowLoginAdmin.py
-#Nama: Rangga Muhamad Fajar
-#Kelas: 1A - D4
-#NIM: 241524026
-#Desc: - Tampilan login untuk admin.
-#      - Memeriksa email dan password dan jika berhasil membuka MainWindow.
-
-#Nama : Muhamad Dino Dermawan
-#Nim : 241524015
-#desc :  -menghubungkan ke WindowMenuAdmin 
-#        -validasi username&password
+# Nama: Rangga Muhamad Fajar
+# Kelas: 1A - D4
+# NIM: 241524026
+# Desc: - Tampilan login untuk admin.
+#       - Memeriksa email dan password dan jika berhasil membuka MainWindow.
+#
+# Nama : Muhamad Dino Dermawan
+# Nim : 241524015
+# Desc :  - Menghubungkan ke WindowMenuAdmin 
+#         - Validasi username & password
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 import json
 import os
 from WindowMenuAdmin import Ui_WindowMenuAdmin
+
+class HoverButton(QtWidgets.QPushButton):
+    def __init__(self, parent=None, image_path=""):
+        super().__init__(parent)
+        self.opacity_effect = QtWidgets.QGraphicsOpacityEffect(self)
+        self.setGraphicsEffect(self.opacity_effect)
+        self.opacity_animation = QtCore.QPropertyAnimation(self.opacity_effect, b"opacity")
+        self.opacity_animation.setDuration(200)
+        self.opacity_effect.setOpacity(1.0)
+        self.image_path = image_path
+        if image_path:
+            self.setStyleSheet(f"QPushButton {{ border-image: url('{self.image_path}'); }}")
+        self.setMouseTracking(True)
+
+    def enterEvent(self, event):
+        self.opacity_animation.stop()
+        self.opacity_animation.setStartValue(self.opacity_effect.opacity())
+        self.opacity_animation.setEndValue(0.7)
+        self.opacity_animation.start()
+        super().enterEvent(event)
+
+    def leaveEvent(self, event):
+        self.opacity_animation.stop()
+        self.opacity_animation.setStartValue(self.opacity_effect.opacity())
+        self.opacity_animation.setEndValue(1.0)
+        self.opacity_animation.start()
+        super().leaveEvent(event)
 
 class Ui_Dialog(object):
     def setupUi(self, windowLoginAdmin):
@@ -70,18 +96,14 @@ class Ui_Dialog(object):
         self.show_password_button.setCheckable(True)
         self.show_password_button.clicked.connect(self.toggle_password)
 
-        # Login Button
-        self.pushButton = QtWidgets.QPushButton(windowLoginAdmin)
+        # Login Button (menggunakan HoverButton)
+        self.pushButton = HoverButton(windowLoginAdmin, image_path="C:/ASSETS/BUTTON/LOGIN.png")
         self.pushButton.setGeometry(QtCore.QRect(330, 660, 251, 91))
-        self.pushButton.setStyleSheet("border-image: url(C:/ASSETS/BUTTON/LOGIN.png);")
-        self.add_hover_effect(self.pushButton)
-        self.pushButton.clicked.connect(lambda: self.login(windowLoginAdmin))  # Pass window reference
+        self.pushButton.clicked.connect(lambda: self.login(windowLoginAdmin))
 
-        # Back Button
-        self.pushButton_2 = QtWidgets.QPushButton(windowLoginAdmin)
+        # Back Button (menggunakan HoverButton)
+        self.pushButton_2 = HoverButton(windowLoginAdmin, image_path="C:/ASSETS/BUTTON/BACK.png")
         self.pushButton_2.setGeometry(QtCore.QRect(10, 20, 111, 101))
-        self.pushButton_2.setStyleSheet("border-image: url(C:/ASSETS/BUTTON/BACK.png);")
-        self.add_hover_effect(self.pushButton_2)
         self.pushButton_2.clicked.connect(windowLoginAdmin.close)
 
         # Raise all elements
@@ -94,12 +116,6 @@ class Ui_Dialog(object):
 
         self.retranslateUi(windowLoginAdmin)
         QtCore.QMetaObject.connectSlotsByName(windowLoginAdmin)
-
-    def add_hover_effect(self, button):
-        effect = QtWidgets.QGraphicsOpacityEffect()
-        button.setGraphicsEffect(effect)
-        button.enterEvent = lambda event: effect.setOpacity(0.7)
-        button.leaveEvent = lambda event: effect.setOpacity(1.0)
 
     def retranslateUi(self, windowLoginAdmin):
         _translate = QtCore.QCoreApplication.translate
@@ -150,12 +166,12 @@ class Ui_Dialog(object):
             # If error occurs, show the login window again
             current_window.show()
 
-
 class WindowLoginAdmin(QtWidgets.QDialog):
     def __init__(self):
         super().__init__()
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
+        from WindowWelcome import WindowWelcome
         self.ui.pushButton_2.clicked.connect(self.back_to_welcome)
     
     def back_to_welcome(self):

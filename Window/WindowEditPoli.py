@@ -10,15 +10,33 @@ import json
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 
-class HoverOpacityFilter(QtCore.QObject):
-    def eventFilter(self, obj, event):
-        if event.type() == QtCore.QEvent.Enter:
-            if obj.graphicsEffect():
-                obj.graphicsEffect().setOpacity(0.7)
-        elif event.type() == QtCore.QEvent.Leave:
-            if obj.graphicsEffect():
-                obj.graphicsEffect().setOpacity(1.0)
-        return super().eventFilter(obj, event)
+class HoverButton(QtWidgets.QPushButton):
+    def __init__(self, parent=None, image_path=""):
+        super().__init__(parent)
+        self.opacity_effect = QtWidgets.QGraphicsOpacityEffect(self)
+        self.setGraphicsEffect(self.opacity_effect)
+        self.opacity_animation = QtCore.QPropertyAnimation(self.opacity_effect, b"opacity")
+        self.opacity_animation.setDuration(200)
+        self.opacity_effect.setOpacity(1.0)
+        if image_path:
+            self.setStyleSheet(
+                f"QPushButton {{ border-image: url('{image_path}'); background: transparent; border: none; }}"
+            )
+        self.setMouseTracking(True)
+
+    def enterEvent(self, event):
+        self.opacity_animation.stop()
+        self.opacity_animation.setStartValue(self.opacity_effect.opacity())
+        self.opacity_animation.setEndValue(0.7)
+        self.opacity_animation.start()
+        super().enterEvent(event)
+
+    def leaveEvent(self, event):
+        self.opacity_animation.stop()
+        self.opacity_animation.setStartValue(self.opacity_effect.opacity())
+        self.opacity_animation.setEndValue(1.0)
+        self.opacity_animation.start()
+        super().leaveEvent(event)
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
@@ -42,41 +60,28 @@ class Ui_Dialog(object):
         self.lineEdit_1.setObjectName("lineEdit_1")
         self.lineEdit_1.setPlaceholderText("Masukkan Nama Poli! (Contoh: Umum)")
 
-        self.pushButton_3 = QtWidgets.QPushButton(Dialog)
+        # Gunakan HoverButton untuk tombol Back
+        self.pushButton_3 = HoverButton(Dialog, image_path="C:/ASSETS/BUTTON/BACK.png")
         self.pushButton_3.setGeometry(QtCore.QRect(10, 20, 111, 101))
-        self.pushButton_3.setStyleSheet(
-            "border-image: url(C:/ASSETS/BUTTON/BACK.png);"
-        )
         self.pushButton_3.setText("")
         self.pushButton_3.setObjectName("pushButton_3")
 
         self.label = QtWidgets.QLabel(Dialog)
         self.label.setGeometry(QtCore.QRect(-4, 0, 1611, 901))
         self.label.setText("")
-        self.label.setPixmap(QtGui.QPixmap(
-            "C:/ASSETS/BACKGROUND/10.png"
-        ))
+        self.label.setPixmap(QtGui.QPixmap("C:/ASSETS/BACKGROUND/10.png"))
         self.label.setScaledContents(True)
         self.label.setObjectName("label")
 
-        self.pushButton_1 = QtWidgets.QPushButton(Dialog)
+        # Gunakan HoverButton untuk tombol Tambah Poli
+        self.pushButton_1 = HoverButton(Dialog, image_path="C:/ASSETS/BUTTON/TAMBAH_POLI.png")
         self.pushButton_1.setGeometry(QtCore.QRect(911, 547, 591, 87))
-        self.pushButton_1.setStyleSheet(
-            "QPushButton{"
-            "    border-image: url(C:/ASSETS/BUTTON/TAMBAH_POLI.png);"
-            "}"
-        )
         self.pushButton_1.setText("")
         self.pushButton_1.setObjectName("pushButton_1")
 
-        self.pushButton_2 = QtWidgets.QPushButton(Dialog)
+        # Gunakan HoverButton untuk tombol Hapus Poli
+        self.pushButton_2 = HoverButton(Dialog, image_path="C:/Users/Rangga/Documents/KULIAH/SEMESTER 2/PROYEK 1/TUBES PRA ETS/ASSETS/BUTTON/HAPUS_POLI.png")
         self.pushButton_2.setGeometry(QtCore.QRect(911, 663, 591, 87))
-        self.pushButton_2.setStyleSheet(
-            "QPushButton{"
-            "    border-image: url(C:/Users/Rangga/Documents/KULIAH/SEMESTER 2/"
-            "PROYEK 1/TUBES PRA ETS/ASSETS/BUTTON/HAPUS_POLI.png);"
-            "}"
-        )
         self.pushButton_2.setText("")
         self.pushButton_2.setObjectName("pushButton_2")
 
@@ -122,29 +127,12 @@ class Ui_Dialog(object):
         header = self.tableView.horizontalHeader()
         header.setSectionsMovable(False)
         header.setDefaultAlignment(QtCore.Qt.AlignCenter)
-
         header.setFixedHeight(100)
-        self.tableView.verticalHeader().setDefaultSectionSize(100) 
+        self.tableView.verticalHeader().setDefaultSectionSize(100)
 
         header.setSectionResizeMode(0, QtWidgets.QHeaderView.Fixed)
         self.tableView.setColumnWidth(0, 70)
         header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
-
-        self.addHoverOpacity(self.pushButton_1)
-        self.addHoverOpacity(self.pushButton_2)
-        self.addHoverOpacity(self.pushButton_3)
-
-    def addHoverOpacity(self, button):
-        """
-        Pasang QGraphicsOpacityEffect dan event filter HoverOpacityFilter
-        pada sebuah tombol, agar opasitas berubah saat mouse hover.
-        """
-        effect = QtWidgets.QGraphicsOpacityEffect(button)
-        effect.setOpacity(1.0)
-        button.setGraphicsEffect(effect)
-
-        hoverFilter = HoverOpacityFilter(button)
-        button.installEventFilter(hoverFilter)
 
     def initModel(self):
         self.model = QStandardItemModel()

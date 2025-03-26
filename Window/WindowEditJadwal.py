@@ -5,24 +5,35 @@
 # Desc: - Program ini digunakan untuk mengelola jadwal layanan poli di rumah sakit.
 #       - Admin dapat menambah, mengubah, dan menghapus jadwal dokter secara interaktif.
 
-
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 class HoverButton(QtWidgets.QPushButton):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, image_path=""):
         super().__init__(parent)
-        self.effect = QtWidgets.QGraphicsOpacityEffect(self)
-        self.setGraphicsEffect(self.effect)
-        self.effect.setOpacity(1.0)
+        self.opacity_effect = QtWidgets.QGraphicsOpacityEffect(self)
+        self.setGraphicsEffect(self.opacity_effect)
+        self.opacity_animation = QtCore.QPropertyAnimation(self.opacity_effect, b"opacity")
+        self.opacity_animation.setDuration(200)
+        self.opacity_effect.setOpacity(1.0)
+        if image_path:
+            self.setStyleSheet(
+                f"QPushButton {{ border-image: url('{image_path}'); background: transparent; border: none; }}"
+            )
+        self.setMouseTracking(True)
 
     def enterEvent(self, event):
-        self.effect.setOpacity(0.7) 
+        self.opacity_animation.stop()
+        self.opacity_animation.setStartValue(self.opacity_effect.opacity())
+        self.opacity_animation.setEndValue(0.7)
+        self.opacity_animation.start()
         super().enterEvent(event)
 
     def leaveEvent(self, event):
-        self.effect.setOpacity(1.0)
+        self.opacity_animation.stop()
+        self.opacity_animation.setStartValue(self.opacity_effect.opacity())
+        self.opacity_animation.setEndValue(1.0)
+        self.opacity_animation.start()
         super().leaveEvent(event)
-
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
@@ -30,22 +41,7 @@ class Ui_Dialog(object):
         Dialog.setObjectName("Dialog")
         Dialog.resize(1600, 900)
         
-        self.lineEdit_2 = QtWidgets.QLineEdit(Dialog)
-        self.lineEdit_2.setGeometry(QtCore.QRect(154, 639, 648, 51))
-        self.lineEdit_2.setStyleSheet(
-            "QLineEdit {"
-            "    color: black; "
-            "    border: none; "
-            "    border-bottom: 4px solid #a6a6a6; "
-            "    font-size: 20px;"
-            "}"
-            "QLineEdit:focus {"
-            "    border-bottom: 4px solid #ffbd59;"
-            "}"
-        )
-        self.lineEdit_2.setObjectName("lineEdit_2")
-        self.lineEdit_2.setPlaceholderText("Masukkan Jam Awal (Format: HH:MM)")
-        
+        # ------ Input Field: Masukkan Hari ------
         self.lineEdit_1 = QtWidgets.QLineEdit(Dialog)
         self.lineEdit_1.setGeometry(QtCore.QRect(154, 554, 648, 51))
         self.lineEdit_1.setStyleSheet(
@@ -62,22 +58,24 @@ class Ui_Dialog(object):
         self.lineEdit_1.setObjectName("lineEdit_1")
         self.lineEdit_1.setPlaceholderText("Masukkan Hari (Contoh: Monday)")
         
-        # Gunakan HoverButton sebagai push button dengan efek hover
-        self.pushButton_4 = HoverButton(Dialog)
-        self.pushButton_4.setGeometry(QtCore.QRect(10, 20, 111, 101))
-        self.pushButton_4.setStyleSheet(
-            "border-image: url(C:/ASSETS/BUTTON/BACK.png);"
+        # ------ Input Field: Masukkan Jam Awal ------
+        self.lineEdit_2 = QtWidgets.QLineEdit(Dialog)
+        self.lineEdit_2.setGeometry(QtCore.QRect(154, 639, 648, 51))
+        self.lineEdit_2.setStyleSheet(
+            "QLineEdit {"
+            "    color: black; "
+            "    border: none; "
+            "    border-bottom: 4px solid #a6a6a6; "
+            "    font-size: 20px;"
+            "}"
+            "QLineEdit:focus {"
+            "    border-bottom: 4px solid #ffbd59;"
+            "}"
         )
-        self.pushButton_4.setText("")
-        self.pushButton_4.setObjectName("pushButton_4")
+        self.lineEdit_2.setObjectName("lineEdit_2")
+        self.lineEdit_2.setPlaceholderText("Masukkan Jam Awal (Format: HH:MM)")
         
-        self.label = QtWidgets.QLabel(Dialog)
-        self.label.setGeometry(QtCore.QRect(-4, 0, 1611, 901))
-        self.label.setText("")
-        self.label.setPixmap(QtGui.QPixmap("C:/ASSETS//BACKGROUND/9.png"))
-        self.label.setScaledContents(True)
-        self.label.setObjectName("label")
-        
+        # ------ Input Field: Masukkan Jam Akhir ------
         self.lineEdit_3 = QtWidgets.QLineEdit(Dialog)
         self.lineEdit_3.setGeometry(QtCore.QRect(154, 724, 648, 51))
         self.lineEdit_3.setStyleSheet(
@@ -94,36 +92,39 @@ class Ui_Dialog(object):
         self.lineEdit_3.setObjectName("lineEdit_3")
         self.lineEdit_3.setPlaceholderText("Masukkan Jam Akhir (Format: HH:MM)")
         
-        self.pushButton_1 = HoverButton(Dialog)
+        # ------ BACK BUTTON ------
+        self.pushButton_4 = HoverButton(Dialog, image_path="C:/ASSETS/BUTTON/BACK.png")
+        self.pushButton_4.setGeometry(QtCore.QRect(10, 20, 111, 101))
+        self.pushButton_4.setText("")
+        self.pushButton_4.setObjectName("pushButton_4")
+        
+        # ------ BACKGROUND LABEL ------
+        self.label = QtWidgets.QLabel(Dialog)
+        self.label.setGeometry(QtCore.QRect(-4, 0, 1611, 901))
+        self.label.setText("")
+        self.label.setPixmap(QtGui.QPixmap("C:/ASSETS/BACKGROUND/9.png"))
+        self.label.setScaledContents(True)
+        self.label.setObjectName("label")
+        
+        # ------ TOMBOL TAMBAH JADWAL ------
+        self.pushButton_1 = HoverButton(Dialog, image_path="C:/ASSETS/BUTTON/TAMBAH_JADWAL.png")
         self.pushButton_1.setGeometry(QtCore.QRect(848, 364, 601, 129))
-        self.pushButton_1.setStyleSheet(
-            "QPushButton {"
-            "    border-image: url(C:/ASSETS/BUTTON/TAMBAH_JADWAL.png);"
-            "}"
-        )
         self.pushButton_1.setText("")
         self.pushButton_1.setObjectName("pushButton_1")
         
-        self.pushButton_2 = HoverButton(Dialog)
+        # ------ TOMBOL UPDATE JADWAL ------
+        self.pushButton_2 = HoverButton(Dialog, image_path="C:/ASSETS/BUTTON/UPDATE_JADWAL.png")
         self.pushButton_2.setGeometry(QtCore.QRect(848, 507, 601, 129))
-        self.pushButton_2.setStyleSheet(
-            "QPushButton {"
-            "    border-image: url(C:/ASSETS/BUTTON/UPDATE_JADWAL.png);"
-            "}"
-        )
         self.pushButton_2.setText("")
         self.pushButton_2.setObjectName("pushButton_2")
         
-        self.pushButton_3 = HoverButton(Dialog)
+        # ------ TOMBOL HAPUS JADWAL ------
+        self.pushButton_3 = HoverButton(Dialog, image_path="C:/ASSETS/BUTTON/HAPUS_JADWAL.png")
         self.pushButton_3.setGeometry(QtCore.QRect(848, 652, 601, 129))
-        self.pushButton_3.setStyleSheet(
-            "QPushButton {"
-            "    border-image: url(C:/ASSETS/BUTTON/HAPUS_JADWAL.png);"
-            "}"
-        )
         self.pushButton_3.setText("")
         self.pushButton_3.setObjectName("pushButton_3")
         
+        # ------ COMBOBOX (Pilih Poli) ------
         self.comboBox_2 = QtWidgets.QComboBox(Dialog)
         self.comboBox_2.setGeometry(QtCore.QRect(154, 382, 648, 51))
         self.comboBox_2.setStyleSheet(
@@ -162,6 +163,7 @@ class Ui_Dialog(object):
         self.comboBox_2.setCurrentIndex(0)
         self.comboBox_2.model().item(0).setEnabled(False)
         
+        # ------ COMBOBOX (Pilih Dokter) ------
         self.comboBox_3 = QtWidgets.QComboBox(Dialog)
         self.comboBox_3.setGeometry(QtCore.QRect(154, 467, 648, 51))
         self.comboBox_3.setStyleSheet(
@@ -200,10 +202,10 @@ class Ui_Dialog(object):
         self.comboBox_3.setCurrentIndex(0)
         self.comboBox_3.model().item(0).setEnabled(False)
         
-        # Atur urutan tampilan widget
+        # Atur urutan tampilan widget (background di bawah, kemudian komponen lainnya)
         self.label.raise_()
-        self.lineEdit_2.raise_()
         self.lineEdit_1.raise_()
+        self.lineEdit_2.raise_()
         self.pushButton_4.raise_()
         self.lineEdit_3.raise_()
         self.pushButton_1.raise_()

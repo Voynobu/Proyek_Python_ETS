@@ -1,4 +1,4 @@
-# WindowMenuAdmin.py
+# WindowMenuUser.py
 # Nama: Rangga Muhamad Fajar
 # Kelas: 1A - D4
 # NIM: 241524026
@@ -9,14 +9,42 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+class HoverButton(QtWidgets.QPushButton):
+    def __init__(self, parent=None, image_path=""):
+        super().__init__(parent)
+        self.opacity_effect = QtWidgets.QGraphicsOpacityEffect(self)
+        self.setGraphicsEffect(self.opacity_effect)
+        self.opacity_animation = QtCore.QPropertyAnimation(self.opacity_effect, b"opacity")
+        self.opacity_animation.setDuration(200)
+        self.opacity_effect.setOpacity(1.0)
+        self.image_path = image_path
+        if image_path:
+            # Pastikan path tidak berada dalam tanda kutip ganda di dalam f-string
+            self.setStyleSheet(f"QPushButton {{ border-image: url({image_path}); }}")
+        self.setMouseTracking(True)
+
+    def enterEvent(self, event):
+        self.opacity_animation.stop()
+        self.opacity_animation.setStartValue(self.opacity_effect.opacity())
+        self.opacity_animation.setEndValue(0.7)
+        self.opacity_animation.start()
+        super().enterEvent(event)
+
+    def leaveEvent(self, event):
+        self.opacity_animation.stop()
+        self.opacity_animation.setStartValue(self.opacity_effect.opacity())
+        self.opacity_animation.setEndValue(1.0)
+        self.opacity_animation.start()
+        super().leaveEvent(event)
+
 class WindowMenuUser(QtWidgets.QDialog):
     def __init__(self, username):
         super().__init__()
-        self.setWindowFlags(QtCore.Qt.FramelessWindowHint)  # Menghilangkan border window
+        self.setWindowFlags(QtCore.Qt.FramelessWindowHint)  # Hilangkan border window
         self.setFixedSize(1600, 900)
+        self.username = username
         self.initUI()
         self.oldPos = None  # Untuk mendukung dragging window
-        self.username = username
 
     def initUI(self):
         # Background
@@ -28,6 +56,7 @@ class WindowMenuUser(QtWidgets.QDialog):
         # Tombol-tombol dengan efek hover
         self.pushButton = self.create_button(1012, 170, 557, 328, "PENDAFTARAN.png")
         self.pushButton.clicked.connect(self.open_pendaftaran)
+
         self.pushButton_3 = self.create_button(686, 171, 331, 329, "RIWAYAT.png")
         self.pushButton_4 = self.create_button(673, 514, 512, 337, "LIHAT_POLI.png")
         self.pushButton_5 = self.create_button(1166, 520, 404, 329, "BATAL_DAFTAR.png")
@@ -35,35 +64,15 @@ class WindowMenuUser(QtWidgets.QDialog):
 
     def create_button(self, x, y, width, height, image_name, action=None):
         """
-        Membuat tombol dengan efek hover.
+        Membuat tombol dengan efek hover menggunakan HoverButton.
         """
-        button = QtWidgets.QPushButton(self)
+        image_path = f"C:/ASSETS/BUTTON/{image_name}"
+        button = HoverButton(self, image_path=image_path)
         button.setGeometry(QtCore.QRect(x, y, width, height))
-        button.setStyleSheet(f"border-image: url(C:/ASSETS/BUTTON/{image_name});")
         button.setText("")
-
-        # Tambahkan efek hover
-        self.add_hover_effect(button)
-
         if action:
             button.clicked.connect(action)
-
         return button
-
-    def add_hover_effect(self, button):
-        """
-        Menambahkan efek hover pada tombol.
-        """
-        button.enterEvent = lambda event: self.set_button_opacity(button, 0.7)  # Saat cursor masuk
-        button.leaveEvent = lambda event: self.set_button_opacity(button, 1.0)  # Saat cursor keluar
-
-    def set_button_opacity(self, button, opacity):
-        """
-        Mengatur opacity tombol.
-        """
-        effect = QtWidgets.QGraphicsOpacityEffect(button)
-        effect.setOpacity(opacity)
-        button.setGraphicsEffect(effect)
 
     def back_to_login(self):
         """Fungsi kembali ke halaman login user."""
@@ -77,8 +86,7 @@ class WindowMenuUser(QtWidgets.QDialog):
         self.pendaftaran_window = WindowPendaftaranPasien(self.username)
         self.pendaftaran_window.show()
         self.close()
-        
-    
+
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)

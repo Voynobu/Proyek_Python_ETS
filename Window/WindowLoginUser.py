@@ -11,6 +11,33 @@ from Register import Register, login_user
 import os
 from WindowMenuUser import WindowMenuUser
 
+class HoverButton(QtWidgets.QPushButton):
+    def __init__(self, parent=None, image_path=""):
+        super().__init__(parent)
+        self.opacity_effect = QtWidgets.QGraphicsOpacityEffect(self)
+        self.setGraphicsEffect(self.opacity_effect)
+        self.opacity_animation = QtCore.QPropertyAnimation(self.opacity_effect, b"opacity")
+        self.opacity_animation.setDuration(200)
+        self.opacity_effect.setOpacity(1.0)
+        self.image_path = image_path
+        if image_path:
+            self.setStyleSheet(f"QPushButton {{ border-image: url('{self.image_path}'); }}")
+        self.setMouseTracking(True)
+
+    def enterEvent(self, event):
+        self.opacity_animation.stop()
+        self.opacity_animation.setStartValue(self.opacity_effect.opacity())
+        self.opacity_animation.setEndValue(0.7)
+        self.opacity_animation.start()
+        super().enterEvent(event)
+
+    def leaveEvent(self, event):
+        self.opacity_animation.stop()
+        self.opacity_animation.setStartValue(self.opacity_effect.opacity())
+        self.opacity_animation.setEndValue(1.0)
+        self.opacity_animation.start()
+        super().leaveEvent(event)
+
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
@@ -65,17 +92,13 @@ class Ui_Dialog(object):
         self.show_password_button.setCheckable(True)
         self.show_password_button.clicked.connect(self.toggle_password)
         
-        # Tombol Login
-        self.pushButton = QtWidgets.QPushButton(Dialog)
+        # Tombol Login (menggunakan HoverButton)
+        self.pushButton = HoverButton(Dialog, image_path="C:/ASSETS/BUTTON/LOGIN.png")
         self.pushButton.setGeometry(QtCore.QRect(330, 660, 251, 91))
-        self.pushButton.setStyleSheet("border-image: url(C:/ASSETS/BUTTON/LOGIN.png);")
-        self.add_hover_effect(self.pushButton)
         
-        # Tombol Back
-        self.pushButton_2 = QtWidgets.QPushButton(Dialog)
+        # Tombol Back (menggunakan HoverButton)
+        self.pushButton_2 = HoverButton(Dialog, image_path="C:/ASSETS/BUTTON/BACK.png")
         self.pushButton_2.setGeometry(QtCore.QRect(10, 20, 111, 101))
-        self.pushButton_2.setStyleSheet("border-image: url(C:/ASSETS/BUTTON/BACK.png);")
-        self.add_hover_effect(self.pushButton_2)
         
         self.label.raise_()
         self.pushButton.raise_()
@@ -97,17 +120,6 @@ class Ui_Dialog(object):
             self.lineEdit_2.setEchoMode(QtWidgets.QLineEdit.Normal)
         else:
             self.lineEdit_2.setEchoMode(QtWidgets.QLineEdit.Password)
-    
-    def add_hover_effect(self, button):
-        # Tambahkan efek hover pada tombol
-        button.enterEvent = lambda event: self.set_button_opacity(button, 0.7)
-        button.leaveEvent = lambda event: self.set_button_opacity(button, 1.0)
-
-    def set_button_opacity(self, button, opacity):
-        # Terapkan efek opacity pada tombol
-        effect = QtWidgets.QGraphicsOpacityEffect(button)
-        effect.setOpacity(opacity)
-        button.setGraphicsEffect(effect)
 
 # Kelas pembungkus untuk WindowLoginUser
 class WindowLoginUser(QtWidgets.QDialog):
@@ -137,10 +149,8 @@ class WindowLoginUser(QtWidgets.QDialog):
             QtWidgets.QMessageBox.warning(self, "Error", login_user(username, password))
         else:
             QtWidgets.QMessageBox.information(self, "Sukses", "Login berhasil!")
-
             self.menu_user = WindowMenuUser(username)
             self.menu_user.show()
-
             self.close()
 
 if __name__ == "__main__":
