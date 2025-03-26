@@ -173,6 +173,7 @@ class Ui_WindowTambahAdmin(object):
             self.parent_window.enableWindow()
 
 
+
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)

@@ -9,6 +9,7 @@
 #Nim  : 241524015
 #Desc : 
 
+# WindowMenuAdmin.py
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QGraphicsOpacityEffect
 from PyQt5.QtCore import QPropertyAnimation
@@ -56,10 +57,11 @@ class Ui_WindowMenuAdmin(object):
         self.background.setPixmap(QtGui.QPixmap("C:/ASSETS/BACKGROUND/6.png"))
         self.background.setScaledContents(True)
 
-        # Tombol Edit Poli (Menggunakan HoverButton)
+        # Tombol Edit Jadwal Poli (Menggunakan HoverButton)
         self.menu1_btn = HoverButton(self.centralwidget, image_path="C:/ASSETS/BUTTON/EDIT_JADWAL_POLI.png")
         self.menu1_btn.setGeometry(QtCore.QRect(688, 201, 860, 311))
         self.menu1_btn.setText("")
+        self.menu1_btn.clicked.connect(self.openEditJadwalPoliDokter)
 
         # Tombol Tambah Admin (Menggunakan HoverButton)
         self.menu2_btn = HoverButton(self.centralwidget, image_path="C:/ASSETS/BUTTON/TAMBAH_ADMIN.png")
@@ -70,7 +72,6 @@ class Ui_WindowMenuAdmin(object):
         # Tombol Kembali (Menggunakan HoverButton)
         self.btn_kembali = HoverButton(self.centralwidget, image_path="C:/ASSETS/BUTTON/BACK.png")
         self.btn_kembali.setGeometry(QtCore.QRect(10, 20, 111, 101))
-        # Menghilangkan border dan latar agar tampak transparan
         self.btn_kembali.setIconSize(QtCore.QSize(111, 101))
         self.btn_kembali.clicked.connect(self.kembali_ke_login)
 
@@ -86,9 +87,18 @@ class Ui_WindowMenuAdmin(object):
         self.windowMenuAdmin.hide()
         from WindowTambahAdmin import Ui_WindowTambahAdmin
         self.windowTambahAdmin = QtWidgets.QMainWindow()
-        self.ui_tambah = Ui_WindowTambahAdmin()
+        self.ui_tambah = Ui_WindowTambahAdmin(parent_window=self.windowMenuAdmin)
         self.ui_tambah.setupUi(self.windowTambahAdmin)
         self.windowTambahAdmin.show()
+
+    def openEditJadwalPoliDokter(self):
+        self.windowMenuAdmin.hide()
+        from WindowEditJadwalPoliDokter import Ui_Dialog
+        self.edit_jadwal_dialog = QtWidgets.QDialog()
+        # Kirim parent_window sebagai self.windowMenuAdmin agar nanti bisa kembali ke menu admin
+        self.ui_edit = Ui_Dialog(parent_window=self.windowMenuAdmin)
+        self.ui_edit.setupUi(self.edit_jadwal_dialog)
+        self.edit_jadwal_dialog.show()
 
     def kembali_ke_login(self):
         from WindowLoginAdmin import WindowLoginAdmin
@@ -101,6 +111,8 @@ class WindowMenuAdmin(QtWidgets.QMainWindow):
         super().__init__()
         self.ui = Ui_WindowMenuAdmin()
         self.ui.setupUi(self)
+    def enableWindow(self):
+        self.show()
 
 if __name__ == "__main__":
     import sys

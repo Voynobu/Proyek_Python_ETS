@@ -15,9 +15,9 @@ class HoverButton(QtWidgets.QPushButton):
         super().__init__(parent)
         self.opacity_effect = QtWidgets.QGraphicsOpacityEffect(self)
         self.setGraphicsEffect(self.opacity_effect)
+        self.opacity_effect.setOpacity(1.0)
         self.opacity_animation = QtCore.QPropertyAnimation(self.opacity_effect, b"opacity")
         self.opacity_animation.setDuration(200)
-        self.opacity_effect.setOpacity(1.0)
         if image_path:
             self.setStyleSheet(
                 f"QPushButton {{ border-image: url('{image_path}'); background: transparent; border: none; }}"
@@ -39,11 +39,16 @@ class HoverButton(QtWidgets.QPushButton):
         super().leaveEvent(event)
 
 class Ui_Dialog(object):
+    def __init__(self, parent_window=None):
+        self.parent_window = parent_window
+
     def setupUi(self, Dialog):
+        self.dialog = Dialog
         Dialog.setObjectName("Dialog")
         Dialog.resize(1600, 900)
         Dialog.setWindowFlags(QtCore.Qt.FramelessWindowHint)
-
+        
+        # ------ Input Field: Masukkan Hari ------
         self.lineEdit_1 = QtWidgets.QLineEdit(Dialog)
         self.lineEdit_1.setGeometry(QtCore.QRect(963, 430, 481, 71))
         self.lineEdit_1.setStyleSheet(
@@ -59,32 +64,36 @@ class Ui_Dialog(object):
         )
         self.lineEdit_1.setObjectName("lineEdit_1")
         self.lineEdit_1.setPlaceholderText("Masukkan Nama Poli! (Contoh: Umum)")
-
-        # Gunakan HoverButton untuk tombol Back
+        
+        # ------ BACK BUTTON ------
         self.pushButton_3 = HoverButton(Dialog, image_path="C:/ASSETS/BUTTON/BACK.png")
         self.pushButton_3.setGeometry(QtCore.QRect(10, 20, 111, 101))
         self.pushButton_3.setText("")
         self.pushButton_3.setObjectName("pushButton_3")
-
+        # Hubungkan tombol back ke metode backToParent
+        self.pushButton_3.clicked.connect(self.backToParent)
+        
+        # ------ BACKGROUND LABEL ------
         self.label = QtWidgets.QLabel(Dialog)
         self.label.setGeometry(QtCore.QRect(-4, 0, 1611, 901))
         self.label.setText("")
         self.label.setPixmap(QtGui.QPixmap("C:/ASSETS/BACKGROUND/10.png"))
         self.label.setScaledContents(True)
         self.label.setObjectName("label")
-
-        # Gunakan HoverButton untuk tombol Tambah Poli
+        
+        # ------ TOMBOL TAMBAH POLI ------ 
         self.pushButton_1 = HoverButton(Dialog, image_path="C:/ASSETS/BUTTON/TAMBAH_POLI.png")
         self.pushButton_1.setGeometry(QtCore.QRect(911, 547, 591, 87))
         self.pushButton_1.setText("")
         self.pushButton_1.setObjectName("pushButton_1")
-
-        # Gunakan HoverButton untuk tombol Hapus Poli
+        
+        # ------ TOMBOL HAPUS POLI ------ 
         self.pushButton_2 = HoverButton(Dialog, image_path="C:/Users/Rangga/Documents/KULIAH/SEMESTER 2/PROYEK 1/TUBES PRA ETS/ASSETS/BUTTON/HAPUS_POLI.png")
         self.pushButton_2.setGeometry(QtCore.QRect(911, 663, 591, 87))
         self.pushButton_2.setText("")
         self.pushButton_2.setObjectName("pushButton_2")
-
+        
+        # ------ TABEL VIEW ------
         self.tableView = QtWidgets.QTableView(Dialog)
         self.tableView.setGeometry(QtCore.QRect(100, 238, 601, 571))
         self.tableView.setStyleSheet(
@@ -103,7 +112,8 @@ class Ui_Dialog(object):
             """
         )
         self.tableView.setObjectName("tableView")
-
+        
+        # Urutan tampilan: pastikan background di bawah, kemudian komponen lainnya
         self.label.raise_()
         self.lineEdit_1.raise_()
         self.pushButton_3.raise_()
@@ -164,13 +174,19 @@ class Ui_Dialog(object):
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", "Splash Screen"))
+        Dialog.setWindowTitle(_translate("Dialog", "Window Edit Poli"))
+
+    def backToParent(self):
+        if self.parent_window:
+            self.parent_window.show()
+        self.dialog.close()
 
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
     Dialog = QtWidgets.QDialog()
-    ui = Ui_Dialog()
+    # Untuk pengujian, kita gunakan Dialog sebagai parent_window (atau None)
+    ui = Ui_Dialog(parent_window=Dialog)
     ui.setupUi(Dialog)
     Dialog.show()
     sys.exit(app.exec_())

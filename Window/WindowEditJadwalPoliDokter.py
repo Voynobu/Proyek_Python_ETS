@@ -6,6 +6,7 @@
 #       Admin dapat melihat, menambah, mengubah, dan menghapus jadwal dokter (termasuk status dan kuota).
 #       Tabel menampilkan informasi lengkap: nomor, poli, dokter (spesialisasi), jadwal, status, serta kuota.
 
+#   
 import sys
 import datetime
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -20,9 +21,7 @@ class HoverButton(QtWidgets.QPushButton):
         self.opacity_animation.setDuration(200)
         self.opacity_effect.setOpacity(1.0)
         if image_path:
-            self.setStyleSheet(
-                f"QPushButton {{ border-image: url('{image_path}'); background: transparent; border: none; }}"
-            )
+            self.setStyleSheet(f"QPushButton {{ border-image: url('{image_path}'); background: transparent; border: none; }}")
         self.setMouseTracking(True)
 
     def enterEvent(self, event):
@@ -40,7 +39,11 @@ class HoverButton(QtWidgets.QPushButton):
         super().leaveEvent(event)
 
 class Ui_Dialog(object):
+    def __init__(self, parent_window=None):
+        self.parent_window = parent_window
+
     def setupUi(self, Dialog):
+        self.dialog = Dialog  # Simpan referensi dialog
         Dialog.setObjectName("Dialog")
         Dialog.resize(1600, 900)
         Dialog.setWindowFlags(QtCore.Qt.FramelessWindowHint)
@@ -50,6 +53,7 @@ class Ui_Dialog(object):
         self.pushButton_4.setGeometry(QtCore.QRect(10, 20, 111, 101))
         self.pushButton_4.setText("")
         self.pushButton_4.setObjectName("pushButton_4")
+        self.pushButton_4.clicked.connect(self.backToMenuAdmin)
 
         # ------ BACKGROUND LABEL ------
         self.label = QtWidgets.QLabel(Dialog)
@@ -58,12 +62,6 @@ class Ui_Dialog(object):
         self.label.setPixmap(QtGui.QPixmap("C:/ASSETS/BACKGROUND/12.png"))
         self.label.setScaledContents(True)
         self.label.setObjectName("label")
-
-        # ------ BUTTON EDIT JADWAL ------
-        self.pushButton_1 = HoverButton(Dialog, image_path="C:/ASSETS/BUTTON/EDIT_JADWAL.png")
-        self.pushButton_1.setGeometry(QtCore.QRect(-2, 219, 411, 201))
-        self.pushButton_1.setText("")
-        self.pushButton_1.setObjectName("pushButton_1")
 
         # ------ TABLE VIEW ------
         self.tableView = QtWidgets.QTableView(Dialog)
@@ -85,19 +83,28 @@ class Ui_Dialog(object):
         )
         self.tableView.setObjectName("tableView")
 
-        # ------ BUTTON EDIT POLI ------
+        # ------ BUTTON EDIT JADWAL ------ (untuk membuka WindowEditJadwal)
+        self.pushButton_1 = HoverButton(Dialog, image_path="C:/ASSETS/BUTTON/EDIT_JADWAL.png")
+        self.pushButton_1.setGeometry(QtCore.QRect(-2, 219, 411, 201))
+        self.pushButton_1.setText("")
+        self.pushButton_1.setObjectName("pushButton_1")
+        self.pushButton_1.clicked.connect(self.openEditJadwal)
+
+        # ------ BUTTON EDIT POLI ------ (untuk membuka WindowEditPoli)
         self.pushButton_2 = HoverButton(Dialog, image_path="C:/ASSETS/BUTTON/EDIT_POLI.png")
         self.pushButton_2.setGeometry(QtCore.QRect(-2, 444, 411, 201))
         self.pushButton_2.setText("")
         self.pushButton_2.setObjectName("pushButton_2")
+        self.pushButton_2.clicked.connect(self.openEditPoli)
 
-        # ------ BUTTON EDIT DOKTER ------
+        # ------ BUTTON EDIT DOKTER ------ (untuk membuka WindowEditDokter)
         self.pushButton_3 = HoverButton(Dialog, image_path="C:/ASSETS/BUTTON/EDIT_DOK.png")
         self.pushButton_3.setGeometry(QtCore.QRect(-7, 669, 421, 201))
         self.pushButton_3.setText("")
         self.pushButton_3.setObjectName("pushButton_3")
+        self.pushButton_3.clicked.connect(self.openEditDokter)
 
-        # ------ LABEL DATETIME (Tanpa Background) ------
+        # ------ LABEL DATETIME ------
         self.label_datetime = QtWidgets.QLabel(Dialog)
         self.label_datetime.setGeometry(QtCore.QRect(431, 36, 691, 96))
         self.label_datetime.setAlignment(QtCore.Qt.AlignCenter)
@@ -112,7 +119,7 @@ class Ui_Dialog(object):
         )
         self.label_datetime.setObjectName("label_datetime")
 
-        # Z-order: pastikan background berada di bawah
+        # Z-order: pastikan background di bawah
         self.label.raise_()
         self.pushButton_4.raise_()
         self.pushButton_1.raise_()
@@ -132,18 +139,15 @@ class Ui_Dialog(object):
         self.tableView.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
         self.tableView.setFocusPolicy(QtCore.Qt.NoFocus)
 
-        # Sembunyikan header vertikal
         self.tableView.verticalHeader().setVisible(False)
         self.tableView.setShowGrid(True)
 
-        # Atur header & baris
         header = self.tableView.horizontalHeader()
         header.setSectionsMovable(False)
         header.setDefaultAlignment(QtCore.Qt.AlignCenter)
         header.setFixedHeight(100)
         self.tableView.verticalHeader().setDefaultSectionSize(100)
 
-        # Ukuran kolom (6 kolom)
         header.setSectionResizeMode(0, QtWidgets.QHeaderView.Fixed)
         self.tableView.setColumnWidth(0, 50)
         header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
@@ -152,10 +156,8 @@ class Ui_Dialog(object):
         header.setSectionResizeMode(4, QtWidgets.QHeaderView.Stretch)
         header.setSectionResizeMode(5, QtWidgets.QHeaderView.Stretch)
 
-        # Contoh data
         self.loadData()
 
-        # Timer update waktu
         self.timer = QtCore.QTimer(Dialog)
         self.timer.timeout.connect(self.updateDateTime)
         self.timer.start(1000)
@@ -169,6 +171,7 @@ class Ui_Dialog(object):
         self.tableView.setModel(self.model)
 
     def loadData(self):
+        # Contoh data, sesuaikan dengan kebutuhan
         data_list = [
             ("1", "POLI JANTUNG", "Dr. Asep (Kardiolog)", "TUESDAY (08:00 - 12:00)\nFRIDAY (10:00 - 13:00)", "AVAILABLE", "20"),
             ("2", "POLI MATA", "Dr. Messi (Spesialis THT-KL)", "MONDAY (10:00 - 15:00)\nTHURSDAY (07:00 - 12:00)", "UNAVAILABLE", "15"),
@@ -186,19 +189,49 @@ class Ui_Dialog(object):
 
     def updateDateTime(self):
         now = QtCore.QDateTime.currentDateTime()
-        day_of_week = now.toString("dddd").upper()      # Contoh: TUESDAY
-        date_str    = now.toString("yyyy-MM-dd")         # Contoh: 2025-03-13
-        time_str    = now.toString("HH:mm:ss")           # Contoh: 10:44:51
+        day_of_week = now.toString("dddd").upper()
+        date_str    = now.toString("yyyy-MM-dd")
+        time_str    = now.toString("HH:mm:ss")
         self.label_datetime.setText(f"{day_of_week} | {date_str} | {time_str}")
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "Window Edit Jadwal Poli Dokter"))
 
+    def openEditJadwal(self):
+        self.dialog.hide()
+        from WindowEditJadwal import Ui_Dialog as Ui_WindowEditJadwal
+        self.edit_jadwal_dialog = QtWidgets.QDialog()
+        self.ui_edit_jadwal = Ui_WindowEditJadwal(parent_window=self.dialog)
+        self.ui_edit_jadwal.setupUi(self.edit_jadwal_dialog)
+        self.edit_jadwal_dialog.show()
+
+    def openEditPoli(self):
+        self.dialog.hide()
+        from WindowEditPoli import Ui_Dialog as Ui_WindowEditPoli
+        self.edit_poli_dialog = QtWidgets.QDialog()
+        self.ui_edit_poli = Ui_WindowEditPoli(parent_window=self.dialog)
+        self.ui_edit_poli.setupUi(self.edit_poli_dialog)
+        self.edit_poli_dialog.show()
+
+    def openEditDokter(self):
+        self.dialog.hide()
+        from WindowEditDokter import Ui_WindowEditDokter
+        self.edit_dokter_dialog = QtWidgets.QDialog()
+        self.ui_edit_dokter = Ui_WindowEditDokter(parent_window=self.dialog)
+        self.ui_edit_dokter.setupUi(self.edit_dokter_dialog)
+        self.edit_dokter_dialog.show()
+
+    def backToMenuAdmin(self):
+        if self.parent_window:
+            self.parent_window.show()
+        self.dialog.close()
+
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     Dialog = QtWidgets.QDialog()
-    ui = Ui_Dialog()
+    # Untuk uji, jika tidak ada parent, bisa diset ke None
+    ui = Ui_Dialog(parent_window=None)
     ui.setupUi(Dialog)
     Dialog.show()
     sys.exit(app.exec_())

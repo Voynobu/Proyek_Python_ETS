@@ -7,6 +7,7 @@
 #         melakukan pendaftaran pasien, melihat daftar poli, dan 
 #         membatalkan pendaftaran dalam sistem rumah sakit.
 
+# WindowMenuUser.py
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 class HoverButton(QtWidgets.QPushButton):
@@ -14,12 +15,11 @@ class HoverButton(QtWidgets.QPushButton):
         super().__init__(parent)
         self.opacity_effect = QtWidgets.QGraphicsOpacityEffect(self)
         self.setGraphicsEffect(self.opacity_effect)
+        self.opacity_effect.setOpacity(1.0)
         self.opacity_animation = QtCore.QPropertyAnimation(self.opacity_effect, b"opacity")
         self.opacity_animation.setDuration(200)
-        self.opacity_effect.setOpacity(1.0)
         self.image_path = image_path
         if image_path:
-            # Pastikan path tidak berada dalam tanda kutip ganda di dalam f-string
             self.setStyleSheet(f"QPushButton {{ border-image: url({image_path}); }}")
         self.setMouseTracking(True)
 
@@ -55,17 +55,20 @@ class WindowMenuUser(QtWidgets.QDialog):
 
         # Tombol-tombol dengan efek hover
         self.pushButton = self.create_button(1012, 170, 557, 328, "PENDAFTARAN.png")
-        self.pushButton.clicked.connect(self.open_pendaftaran)
+        self.pushButton.clicked.connect(self.open_Pendaftaran)
 
         self.pushButton_3 = self.create_button(686, 171, 331, 329, "RIWAYAT.png")
+        self.pushButton_3.clicked.connect(self.open_Riwayat)
+
         self.pushButton_4 = self.create_button(673, 514, 512, 337, "LIHAT_POLI.png")
+        self.pushButton_4.clicked.connect(self.open_LihatPoli)
+        
         self.pushButton_5 = self.create_button(1166, 520, 404, 329, "BATAL_DAFTAR.png")
+        self.pushButton_5.clicked.connect(self.open_Cancel)
+        
         self.pushButton_2 = self.create_button(10, 20, 111, 101, "BACK.png", self.back_to_login)
 
     def create_button(self, x, y, width, height, image_name, action=None):
-        """
-        Membuat tombol dengan efek hover menggunakan HoverButton.
-        """
         image_path = f"C:/ASSETS/BUTTON/{image_name}"
         button = HoverButton(self, image_path=image_path)
         button.setGeometry(QtCore.QRect(x, y, width, height))
@@ -75,16 +78,40 @@ class WindowMenuUser(QtWidgets.QDialog):
         return button
 
     def back_to_login(self):
-        """Fungsi kembali ke halaman login user."""
         from WindowLoginUser import WindowLoginUser
         self.login_win = WindowLoginUser()
         self.login_win.show()
         self.close()
 
-    def open_pendaftaran(self):
+    def open_Riwayat(self):
+        from WindowRiwayat import Ui_Dialog  # Pastikan nama file dan class sesuai
+        self.riwayat_dialog = QtWidgets.QDialog()
+        self.ui_riwayat = Ui_Dialog()
+        self.ui_riwayat.setupUi(self.riwayat_dialog)
+        self.riwayat_dialog.show()
+        self.close()
+
+    def open_Pendaftaran(self):
         from WindowPendaftaranPasien import WindowPendaftaranPasien
         self.pendaftaran_window = WindowPendaftaranPasien(self.username)
         self.pendaftaran_window.show()
+        self.close()
+
+    def open_LihatPoli(self):
+        from WindowLihatDaftarPoliUser import Ui_Dialog  # Pastikan nama class dan path sudah benar
+        self.dialog = QtWidgets.QDialog()
+        self.ui_lihat = Ui_Dialog()
+        self.ui_lihat.setupUi(self.dialog)
+        self.dialog.show()
+        self.close()
+        
+    
+    def open_Cancel(self):
+        from WindowCancel import Ui_Dialog as CancelUi
+        self.cancel_dialog = QtWidgets.QDialog()
+        self.cancel_ui = CancelUi()
+        self.cancel_ui.setupUi(self.cancel_dialog)
+        self.cancel_dialog.show()
         self.close()
 
 if __name__ == "__main__":

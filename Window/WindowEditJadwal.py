@@ -5,6 +5,13 @@
 # Desc: - Program ini digunakan untuk mengelola jadwal layanan poli di rumah sakit.
 #       - Admin dapat menambah, mengubah, dan menghapus jadwal dokter secara interaktif.
 
+# WindowEditJadwal.py
+# Nama: Rangga Muhamad Fajar
+# Kelas: 1A - D4
+# NIM: 241524026
+# Desc: - Program ini digunakan untuk mengelola jadwal layanan poli di rumah sakit.
+#       - Admin dapat menambah, mengubah, dan menghapus jadwal dokter secara interaktif.
+
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 class HoverButton(QtWidgets.QPushButton):
@@ -36,10 +43,14 @@ class HoverButton(QtWidgets.QPushButton):
         super().leaveEvent(event)
 
 class Ui_Dialog(object):
+    def __init__(self, parent_window=None):
+        self.parent_window = parent_window
+
     def setupUi(self, Dialog):
-        Dialog.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+        self.dialog = Dialog  # Simpan referensi dialog ini
         Dialog.setObjectName("Dialog")
         Dialog.resize(1600, 900)
+        Dialog.setWindowFlags(QtCore.Qt.FramelessWindowHint)
         
         # ------ Input Field: Masukkan Hari ------
         self.lineEdit_1 = QtWidgets.QLineEdit(Dialog)
@@ -97,6 +108,7 @@ class Ui_Dialog(object):
         self.pushButton_4.setGeometry(QtCore.QRect(10, 20, 111, 101))
         self.pushButton_4.setText("")
         self.pushButton_4.setObjectName("pushButton_4")
+        self.pushButton_4.clicked.connect(self.backToParent)
         
         # ------ BACKGROUND LABEL ------
         self.label = QtWidgets.QLabel(Dialog)
@@ -220,12 +232,18 @@ class Ui_Dialog(object):
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "Window Edit Jadwal"))
+    
+    def backToParent(self):
+        if self.parent_window:
+            self.parent_window.show()
+        self.dialog.close()
 
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
     Dialog = QtWidgets.QDialog()
-    ui = Ui_Dialog()
+    # Untuk uji coba, kirimkan parent_window yang valid; misalnya, gunakan Dialog itu sendiri
+    ui = Ui_Dialog(parent_window=Dialog)
     ui.setupUi(Dialog)
     Dialog.show()
     sys.exit(app.exec_())

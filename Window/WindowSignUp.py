@@ -87,7 +87,7 @@ class Ui_Dialog(object):
         self.show_password_button = QtWidgets.QPushButton(Dialog)
         self.show_password_button.setGeometry(QtCore.QRect(676, 520, 61, 61))
         self.show_password_button.setStyleSheet("border: none;")
-        self.show_password_button.setIcon(QtGui.QIcon("C:/BUTTON/EYE.png"))
+        self.show_password_button.setIcon(QtGui.QIcon("C:/ASSETS/BUTTON/EYE.png"))
         self.show_password_button.setIconSize(QtCore.QSize(30, 30))
         self.show_password_button.setCheckable(True)
         self.show_password_button.clicked.connect(self.toggle_password_visibility)

@@ -39,26 +39,24 @@ class HoverButton(QtWidgets.QPushButton):
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(1598, 900)
+        Dialog.resize(1600, 900)
         Dialog.setWindowFlags(QtCore.Qt.FramelessWindowHint)
-        
-        # Tombol Back menggunakan HoverButton
+
         self.pushButton_3 = HoverButton(Dialog, image_path="C:/ASSETS/BUTTON/BACK.png")
         self.pushButton_3.setGeometry(QtCore.QRect(10, 20, 111, 101))
         self.pushButton_3.setText("")
         self.pushButton_3.setObjectName("pushButton_3")
+        self.pushButton_3.clicked.connect(self.backToMenu)
         
-        # Background
         self.label = QtWidgets.QLabel(Dialog)
         self.label.setGeometry(QtCore.QRect(-4, 0, 1611, 901))
         self.label.setText("")
-        self.label.setPixmap(QtGui.QPixmap("C:/ASSETS/BACKGROUND/16.png"))
+        self.label.setPixmap(QtGui.QPixmap("C:/ASSETS/BACKGROUND/14.png"))
         self.label.setScaledContents(True)
         self.label.setObjectName("label")
         
-        # Tabel untuk menampilkan data poli
         self.tableView = QtWidgets.QTableView(Dialog)
-        self.tableView.setGeometry(QtCore.QRect(124, 210, 1359, 602))
+        self.tableView.setGeometry(QtCore.QRect(258, 163, 1069, 698))
         self.tableView.setStyleSheet(
             "QHeaderView::section {\n"
             "    background-color: #0cc0df; \n"
@@ -68,17 +66,22 @@ class Ui_Dialog(object):
         )
         self.tableView.setObjectName("tableView")
         
-        # Pastikan tampilan tombol dan tabel berada di atas background
         self.label.raise_()
         self.pushButton_3.raise_()
         self.tableView.raise_()
 
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
-        
-        # Inisialisasi model tabel dan load data (misalnya, dari file JSON)
+
         self.initModel()
         self.loadData()
+        
+    def backToMenu(self):
+        from WindowMenuUser import WindowMenuUser
+        self.menu = WindowMenuUser("test")
+        self.menu.show()
+        self.dialog = self.pushButton_3.parent()
+        self.dialog.close()
         
     def initModel(self):
         self.model = QStandardItemModel()
@@ -107,10 +110,10 @@ class Ui_Dialog(object):
         except Exception as e:
             print("Error membaca file JSON:", e)
     
+    
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "Lihat Daftar Poli"))
-
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
@@ -119,3 +122,4 @@ if __name__ == "__main__":
     ui.setupUi(Dialog)
     Dialog.show()
     sys.exit(app.exec_())
+

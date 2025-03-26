@@ -35,8 +35,13 @@ class HoverButton(QtWidgets.QPushButton):
         self.opacity_animation.start()
         super().leaveEvent(event)
 
-class Ui_Dialog(object):
+class Ui_WindowEditDokter(object):
+    def __init__(self, parent_window=None):
+        # Simpan referensi ke window sebelumnya (parent window)
+        self.parent_window = parent_window
+
     def setupUi(self, Dialog):
+        self.dialog = Dialog  # Simpan referensi dialog agar bisa ditutup nanti
         Dialog.setObjectName("Dialog")
         Dialog.resize(1600, 900)
         Dialog.setWindowFlags(QtCore.Qt.FramelessWindowHint)
@@ -80,6 +85,8 @@ class Ui_Dialog(object):
         self.pushButton_3.setGeometry(QtCore.QRect(10, 20, 111, 101))
         self.pushButton_3.setText("")
         self.pushButton_3.setObjectName("pushButton_3")
+        # Hubungkan tombol back dengan fungsi untuk kembali ke window sebelumnya
+        self.pushButton_3.clicked.connect(self.backToJadwalPoliDokter)
 
         # ------ BACKGROUND LABEL ------
         self.label = QtWidgets.QLabel(Dialog)
@@ -202,7 +209,6 @@ class Ui_Dialog(object):
 
     def loadData(self):
         # Contoh: load data dari file JSON "dokter_data.json"
-        # Asumsikan struktur JSON: {"dokter": {"dr.john": "Jantung", "dr.smith": "Saraf", ...}}
         file_path = "dokter_data.json"
         try:
             with open(file_path, "r") as file:
@@ -230,7 +236,7 @@ class Ui_Dialog(object):
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", "Splash Screen"))
+        Dialog.setWindowTitle(_translate("Dialog", "Edit Dokter"))
         self.lineEdit_1.setText(_translate("Dialog", ""))
         self.lineEdit_2.setText(_translate("Dialog", ""))
         self.comboBox_2.setItemText(0, _translate("Dialog", "POLI JANTUNG"))
@@ -239,11 +245,22 @@ class Ui_Dialog(object):
         self.comboBox_2.setItemText(3, _translate("Dialog", "POLI SARAF"))
         self.comboBox_2.setItemText(4, _translate("Dialog", "POLI ANAK"))
 
+    def backToJadwalPoliDokter(self):
+        """
+        Metode ini akan dipanggil ketika tombol back diklik.
+        Jika ada parent window (dalam hal ini window edit jadwal poli dokter), maka tampilkan kembali.
+        Setelah itu, tutup dialog window edit dokter.
+        """
+        if self.parent_window:
+            self.parent_window.show()
+        self.dialog.close()
+
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
     Dialog = QtWidgets.QDialog()
-    ui = Ui_Dialog()
+    # Untuk uji, jika tidak ada parent, bisa diset ke None
+    ui = Ui_WindowEditDokter(parent_window=None)
     ui.setupUi(Dialog)
     Dialog.show()
     sys.exit(app.exec_())

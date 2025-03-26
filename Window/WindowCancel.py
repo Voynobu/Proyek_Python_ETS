@@ -39,6 +39,8 @@ class HoverButton(QtWidgets.QPushButton):
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
+        # Simpan referensi dialog untuk digunakan di method backToMenuUser
+        self.dialog = Dialog
         Dialog.setObjectName("Dialog")
         Dialog.resize(1598, 900)
         Dialog.setWindowFlags(QtCore.Qt.FramelessWindowHint)
@@ -48,6 +50,8 @@ class Ui_Dialog(object):
         self.pushButton_3.setGeometry(QtCore.QRect(10, 20, 111, 101))
         self.pushButton_3.setText("")
         self.pushButton_3.setObjectName("pushButton_3")
+        # Hubungkan tombol back dengan method backToMenuUser
+        self.pushButton_3.clicked.connect(self.backToMenuUser)
         
         self.label = QtWidgets.QLabel(Dialog)
         self.label.setGeometry(QtCore.QRect(-4, 0, 1611, 901))
@@ -73,12 +77,50 @@ class Ui_Dialog(object):
 
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
-
+        
+        # Inisialisasi model tabel dan load data (misalnya, dari file JSON)
+        self.initModel()
+        self.loadData()
+        
+    def initModel(self):
+        self.model = QStandardItemModel()
+        self.model.setHorizontalHeaderLabels(["NO", "NAMA POLI"])
+        self.tableView.setModel(self.model)
+    
+    def loadData(self):
+        file_path = "poliklinik_data.json"
+        try:
+            with open(file_path, "r") as file:
+                data = json.load(file)
+            poliklinik_data = data.get("poliklinik", {})
+            
+            self.model.setRowCount(0)
+            row_num = 0
+            for poli_name in poliklinik_data.keys():
+                if poli_name.strip():
+                    item_no = QStandardItem(str(row_num + 1))
+                    item_no.setTextAlignment(QtCore.Qt.AlignCenter)
+                    
+                    item_poli = QStandardItem(poli_name.capitalize())
+                    item_poli.setTextAlignment(QtCore.Qt.AlignCenter)
+                    
+                    self.model.appendRow([item_no, item_poli])
+                    row_num += 1
+        except Exception as e:
+            print("Error membaca file JSON:", e)
+    
+    def backToMenuUser(self):
+        from WindowMenuUser import WindowMenuUser
+        self.menu_user = WindowMenuUser("test")  # Ganti "test" dengan username yang sesuai
+        self.menu_user.show()
+        self.dialog.close()
+    
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "Splash Screen"))
 
 if __name__ == "__main__":
+    import sys
     app = QtWidgets.QApplication(sys.argv)
     Dialog = QtWidgets.QDialog()
     ui = Ui_Dialog()
