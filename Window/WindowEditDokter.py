@@ -1,3 +1,10 @@
+# WindowEditDokter.py
+# Nama: Rangga Muhamad Fajar
+# Kelas: 1A - D4
+# NIM: 241524026
+# Desc: - Program ini digunakan untuk mengelola dokter yang ada di rumah sakit.
+#       - Admin dapat menambah dan menghapus dokter secara interaktif.
+
 import json
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
