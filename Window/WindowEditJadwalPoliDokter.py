@@ -6,8 +6,8 @@
 #       Admin dapat melihat, menambah, mengubah, dan menghapus jadwal dokter (termasuk status dan kuota).
 #       Tabel menampilkan informasi lengkap: nomor, poli, dokter (spesialisasi), jadwal, status, serta kuota.
 
-#   
 import sys
+import json
 import datetime
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
@@ -49,7 +49,7 @@ class Ui_Dialog(object):
         Dialog.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 
         # ------ BACK BUTTON ------
-        self.pushButton_4 = HoverButton(Dialog, image_path="C:/Users/Rangga/Documents/KULIAH/SEMESTER 2/PROYEK 1/TUBES PRA ETS/ASSETS/BUTTON/BACK.png")
+        self.pushButton_4 = HoverButton(Dialog, image_path="C:/ASSETS/BUTTON/BACK.png")
         self.pushButton_4.setGeometry(QtCore.QRect(10, 20, 111, 101))
         self.pushButton_4.setText("")
         self.pushButton_4.setObjectName("pushButton_4")
@@ -83,21 +83,21 @@ class Ui_Dialog(object):
         )
         self.tableView.setObjectName("tableView")
 
-        # ------ BUTTON EDIT JADWAL ------ (untuk membuka WindowEditJadwal)
+        # ------ BUTTON EDIT JADWAL ------
         self.pushButton_1 = HoverButton(Dialog, image_path="C:/ASSETS/BUTTON/EDIT_JADWAL.png")
         self.pushButton_1.setGeometry(QtCore.QRect(-2, 219, 411, 201))
         self.pushButton_1.setText("")
         self.pushButton_1.setObjectName("pushButton_1")
         self.pushButton_1.clicked.connect(self.openEditJadwal)
 
-        # ------ BUTTON EDIT POLI ------ (untuk membuka WindowEditPoli)
+        # ------ BUTTON EDIT POLI ------
         self.pushButton_2 = HoverButton(Dialog, image_path="C:/ASSETS/BUTTON/EDIT_POLI.png")
         self.pushButton_2.setGeometry(QtCore.QRect(-2, 444, 411, 201))
         self.pushButton_2.setText("")
         self.pushButton_2.setObjectName("pushButton_2")
         self.pushButton_2.clicked.connect(self.openEditPoli)
 
-        # ------ BUTTON EDIT DOKTER ------ (untuk membuka WindowEditDokter)
+        # ------ BUTTON EDIT DOKTER ------
         self.pushButton_3 = HoverButton(Dialog, image_path="C:/ASSETS/BUTTON/EDIT_DOK.png")
         self.pushButton_3.setGeometry(QtCore.QRect(-7, 669, 421, 201))
         self.pushButton_3.setText("")
@@ -171,15 +171,65 @@ class Ui_Dialog(object):
         self.tableView.setModel(self.model)
 
     def loadData(self):
-        # Contoh data, sesuaikan dengan kebutuhan
-        data_list = [
-            ("1", "POLI JANTUNG", "Dr. Asep (Kardiolog)", "TUESDAY (08:00 - 12:00)\nFRIDAY (10:00 - 13:00)", "AVAILABLE", "20"),
-            ("2", "POLI MATA", "Dr. Messi (Spesialis THT-KL)", "MONDAY (10:00 - 15:00)\nTHURSDAY (07:00 - 12:00)", "UNAVAILABLE", "15"),
-            ("3", "POLI SARAF", "Dr. Rafi (Pediatric Gawat Darurat)", "TUESDAY (08:00 - 12:00)\nWEDNESDAY (18:00 - 20:00)", "AVAILABLE", "20"),
-            ("4", "POLI ANAK", "Dr. Rehan (Spesialis Anak)", "THURSDAY (10:00 - 12:00)", "UNAVAILABLE", "20"),
+        try:
+            with open("JadwalPoli.json", "r", encoding="utf-8") as file:
+                data = json.load(file)
+                self.model.setRowCount(0)
+                
+                for idx, poli in enumerate(data["daftar_poli"], start=1):
+                    nama_poli = poli["nama_poli"].upper()
+                    kuota = str(poli.get("kuota", "N/A"))
+                    
+                    # Format dokter
+                    dokter_str = "\n".join([
+                        f"{dokter['nama']} ({dokter['spesialis']})" 
+                        for dokter in poli["dokter_list"]
+                    ])
+                    
+                    # Format jadwal dan status
+                    jadwal_entries = []
+                    status_entries = []
+                    for jadwal in poli["jadwal_list"]:
+                        hari = jadwal["hari"].upper()
+                        jam = f"{jadwal['jam_awal']} - {jadwal['jam_akhir']}"
+                        jadwal_entries.append(f"{hari} ({jam})")
+                        status_entries.append(jadwal.get("status", "N/A").upper())
+                    
+                    jadwal_str = "\n".join(jadwal_entries)
+                    status_str = "\n".join(status_entries)
+                    
+                    # Tambahkan baris ke tabel
+                    row_data = [
+                        str(idx), 
+                        nama_poli, 
+                        dokter_str, 
+                        jadwal_str, 
+                        status_str, 
+                        kuota
+                    ]
+                    
+                    items = []
+                    for value in row_data:
+                        item = QStandardItem(str(value))
+                        item.setTextAlignment(QtCore.Qt.AlignCenter)
+                        items.append(item)
+                    self.model.appendRow(items)
+                    
+        except Exception as e:
+            print(f"Error loading JSON data: {e}")
+            # Fallback data jika file tidak ditemukan
+            self.loadFallbackData()
+
+    def loadFallbackData(self):
+        fallback_data = [
+            ("1", "POLI JANTUNG", "Dr. Asep (Kardiolog)", "TUESDAY (08:00 - 12:00)\nFRIDAY (13:00 - 18:00)", "AVAILABLE\nAVAILABLE", "20"),
+            ("2", "POLI MATA", "Dr. Ahmad (Oftalmolog)", "MONDAY (09:00 - 15:00)\nTHURSDAY (07:00 - 12:00)", "AVAILABLE\nUNAVAILABLE", "15"),
+            ("3", "POLI THT-KL", "Dr. Messi (Spesialis THT-KH)", "TUESDAY (11:00 - 18:00)\nWEDNESDAY (18:00 - 21:00)", "AVAILABLE\nAVAILABLE", "25"),
+            ("4", "POLI SARAF", "Dr. Jajang (Neurolog)", "TUESDAY (08:00 - 13:00)\nSUNDAY (10:00 - 17:00)", "AVAILABLE\nUNAVAILABLE", "18"),
+            ("5", "POLI ANAK", "Dr.Radhit (Pediatrik Gawat Darurat)", "THURSDAY (10:00 - 17:00)", "AVAILABLE", "30")
         ]
         self.model.setRowCount(0)
-        for row_data in data_list:
+        for row_data in fallback_data:
             items = []
             for value in row_data:
                 item = QStandardItem(str(value))

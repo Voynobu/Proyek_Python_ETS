@@ -88,7 +88,7 @@ class Ui_Dialog(object):
         self.pushButton_1.setObjectName("pushButton_1")
         
         # ------ TOMBOL HAPUS POLI ------ 
-        self.pushButton_2 = HoverButton(Dialog, image_path="C:/Users/Rangga/Documents/KULIAH/SEMESTER 2/PROYEK 1/TUBES PRA ETS/ASSETS/BUTTON/HAPUS_POLI.png")
+        self.pushButton_2 = HoverButton(Dialog, image_path="C:/ASSETS/BUTTON/HAPUS_POLI.png")
         self.pushButton_2.setGeometry(QtCore.QRect(911, 663, 591, 87))
         self.pushButton_2.setText("")
         self.pushButton_2.setObjectName("pushButton_2")

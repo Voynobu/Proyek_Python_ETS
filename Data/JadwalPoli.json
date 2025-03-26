@@ -1,0 +1,135 @@
+{
+    "nama": "Jadwal Poli",
+    "daftar_poli": [
+        {
+            "nama_poli": "Poli Jantung",
+            "kuota": 20,
+            "dokter_list": [
+                {
+                    "nama": "Dr. Asep",
+                    "spesialis": "Kardiolog"
+                }
+            ],
+            "jadwal_list": [
+                {
+                    "dokter": "Dr. Asep",
+                    "hari": "Tuesday",
+                    "jam_awal": "08:00",
+                    "jam_akhir": "12:00",
+                    "status": "AVAILABLE"
+                },
+                {
+                    "dokter": "Dr. Asep",
+                    "hari": "Friday",
+                    "jam_awal": "13:00",
+                    "jam_akhir": "18:00",
+                    "status": "AVAILABLE"
+                },
+                {
+                    "dokter": "Dr. Asep",
+                    "hari": "Tuesday",
+                    "jam_awal": "09:00",
+                    "jam_akhir": "13:00",
+                    "status": "UNAVAILABLE"
+                }
+            ]
+        },
+        {
+            "nama_poli": "Poli Mata",
+            "kuota": 15,
+            "dokter_list": [
+                {
+                    "nama": "Dr. Ahmad",
+                    "spesialis": "Oftalmolog"
+                }
+            ],
+            "jadwal_list": [
+                {
+                    "dokter": "Dr. Ahmad",
+                    "hari": "Monday",
+                    "jam_awal": "09:00",
+                    "jam_akhir": "15:00",
+                    "status": "AVAILABLE"
+                },
+                {
+                    "dokter": "Dr. Ahmad",
+                    "hari": "Thursday",
+                    "jam_awal": "07:00",
+                    "jam_akhir": "12:00",
+                    "status": "UNAVAILABLE"
+                }
+            ]
+        },
+        {
+            "nama_poli": "Poli THT-KL",
+            "kuota": 25,
+            "dokter_list": [
+                {
+                    "nama": "Dr. Messi",
+                    "spesialis": "Spesialis THT-KH"
+                }
+            ],
+            "jadwal_list": [
+                {
+                    "dokter": "Dr. Messi",
+                    "hari": "Tuesday",
+                    "jam_awal": "11:00",
+                    "jam_akhir": "18:00",
+                    "status": "AVAILABLE"
+                },
+                {
+                    "dokter": "Dr. Messi",
+                    "hari": "Wednesday",
+                    "jam_awal": "18:00",
+                    "jam_akhir": "21:00",
+                    "status": "AVAILABLE"
+                }
+            ]
+        },
+        {
+            "nama_poli": "Poli Saraf",
+            "kuota": 18,
+            "dokter_list": [
+                {
+                    "nama": "Dr. Jajang",
+                    "spesialis": "Neurolog"
+                }
+            ],
+            "jadwal_list": [
+                {
+                    "dokter": "Dr. Jajang",
+                    "hari": "Tuesday",
+                    "jam_awal": "08:00",
+                    "jam_akhir": "13:00",
+                    "status": "AVAILABLE"
+                },
+                {
+                    "dokter": "Dr. Jajang",
+                    "hari": "Sunday",
+                    "jam_awal": "10:00",
+                    "jam_akhir": "17:00",
+                    "status": "UNAVAILABLE"
+                }
+            ]
+        },
+        {
+            "nama_poli": "Poli Anak",
+            "kuota": 30,
+            "dokter_list": [
+                {
+                    "nama": "Dr.Radhit",
+                    "spesialis": "Pediatrik Gawat Darurat"
+                }
+            ],
+            "jadwal_list": [
+                {
+                    "dokter": "Dr.Radhit",
+                    "hari": "Thursday",
+                    "jam_awal": "10:00",
+                    "jam_akhir": "17:00",
+                    "status": "AVAILABLE"
+                }
+            ]
+        }
+    ]
+}
