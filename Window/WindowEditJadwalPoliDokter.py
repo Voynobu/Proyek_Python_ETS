@@ -138,7 +138,6 @@ class Ui_Dialog(object):
         self.tableView.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.tableView.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
         self.tableView.setFocusPolicy(QtCore.Qt.NoFocus)
-
         self.tableView.verticalHeader().setVisible(False)
         self.tableView.setShowGrid(True)
 
@@ -148,13 +147,18 @@ class Ui_Dialog(object):
         header.setFixedHeight(100)
         self.tableView.verticalHeader().setDefaultSectionSize(100)
 
+        # Set column widths
         header.setSectionResizeMode(0, QtWidgets.QHeaderView.Fixed)
-        self.tableView.setColumnWidth(0, 50)
-        header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
-        header.setSectionResizeMode(2, QtWidgets.QHeaderView.Stretch)
-        header.setSectionResizeMode(3, QtWidgets.QHeaderView.Stretch)
-        header.setSectionResizeMode(4, QtWidgets.QHeaderView.Stretch)
-        header.setSectionResizeMode(5, QtWidgets.QHeaderView.Stretch)
+        self.tableView.setColumnWidth(0, 50)  # NO
+        header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)  # POLI
+        header.setSectionResizeMode(2, QtWidgets.QHeaderView.Stretch)  # DOKTER
+        header.setSectionResizeMode(3, QtWidgets.QHeaderView.Stretch)  # JADWAL
+        header.setSectionResizeMode(4, QtWidgets.QHeaderView.Fixed)    # STATUS
+        self.tableView.setColumnWidth(4, 150)
+        header.setSectionResizeMode(5, QtWidgets.QHeaderView.Fixed)   # KUOTA AWAL
+        self.tableView.setColumnWidth(5, 120)
+        header.setSectionResizeMode(6, QtWidgets.QHeaderView.Fixed)   # KUOTA LEFT
+        self.tableView.setColumnWidth(6, 120)
 
         self.loadData()
 
@@ -166,7 +170,7 @@ class Ui_Dialog(object):
     def initTable(self):
         self.model = QStandardItemModel()
         self.model.setHorizontalHeaderLabels([
-            "NO", "POLI", "DOKTER", "JADWAL", "STATUS", "KUOTA"
+            "NO", "POLI", "DOKTER", "JADWAL", "STATUS", "KUOTA", "TERSEDIA"
         ])
         self.tableView.setModel(self.model)
 
@@ -179,6 +183,12 @@ class Ui_Dialog(object):
                 for idx, poli in enumerate(data["daftar_poli"], start=1):
                     nama_poli = poli["nama_poli"].upper()
                     kuota = str(poli.get("kuota", "N/A"))
+                    
+                    # Calculate tersedia (80% of kuota for demo)
+                    try:
+                        tersedia = str(int(int(kuota) * 0.8))
+                    except:
+                        tersedia = "N/A"
                     
                     # Format dokter
                     dokter_str = "\n".join([
@@ -205,7 +215,8 @@ class Ui_Dialog(object):
                         dokter_str, 
                         jadwal_str, 
                         status_str, 
-                        kuota
+                        kuota,
+                        tersedia
                     ]
                     
                     items = []
@@ -222,11 +233,11 @@ class Ui_Dialog(object):
 
     def loadFallbackData(self):
         fallback_data = [
-            ("1", "POLI JANTUNG", "Dr. Asep (Kardiolog)", "TUESDAY (08:00 - 12:00)\nFRIDAY (13:00 - 18:00)", "AVAILABLE\nAVAILABLE", "20"),
-            ("2", "POLI MATA", "Dr. Ahmad (Oftalmolog)", "MONDAY (09:00 - 15:00)\nTHURSDAY (07:00 - 12:00)", "AVAILABLE\nUNAVAILABLE", "15"),
-            ("3", "POLI THT-KL", "Dr. Messi (Spesialis THT-KH)", "TUESDAY (11:00 - 18:00)\nWEDNESDAY (18:00 - 21:00)", "AVAILABLE\nAVAILABLE", "25"),
-            ("4", "POLI SARAF", "Dr. Jajang (Neurolog)", "TUESDAY (08:00 - 13:00)\nSUNDAY (10:00 - 17:00)", "AVAILABLE\nUNAVAILABLE", "18"),
-            ("5", "POLI ANAK", "Dr.Radhit (Pediatrik Gawat Darurat)", "THURSDAY (10:00 - 17:00)", "AVAILABLE", "30")
+            ("1", "POLI JANTUNG", "Dr. Asep (Kardiolog)", "TUESDAY (08:00 - 12:00)\nFRIDAY (13:00 - 18:00)", "AVAILABLE\nAVAILABLE", "20", "16"),
+            ("2", "POLI MATA", "Dr. Ahmad (Oftalmolog)", "MONDAY (09:00 - 15:00)\nTHURSDAY (07:00 - 12:00)", "AVAILABLE\nUNAVAILABLE", "15", "12"),
+            ("3", "POLI THT-KL", "Dr. Messi (Spesialis THT-KH)", "TUESDAY (11:00 - 18:00)\nWEDNESDAY (18:00 - 21:00)", "AVAILABLE\nAVAILABLE", "25", "20"),
+            ("4", "POLI SARAF", "Dr. Jajang (Neurolog)", "TUESDAY (08:00 - 13:00)\nSUNDAY (10:00 - 17:00)", "AVAILABLE\nUNAVAILABLE", "18", "14"),
+            ("5", "POLI ANAK", "Dr.Radhit (Pediatrik Gawat Darurat)", "THURSDAY (10:00 - 17:00)", "AVAILABLE", "30", "24")
         ]
         self.model.setRowCount(0)
         for row_data in fallback_data:
@@ -240,8 +251,8 @@ class Ui_Dialog(object):
     def updateDateTime(self):
         now = QtCore.QDateTime.currentDateTime()
         day_of_week = now.toString("dddd").upper()
-        date_str    = now.toString("yyyy-MM-dd")
-        time_str    = now.toString("HH:mm:ss")
+        date_str = now.toString("yyyy-MM-dd")
+        time_str = now.toString("HH:mm:ss")
         self.label_datetime.setText(f"{day_of_week} | {date_str} | {time_str}")
 
     def retranslateUi(self, Dialog):
@@ -280,7 +291,6 @@ class Ui_Dialog(object):
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     Dialog = QtWidgets.QDialog()
-    # Untuk uji, jika tidak ada parent, bisa diset ke None
     ui = Ui_Dialog(parent_window=None)
     ui.setupUi(Dialog)
     Dialog.show()
