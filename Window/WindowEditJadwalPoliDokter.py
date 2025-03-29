@@ -288,6 +288,40 @@ class Ui_Dialog(object):
             self.parent_window.show()
         self.dialog.close()
 
+    def openEditJadwal(self):
+        self.dialog.hide()
+        from WindowEditJadwal import Ui_Dialog as Ui_WindowEditJadwal
+        self.edit_jadwal_dialog = QtWidgets.QDialog()
+        self.ui_edit_jadwal = Ui_WindowEditJadwal(parent_window=self.dialog)
+        self.ui_edit_jadwal.setupUi(self.edit_jadwal_dialog)
+        
+        # Connect the dialog's finished signal to refresh data
+        self.edit_jadwal_dialog.finished.connect(self.loadData)
+        self.edit_jadwal_dialog.show()
+
+    def openEditPoli(self):
+        self.dialog.hide()
+        from WindowEditPoli import Ui_Dialog as Ui_WindowEditPoli
+        self.edit_poli_dialog = QtWidgets.QDialog()
+        self.ui_edit_poli = Ui_WindowEditPoli(parent_window=self.dialog)
+        self.ui_edit_poli.setupUi(self.edit_poli_dialog)
+        
+        # Connect the dialog's finished signal to refresh data
+        self.edit_poli_dialog.finished.connect(self.loadData)
+        self.edit_poli_dialog.show()
+
+    def openEditDokter(self):
+        self.dialog.hide()
+        from WindowEditDokter import Ui_WindowEditDokter
+        self.edit_dokter_dialog = QtWidgets.QDialog()
+        self.ui_edit_dokter = Ui_WindowEditDokter(parent_window=self.dialog)
+        self.ui_edit_dokter.setupUi(self.edit_dokter_dialog)
+        
+        # Connect the dialog's finished signal to refresh data
+        self.edit_dokter_dialog.finished.connect(self.loadData)
+        self.edit_dokter_dialog.show()
+
+
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     Dialog = QtWidgets.QDialog()

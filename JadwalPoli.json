@@ -2,39 +2,6 @@
     "nama": "Jadwal Poli",
     "daftar_poli": [
         {
-            "nama_poli": "Poli Jantung",
-            "kuota": 20,
-            "dokter_list": [
-                {
-                    "nama": "Dr. Asep",
-                    "spesialis": "Kardiolog"
-                }
-            ],
-            "jadwal_list": [
-                {
-                    "dokter": "Dr. Asep",
-                    "hari": "Tuesday",
-                    "jam_awal": "08:00",
-                    "jam_akhir": "12:00",
-                    "status": "AVAILABLE"
-                },
-                {
-                    "dokter": "Dr. Asep",
-                    "hari": "Friday",
-                    "jam_awal": "13:00",
-                    "jam_akhir": "18:00",
-                    "status": "AVAILABLE"
-                },
-                {
-                    "dokter": "Dr. Asep",
-                    "hari": "Tuesday",
-                    "jam_awal": "09:00",
-                    "jam_akhir": "13:00",
-                    "status": "UNAVAILABLE"
-                }
-            ]
-        },
-        {
             "nama_poli": "Poli Mata",
             "kuota": 15,
             "dokter_list": [
@@ -44,13 +11,6 @@
                 }
             ],
             "jadwal_list": [
-                {
-                    "dokter": "Dr. Ahmad",
-                    "hari": "Monday",
-                    "jam_awal": "09:00",
-                    "jam_akhir": "15:00",
-                    "status": "AVAILABLE"
-                },
                 {
                     "dokter": "Dr. Ahmad",
                     "hari": "Thursday",
