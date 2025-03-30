@@ -3,22 +3,13 @@
         {
             "nama": "ivan",
             "jenis_kelamin": "Pria",
-            "tanggal_lahir": "29-07-2025",
             "jenis_layanan": "Mandiri",
-            "poli": "umum",
-            "dokter": "dokter anwar",
-            "tanggal_temu": "sakit perut",
-            "keluhan": "23-03-2025"
-        },
-        {
-            "nama": "test",
-            "jenis_kelamin": "Pria",
-            "tanggal_lahir": "22-03-2025",
-            "jenis_layanan": "Mandiri",
-            "poli": "mata",
-            "dokter": "dokter azhar",
-            "tanggal_temu": "tesst",
-            "keluhan": "23-03-2025"
+            "poli": "Poli Jantung",
+            "dokter": "Dr. Asep",
+            "jadwal": "08:00 - 12:00",
+            "tanggal_temu": "01-04-2025",
+            "keluhan": "sakit",
+            "nomor antrian": "MNDR-Poli Jantung-1"
         }
     ]
 }
