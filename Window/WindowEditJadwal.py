@@ -2,50 +2,54 @@
 # Nama: Rangga Muhamad Fajar
 # Kelas: 1A - D4
 # NIM: 241524026
-# Desc: - Program ini digunakan untuk mengelola jadwal layanan poli di rumah sakit.
-#       - Admin dapat menambah, mengubah, dan menghapus jadwal dokter secara interaktif.
+# Desc: Program untuk mengelola jadwal layanan poli di rumah sakit
 
-
+import json
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QMessageBox
 
 class HoverButton(QtWidgets.QPushButton):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, image_path=""):
         super().__init__(parent)
-        self.effect = QtWidgets.QGraphicsOpacityEffect(self)
-        self.setGraphicsEffect(self.effect)
-        self.effect.setOpacity(1.0)
+        self.opacity_effect = QtWidgets.QGraphicsOpacityEffect(self)
+        self.setGraphicsEffect(self.opacity_effect)
+        self.opacity_animation = QtCore.QPropertyAnimation(self.opacity_effect, b"opacity")
+        self.opacity_animation.setDuration(200)
+        self.opacity_effect.setOpacity(1.0)
+        if image_path:
+            self.setStyleSheet(
+                f"QPushButton {{ border-image: url('{image_path}'); background: transparent; border: none; }}"
+            )
+        self.setMouseTracking(True)
 
     def enterEvent(self, event):
-        self.effect.setOpacity(0.7) 
+        self.opacity_animation.stop()
+        self.opacity_animation.setStartValue(self.opacity_effect.opacity())
+        self.opacity_animation.setEndValue(0.7)
+        self.opacity_animation.start()
         super().enterEvent(event)
 
     def leaveEvent(self, event):
-        self.effect.setOpacity(1.0)
+        self.opacity_animation.stop()
+        self.opacity_animation.setStartValue(self.opacity_effect.opacity())
+        self.opacity_animation.setEndValue(1.0)
+        self.opacity_animation.start()
         super().leaveEvent(event)
 
-
 class Ui_Dialog(object):
+    def __init__(self, parent_window=None):
+        self.parent_window = parent_window
+        self.current_data = self.load_data()
+        self.selected_poli_index = -1
+        self.selected_jadwal_index = -1
+
     def setupUi(self, Dialog):
-        Dialog.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+        self.dialog = Dialog
         Dialog.setObjectName("Dialog")
         Dialog.resize(1600, 900)
+        Dialog.setWindowFlags(QtCore.Qt.FramelessWindowHint)
         
-        self.lineEdit_2 = QtWidgets.QLineEdit(Dialog)
-        self.lineEdit_2.setGeometry(QtCore.QRect(154, 639, 648, 51))
-        self.lineEdit_2.setStyleSheet(
-            "QLineEdit {"
-            "    color: black; "
-            "    border: none; "
-            "    border-bottom: 4px solid #a6a6a6; "
-            "    font-size: 20px;"
-            "}"
-            "QLineEdit:focus {"
-            "    border-bottom: 4px solid #ffbd59;"
-            "}"
-        )
-        self.lineEdit_2.setObjectName("lineEdit_2")
-        self.lineEdit_2.setPlaceholderText("Masukkan Jam Awal (Format: HH:MM)")
-        
+        # ------ Input Field: Masukkan Hari ------
         self.lineEdit_1 = QtWidgets.QLineEdit(Dialog)
         self.lineEdit_1.setGeometry(QtCore.QRect(154, 554, 648, 51))
         self.lineEdit_1.setStyleSheet(
@@ -62,22 +66,24 @@ class Ui_Dialog(object):
         self.lineEdit_1.setObjectName("lineEdit_1")
         self.lineEdit_1.setPlaceholderText("Masukkan Hari (Contoh: Monday)")
         
-        # Gunakan HoverButton sebagai push button dengan efek hover
-        self.pushButton_4 = HoverButton(Dialog)
-        self.pushButton_4.setGeometry(QtCore.QRect(10, 20, 111, 101))
-        self.pushButton_4.setStyleSheet(
-            "border-image: url(C:/ASSETS/BUTTON/BACK.png);"
+        # ------ Input Field: Masukkan Jam Awal ------
+        self.lineEdit_2 = QtWidgets.QLineEdit(Dialog)
+        self.lineEdit_2.setGeometry(QtCore.QRect(154, 639, 648, 51))
+        self.lineEdit_2.setStyleSheet(
+            "QLineEdit {"
+            "    color: black; "
+            "    border: none; "
+            "    border-bottom: 4px solid #a6a6a6; "
+            "    font-size: 20px;"
+            "}"
+            "QLineEdit:focus {"
+            "    border-bottom: 4px solid #ffbd59;"
+            "}"
         )
-        self.pushButton_4.setText("")
-        self.pushButton_4.setObjectName("pushButton_4")
+        self.lineEdit_2.setObjectName("lineEdit_2")
+        self.lineEdit_2.setPlaceholderText("Masukkan Jam Awal (Format: HH:MM)")
         
-        self.label = QtWidgets.QLabel(Dialog)
-        self.label.setGeometry(QtCore.QRect(-4, 0, 1611, 901))
-        self.label.setText("")
-        self.label.setPixmap(QtGui.QPixmap("C:/ASSETS//BACKGROUND/9.png"))
-        self.label.setScaledContents(True)
-        self.label.setObjectName("label")
-        
+        # ------ Input Field: Masukkan Jam Akhir ------
         self.lineEdit_3 = QtWidgets.QLineEdit(Dialog)
         self.lineEdit_3.setGeometry(QtCore.QRect(154, 724, 648, 51))
         self.lineEdit_3.setStyleSheet(
@@ -94,36 +100,43 @@ class Ui_Dialog(object):
         self.lineEdit_3.setObjectName("lineEdit_3")
         self.lineEdit_3.setPlaceholderText("Masukkan Jam Akhir (Format: HH:MM)")
         
-        self.pushButton_1 = HoverButton(Dialog)
+        # ------ BACK BUTTON ------
+        self.pushButton_4 = HoverButton(Dialog, image_path="C:/ASSETS/BUTTON/BACK.png")
+        self.pushButton_4.setGeometry(QtCore.QRect(10, 20, 111, 101))
+        self.pushButton_4.setText("")
+        self.pushButton_4.setObjectName("pushButton_4")
+        self.pushButton_4.clicked.connect(self.backToParent)
+        
+        # ------ BACKGROUND LABEL ------
+        self.label = QtWidgets.QLabel(Dialog)
+        self.label.setGeometry(QtCore.QRect(-4, 0, 1611, 901))
+        self.label.setText("")
+        self.label.setPixmap(QtGui.QPixmap("C:/ASSETS/BACKGROUND/9.png"))
+        self.label.setScaledContents(True)
+        self.label.setObjectName("label")
+        
+        # ------ TOMBOL TAMBAH JADWAL ------
+        self.pushButton_1 = HoverButton(Dialog, image_path="C:/ASSETS/BUTTON/TAMBAH_JADWAL.png")
         self.pushButton_1.setGeometry(QtCore.QRect(848, 364, 601, 129))
-        self.pushButton_1.setStyleSheet(
-            "QPushButton {"
-            "    border-image: url(C:/ASSETS/BUTTON/TAMBAH_JADWAL.png);"
-            "}"
-        )
         self.pushButton_1.setText("")
         self.pushButton_1.setObjectName("pushButton_1")
+        self.pushButton_1.clicked.connect(self.tambah_jadwal)
         
-        self.pushButton_2 = HoverButton(Dialog)
+        # ------ TOMBOL UPDATE JADWAL ------
+        self.pushButton_2 = HoverButton(Dialog, image_path="C:/ASSETS/BUTTON/UPDATE_JADWAL.png")
         self.pushButton_2.setGeometry(QtCore.QRect(848, 507, 601, 129))
-        self.pushButton_2.setStyleSheet(
-            "QPushButton {"
-            "    border-image: url(C:/ASSETS/BUTTON/UPDATE_JADWAL.png);"
-            "}"
-        )
         self.pushButton_2.setText("")
         self.pushButton_2.setObjectName("pushButton_2")
+        self.pushButton_2.clicked.connect(self.update_jadwal)
         
-        self.pushButton_3 = HoverButton(Dialog)
+        # ------ TOMBOL HAPUS JADWAL ------
+        self.pushButton_3 = HoverButton(Dialog, image_path="C:/ASSETS/BUTTON/HAPUS_JADWAL.png")
         self.pushButton_3.setGeometry(QtCore.QRect(848, 652, 601, 129))
-        self.pushButton_3.setStyleSheet(
-            "QPushButton {"
-            "    border-image: url(C:/ASSETS/BUTTON/HAPUS_JADWAL.png);"
-            "}"
-        )
         self.pushButton_3.setText("")
         self.pushButton_3.setObjectName("pushButton_3")
+        self.pushButton_3.clicked.connect(self.hapus_jadwal)
         
+        # ------ COMBOBOX (Pilih Poli) ------
         self.comboBox_2 = QtWidgets.QComboBox(Dialog)
         self.comboBox_2.setGeometry(QtCore.QRect(154, 382, 648, 51))
         self.comboBox_2.setStyleSheet(
@@ -161,7 +174,9 @@ class Ui_Dialog(object):
         self.comboBox_2.addItem("POLI ANAK")
         self.comboBox_2.setCurrentIndex(0)
         self.comboBox_2.model().item(0).setEnabled(False)
+        self.comboBox_2.currentIndexChanged.connect(self.update_dokter_combo)
         
+        # ------ COMBOBOX (Pilih Dokter) ------
         self.comboBox_3 = QtWidgets.QComboBox(Dialog)
         self.comboBox_3.setGeometry(QtCore.QRect(154, 467, 648, 51))
         self.comboBox_3.setStyleSheet(
@@ -184,7 +199,7 @@ class Ui_Dialog(object):
             "    subcontrol-position: center right;"
             "}"
             "QComboBox::down-arrow {"
-            "    image: url(C:/Users/Rangga/Documents/KULIAH/SEMESTER 2/PROYEK 1/TUBES PRA ETS/ASSETS/BUTTON/ARROW.png);"
+            "    image: url(C:/ASSETS/BUTTON/ARROW.png);"
             "    width: 50px;"
             "    height: 50px;"
             "    margin-right: 20px;"
@@ -192,18 +207,12 @@ class Ui_Dialog(object):
         )
         self.comboBox_3.setObjectName("comboBox_3")
         self.comboBox_3.addItem("Pilih Dokter")
-        self.comboBox_3.addItem("Dr. Asep (Kardiolog)")
-        self.comboBox_3.addItem("Dr. Ahmad (Oftalmolog)")
-        self.comboBox_3.addItem("Dr. Messi (Spesialis THT-KH)")
-        self.comboBox_3.addItem("Dr. Jajang (Neurolog)")
-        self.comboBox_3.addItem("Dr. Radhit (Pediatrik Gawat Darurat)")
-        self.comboBox_3.setCurrentIndex(0)
         self.comboBox_3.model().item(0).setEnabled(False)
         
         # Atur urutan tampilan widget
         self.label.raise_()
-        self.lineEdit_2.raise_()
         self.lineEdit_1.raise_()
+        self.lineEdit_2.raise_()
         self.pushButton_4.raise_()
         self.lineEdit_3.raise_()
         self.pushButton_1.raise_()
@@ -218,12 +227,233 @@ class Ui_Dialog(object):
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "Window Edit Jadwal"))
+    
+    # ================ FUNGSI UTAMA ================
+    def load_data(self):
+        try:
+            with open("JadwalPoli.json", "r", encoding="utf-8") as file:
+                return json.load(file)
+        except:
+            # Fallback data jika file tidak ditemukan
+            return {
+                "daftar_poli": [
+                    {
+                        "nama_poli": "POLI JANTUNG",
+                        "dokter_list": [{"nama": "Dr. Asep", "spesialis": "Kardiolog"}],
+                        "jadwal_list": [],
+                        "kuota": 20
+                    },
+                    {
+                        "nama_poli": "POLI MATA",
+                        "dokter_list": [{"nama": "Dr. Ahmad", "spesialis": "Oftalmolog"}],
+                        "jadwal_list": [],
+                        "kuota": 15
+                    },
+                    {
+                        "nama_poli": "POLI THT-KL",
+                        "dokter_list": [{"nama": "Dr. Messi", "spesialis": "Spesialis THT-KH"}],
+                        "jadwal_list": [],
+                        "kuota": 25
+                    },
+                    {
+                        "nama_poli": "POLI SARAF",
+                        "dokter_list": [{"nama": "Dr. Jajang", "spesialis": "Neurolog"}],
+                        "jadwal_list": [],
+                        "kuota": 18
+                    },
+                    {
+                        "nama_poli": "POLI ANAK",
+                        "dokter_list": [{"nama": "Dr. Radhit", "spesialis": "Pediatrik Gawat Darurat"}],
+                        "jadwal_list": [],
+                        "kuota": 30
+                    }
+                ]
+            }
+
+    def save_data(self):
+        try:
+            with open("JadwalPoli.json", "w", encoding="utf-8") as file:
+                json.dump(self.current_data, file, indent=4)
+            return True
+        except Exception as e:
+            QMessageBox.critical(self.dialog, "Error", f"Gagal menyimpan data: {str(e)}")
+            return False
+
+    def update_dokter_combo(self):
+        self.comboBox_3.clear()
+        self.comboBox_3.addItem("Pilih Dokter")
+        self.comboBox_3.model().item(0).setEnabled(False)
+        
+        poli_index = self.comboBox_2.currentIndex() - 1
+        if poli_index >= 0 and poli_index < len(self.current_data["daftar_poli"]):
+            for dokter in self.current_data["daftar_poli"][poli_index]["dokter_list"]:
+                self.comboBox_3.addItem(f"{dokter['nama']} ({dokter['spesialis']})")
+
+    def validate_input(self):
+        # Validasi combobox
+        if self.comboBox_2.currentIndex() == 0:
+            QMessageBox.warning(self.dialog, "Peringatan", "Pilih poli terlebih dahulu!")
+            return False
+        
+        if self.comboBox_3.currentIndex() == 0:
+            QMessageBox.warning(self.dialog, "Peringatan", "Pilih dokter terlebih dahulu!")
+            return False
+        
+        # Validasi field input
+        if not self.lineEdit_1.text().strip():
+            QMessageBox.warning(self.dialog, "Peringatan", "Masukkan hari terlebih dahulu!")
+            return False
+            
+        if not self.lineEdit_2.text().strip():
+            QMessageBox.warning(self.dialog, "Peringatan", "Masukkan jam awal terlebih dahulu!")
+            return False
+            
+        if not self.lineEdit_3.text().strip():
+            QMessageBox.warning(self.dialog, "Peringatan", "Masukkan jam akhir terlebih dahulu!")
+            return False
+            
+        # Validasi format waktu
+        if not self.validate_time_format(self.lineEdit_2.text()):
+            QMessageBox.warning(self.dialog, "Peringatan", "Format jam awal tidak valid! Gunakan HH:MM")
+            return False
+            
+        if not self.validate_time_format(self.lineEdit_3.text()):
+            QMessageBox.warning(self.dialog, "Peringatan", "Format jam akhir tidak valid! Gunakan HH:MM")
+            return False
+            
+        return True
+
+    def validate_time_format(self, time_str):
+        try:
+            hours, minutes = map(int, time_str.split(':'))
+            return 0 <= hours < 24 and 0 <= minutes < 60
+        except:
+            return False
+
+    def find_poli_index(self, poli_name):
+        for index, poli in enumerate(self.current_data["daftar_poli"]):
+            if poli["nama_poli"] == poli_name:
+                return index
+        return -1
+
+    def clear_input_fields(self):
+        self.lineEdit_1.clear()
+        self.lineEdit_2.clear()
+        self.lineEdit_3.clear()
+
+    def tambah_jadwal(self):
+        if not self.validate_input():
+            return
+
+        poli_index = self.comboBox_2.currentIndex() - 1
+        if poli_index < 0:
+            return
+
+        new_jadwal = {
+            "hari": self.lineEdit_1.text(),
+            "jam_awal": self.lineEdit_2.text(),
+            "jam_akhir": self.lineEdit_3.text(),
+            "status": "Available"
+        }
+
+        self.current_data["daftar_poli"][poli_index]["jadwal_list"].append(new_jadwal)
+        if self.save_data():
+            QMessageBox.information(self.dialog, "Sukses", "Jadwal berhasil ditambahkan!")
+            self.clear_input_fields()
+
+    def update_jadwal(self):
+        if not self.validate_input():
+            return
+
+        poli_index = self.comboBox_2.currentIndex() - 1
+        if poli_index < 0:
+            return
+
+        # Jika belum memilih jadwal, tampilkan dialog pilihan
+        if self.selected_jadwal_index == -1:
+            jadwal_items = [
+                f"{j['hari']} ({j['jam_awal']}-{j['jam_akhir']}) - {j.get('status', 'Available')}"
+                for j in self.current_data["daftar_poli"][poli_index]["jadwal_list"]
+            ]
+            
+            if not jadwal_items:
+                QMessageBox.warning(self.dialog, "Peringatan", "Tidak ada jadwal untuk diupdate!")
+                return
+                
+            item, ok = QtWidgets.QInputDialog.getItem(
+                self.dialog, "Pilih Jadwal", "Pilih jadwal yang akan diupdate:", 
+                jadwal_items, 0, False
+            )
+            
+            if not ok:
+                return
+                
+            self.selected_jadwal_index = jadwal_items.index(item)
+
+        # Update jadwal
+        self.current_data["daftar_poli"][poli_index]["jadwal_list"][self.selected_jadwal_index] = {
+            "hari": self.lineEdit_1.text(),
+            "jam_awal": self.lineEdit_2.text(),
+            "jam_akhir": self.lineEdit_3.text(),
+            "status": "Available"
+        }
+
+        if self.save_data():
+            QMessageBox.information(self.dialog, "Sukses", "Jadwal berhasil diupdate!")
+            self.clear_input_fields()
+            self.selected_jadwal_index = -1
+
+    def hapus_jadwal(self):
+        poli_index = self.comboBox_2.currentIndex() - 1
+        if poli_index < 0:
+            QMessageBox.warning(self.dialog, "Peringatan", "Pilih poli terlebih dahulu!")
+            return
+
+        # Jika belum memilih jadwal, tampilkan dialog pilihan
+        if self.selected_jadwal_index == -1:
+            jadwal_items = [
+                f"{j['hari']} ({j['jam_awal']}-{j['jam_akhir']})"
+                for j in self.current_data["daftar_poli"][poli_index]["jadwal_list"]
+            ]
+            
+            if not jadwal_items:
+                QMessageBox.warning(self.dialog, "Peringatan", "Tidak ada jadwal untuk dihapus!")
+                return
+                
+            item, ok = QtWidgets.QInputDialog.getItem(
+                self.dialog, "Hapus Jadwal", "Pilih jadwal yang akan dihapus:", 
+                jadwal_items, 0, False
+            )
+            
+            if not ok:
+                return
+                
+            self.selected_jadwal_index = jadwal_items.index(item)
+
+        # Konfirmasi penghapusan
+        reply = QMessageBox.question(
+            self.dialog, 'Konfirmasi',
+            'Yakin ingin menghapus jadwal ini?', 
+            QMessageBox.Yes | QMessageBox.No, QMessageBox.No
+        )
+        
+        if reply == QMessageBox.Yes:
+            self.current_data["daftar_poli"][poli_index]["jadwal_list"].pop(self.selected_jadwal_index)
+            if self.save_data():
+                QMessageBox.information(self.dialog, "Sukses", "Jadwal berhasil dihapus!")
+                self.clear_input_fields()
+                self.selected_jadwal_index = -1
+
+    def backToParent(self):
+        if self.parent_window:
+            self.parent_window.show()
+        self.dialog.close()
 
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
     Dialog = QtWidgets.QDialog()
-    ui = Ui_Dialog()
+    ui = Ui_Dialog(parent_window=Dialog)
     ui.setupUi(Dialog)
     Dialog.show()
     sys.exit(app.exec_())

@@ -1,133 +1,84 @@
+# WindowEditDokter.py
+# Nama: Rangga Muhamad Fajar
+# Kelas: 1A - D4
+# NIM: 241524026
+# Desc: - Program ini digunakan untuk mengelola dokter yang ada di rumah sakit.
+#       - Admin dapat menambah dan menghapus dokter secara interaktif.
+
 import json
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 
-class HoverOpacityFilter(QtCore.QObject):
-    def eventFilter(self, obj, event):
-        if event.type() == QtCore.QEvent.Enter:
-            if obj.graphicsEffect():
-                obj.graphicsEffect().setOpacity(0.7)
-        elif event.type() == QtCore.QEvent.Leave:
-            if obj.graphicsEffect():
-                obj.graphicsEffect().setOpacity(1.0)
-        return super().eventFilter(obj, event)
+class HoverButton(QtWidgets.QPushButton):
+    def __init__(self, parent=None, image_path=""):
+        super().__init__(parent)
+        self.opacity_effect = QtWidgets.QGraphicsOpacityEffect(self)
+        self.setGraphicsEffect(self.opacity_effect)
+        self.opacity_effect.setOpacity(1.0)
+        self.opacity_animation = QtCore.QPropertyAnimation(self.opacity_effect, b"opacity")
+        self.opacity_animation.setDuration(200)
+        if image_path:
+            self.setStyleSheet(
+                f"QPushButton {{ border-image: url('{image_path}'); background: transparent; border: none; }}"
+            )
+        self.setMouseTracking(True)
 
-class Ui_Dialog(object):
+    def enterEvent(self, event):
+        self.opacity_animation.stop()
+        self.opacity_animation.setStartValue(self.opacity_effect.opacity())
+        self.opacity_animation.setEndValue(0.7)
+        self.opacity_animation.start()
+        super().enterEvent(event)
+
+    def leaveEvent(self, event):
+        self.opacity_animation.stop()
+        self.opacity_animation.setStartValue(self.opacity_effect.opacity())
+        self.opacity_animation.setEndValue(1.0)
+        self.opacity_animation.start()
+        super().leaveEvent(event)
+
+class Ui_WindowEditDokter(object):
+    def __init__(self, parent_window=None):
+        self.parent_window = parent_window
+
     def setupUi(self, Dialog):
+        self.dialog = Dialog
         Dialog.setObjectName("Dialog")
         Dialog.resize(1600, 900)
         Dialog.setWindowFlags(QtCore.Qt.FramelessWindowHint)
-
-        # ------ LINE EDIT (Nama Dokter) ------
+        
+        # ------ Input Fields ------
         self.lineEdit_1 = QtWidgets.QLineEdit(Dialog)
         self.lineEdit_1.setGeometry(QtCore.QRect(910, 401, 608, 51))
-        self.lineEdit_1.setStyleSheet(
-            "QLineEdit {"
-            "    color: black; "
-            "    border: none; "
-            "    border-bottom: 4px solid #a6a6a6; "
-            "    font-size: 24px;"
-            "}"
-            "QLineEdit:focus {"
-            "    border-bottom: 4px solid #ffbd59;"
-            "}"
-        )
-        self.lineEdit_1.setObjectName("lineEdit_1")
         self.lineEdit_1.setPlaceholderText("Masukkan Nama Dokter!")
-
-        # ------ LINE EDIT (Spesialisasi Dokter) ------
+        
         self.lineEdit_2 = QtWidgets.QLineEdit(Dialog)
         self.lineEdit_2.setGeometry(QtCore.QRect(910, 501, 608, 51))
-        self.lineEdit_2.setStyleSheet(
-            "QLineEdit {"
-            "    color: black; "
-            "    border: none; "
-            "    border-bottom: 4px solid #a6a6a6; "
-            "    font-size: 24px;"
-            "}"
-            "QLineEdit:focus {"
-            "    border-bottom: 4px solid #ffbd59;"
-            "}"
-        )
-        self.lineEdit_2.setObjectName("lineEdit_2")
         self.lineEdit_2.setPlaceholderText("Masukkan Spesialisasi Dokter!")
-
+        
         # ------ BACK BUTTON ------
-        self.pushButton_3 = QtWidgets.QPushButton(Dialog)
+        self.pushButton_3 = HoverButton(Dialog, image_path="C:/ASSETS/BUTTON/BACK.png")
         self.pushButton_3.setGeometry(QtCore.QRect(10, 20, 111, 101))
-        self.pushButton_3.setStyleSheet(
-            "border-image: url(C:/ASSETS/BUTTON/BACK.png);"
-        )
-        self.pushButton_3.setText("")
-        self.pushButton_3.setObjectName("pushButton_3")
-
+        
         # ------ BACKGROUND LABEL ------
         self.label = QtWidgets.QLabel(Dialog)
         self.label.setGeometry(QtCore.QRect(-4, 0, 1611, 901))
-        self.label.setText("")
         self.label.setPixmap(QtGui.QPixmap("C:/ASSETS/BACKGROUND/11.png"))
         self.label.setScaledContents(True)
-        self.label.setObjectName("label")
-
+        
         # ------ TOMBOL TAMBAH DOKTER ------
-        self.pushButton_1 = QtWidgets.QPushButton(Dialog)
+        self.pushButton_1 = HoverButton(Dialog, image_path="C:/ASSETS/BUTTON/TAMBAH_DOKTER.png")
         self.pushButton_1.setGeometry(QtCore.QRect(891, 593, 648, 101))
-        self.pushButton_1.setStyleSheet(
-            "QPushButton {"
-            "    border-image: url(C:/ASSETS/BUTTON/TAMBAH_DOKTER.png);"
-            "}"
-        )
-        self.pushButton_1.setText("")
-        self.pushButton_1.setObjectName("pushButton_1")
-
+        
         # ------ TOMBOL HAPUS DOKTER ------
-        self.pushButton_2 = QtWidgets.QPushButton(Dialog)
+        self.pushButton_2 = HoverButton(Dialog, image_path="C:/ASSETS/BUTTON/HAPUS_DOKTER.png")
         self.pushButton_2.setGeometry(QtCore.QRect(891, 711, 648, 101))
-        self.pushButton_2.setStyleSheet(
-            "QPushButton {"
-            "    border-image: url(C:/ASSETS/BUTTON/HAPUS_DOKTER.png);"
-            "}"
-        )
-        self.pushButton_2.setText("")
-        self.pushButton_2.setObjectName("pushButton_2")
-
-        # ------ COMBOBOX (Pilih Poli) ------
+        
+        # ------ COMBOBOX POLI ------
         self.comboBox_2 = QtWidgets.QComboBox(Dialog)
         self.comboBox_2.setGeometry(QtCore.QRect(910, 301, 608, 51))
-        self.comboBox_2.setStyleSheet(
-            "QComboBox {"
-            "    color: black;"
-            "    border: none;"
-            "    border-bottom: 4px solid #a6a6a6;"
-            "    font-size: 24px;"
-            "    padding: 5px 10px;"
-            "    background: transparent;"
-            "    padding-right: 40px;"
-            "}"
-            "QComboBox:focus {"
-            "    border-bottom: 4px solid #ffbd59;"
-            "}"
-            "QComboBox::drop-down {"
-            "    border: none;"
-            "    width: 30px;"
-            "    subcontrol-origin: padding;"
-            "    subcontrol-position: center right;"
-            "}"
-            "QComboBox::down-arrow {"
-            "    image: url(C:/ASSETS/BUTTON/ARROW.png);"
-            "    width: 50px;"
-            "    height: 50px;"
-            "    margin-right: 20px;"
-            "}"
-        )
-        self.comboBox_2.setObjectName("comboBox_2")
-        self.comboBox_2.addItem("")
-        self.comboBox_2.addItem("")
-        self.comboBox_2.addItem("")
-        self.comboBox_2.addItem("")
-        self.comboBox_2.addItem("")
-
-        # ------ TABLE VIEW ------
+        
+        # ------ TABEL VIEW ------
         self.tableView = QtWidgets.QTableView(Dialog)
         self.tableView.setGeometry(QtCore.QRect(81, 182, 641, 666))
         self.tableView.setStyleSheet(
@@ -145,30 +96,16 @@ class Ui_Dialog(object):
             }
             """
         )
-        self.tableView.setObjectName("tableView")
-
-        # Urutan tampilan: background di bawah, kemudian komponen lainnya
-        self.label.raise_()
-        self.lineEdit_1.raise_()
-        self.lineEdit_2.raise_()
-        self.pushButton_3.raise_()
-        self.pushButton_1.raise_()
-        self.pushButton_2.raise_()
-        self.comboBox_2.raise_()
-        self.tableView.raise_()
-
-        self.retranslateUi(Dialog)
-        QtCore.QMetaObject.connectSlotsByName(Dialog)
-
-        # ------ INIT MODEL & LOAD DATA ------
+        
+        # Init model dan load data
         self.initModel()
         self.loadData()
-
-        # --- Nonaktifkan interaksi langsung pada tabel ---
+        self.loadComboData()
+        
+        # Konfigurasi tabel
         self.tableView.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.tableView.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
         self.tableView.setFocusPolicy(QtCore.Qt.NoFocus)
-
         self.tableView.verticalHeader().setVisible(False)
         self.tableView.setShowGrid(True)
 
@@ -178,79 +115,153 @@ class Ui_Dialog(object):
         header.setFixedHeight(100)
         self.tableView.verticalHeader().setDefaultSectionSize(100)
 
-        # Atur ukuran kolom: kolom pertama fixed, kolom kedua dan ketiga stretch
         header.setSectionResizeMode(0, QtWidgets.QHeaderView.Fixed)
         self.tableView.setColumnWidth(0, 70)
         header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
         header.setSectionResizeMode(2, QtWidgets.QHeaderView.Stretch)
+        header.setSectionResizeMode(3, QtWidgets.QHeaderView.Stretch)
 
-        # ---- Tambahkan efek hover pada push button ----
-        self.addHoverOpacity(self.pushButton_1)
-        self.addHoverOpacity(self.pushButton_2)
-        self.addHoverOpacity(self.pushButton_3)
+        # Z-order
+        self.label.lower()
+        self.lineEdit_1.raise_()
+        self.lineEdit_2.raise_()
+        self.pushButton_3.raise_()
+        self.pushButton_1.raise_()
+        self.pushButton_2.raise_()
+        self.comboBox_2.raise_()
+        self.tableView.raise_()
 
-    def addHoverOpacity(self, button):
-        """
-        Pasang QGraphicsOpacityEffect dan event filter HoverOpacityFilter
-        pada sebuah tombol, agar opasitas berubah saat mouse hover.
-        """
-        effect = QtWidgets.QGraphicsOpacityEffect(button)
-        effect.setOpacity(1.0)
-        button.setGraphicsEffect(effect)
-
-        hoverFilter = HoverOpacityFilter(button)
-        button.installEventFilter(hoverFilter)
+        # Hubungkan tombol
+        self.pushButton_1.clicked.connect(self.tambah_dokter)
+        self.pushButton_2.clicked.connect(self.hapus_dokter)
+        self.pushButton_3.clicked.connect(self.backToJadwalPoliDokter)
 
     def initModel(self):
-        # Inisialisasi model dengan 3 kolom: NO, NAMA DOKTER, SPESIALISASI
         self.model = QStandardItemModel()
-        self.model.setHorizontalHeaderLabels(["NO", "NAMA DOKTER", "SPESIALISASI"])
+        self.model.setHorizontalHeaderLabels(["NO", "NAMA DOKTER", "SPESIALISASI", "POLI"])
         self.tableView.setModel(self.model)
 
     def loadData(self):
-        # Contoh: load data dari file JSON "dokter_data.json"
-        # Asumsikan struktur JSON: {"dokter": {"dr.john": "Jantung", "dr.smith": "Saraf", ...}}
-        file_path = "dokter_data.json"
         try:
-            with open(file_path, "r") as file:
+            with open("JadwalPoli.json", "r") as file:
                 data = json.load(file)
-            dokter_data = data.get("dokter", {})
-
+            
             self.model.setRowCount(0)
             row_num = 0
-            for dokter_name, spesialisasi in dokter_data.items():
-                if dokter_name.strip():
+            for poli in data["daftar_poli"]:
+                for dokter in poli["dokter_list"]:
                     item_no = QStandardItem(str(row_num + 1))
                     item_no.setTextAlignment(QtCore.Qt.AlignCenter)
-
-                    item_dokter = QStandardItem(dokter_name.capitalize())
+                    
+                    item_dokter = QStandardItem(dokter["nama"])
                     item_dokter.setTextAlignment(QtCore.Qt.AlignCenter)
-
-                    item_spesialisasi = QStandardItem(str(spesialisasi))
-                    item_spesialisasi.setTextAlignment(QtCore.Qt.AlignCenter)
-
-                    self.model.appendRow([item_no, item_dokter, item_spesialisasi])
+                    
+                    item_spesialis = QStandardItem(dokter["spesialis"])
+                    item_spesialis.setTextAlignment(QtCore.Qt.AlignCenter)
+                    
+                    item_poli = QStandardItem(poli["nama_poli"])
+                    item_poli.setTextAlignment(QtCore.Qt.AlignCenter)
+                    
+                    self.model.appendRow([item_no, item_dokter, item_spesialis, item_poli])
                     row_num += 1
-
+                    
         except Exception as e:
             print("Error membaca file JSON:", e)
 
-    def retranslateUi(self, Dialog):
-        _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", "Splash Screen"))
-        self.lineEdit_1.setText(_translate("Dialog", ""))
-        self.lineEdit_2.setText(_translate("Dialog", ""))
-        self.comboBox_2.setItemText(0, _translate("Dialog", "POLI JANTUNG"))
-        self.comboBox_2.setItemText(1, _translate("Dialog", "POLI MATA"))
-        self.comboBox_2.setItemText(2, _translate("Dialog", "POLI THT-KL"))
-        self.comboBox_2.setItemText(3, _translate("Dialog", "POLI SARAF"))
-        self.comboBox_2.setItemText(4, _translate("Dialog", "POLI ANAK"))
+    def loadComboData(self):
+        try:
+            with open("JadwalPoli.json", "r") as file:
+                data = json.load(file)
+            
+            self.comboBox_2.clear()
+            for poli in data["daftar_poli"]:
+                self.comboBox_2.addItem(poli["nama_poli"])
+                
+        except Exception as e:
+            print("Error loading combo data:", e)
+
+    def tambah_dokter(self):
+        nama_poli = self.comboBox_2.currentText()
+        nama_dokter = self.lineEdit_1.text().strip()
+        spesialis = self.lineEdit_2.text().strip()
+        
+        if not all([nama_poli, nama_dokter, spesialis]):
+            QtWidgets.QMessageBox.warning(self.dialog, "Error", "Semua field harus diisi!")
+            return
+            
+        try:
+            with open("JadwalPoli.json", "r") as file:
+                data = json.load(file)
+                
+            # Cari poli dan tambahkan dokter
+            for poli in data["daftar_poli"]:
+                if poli["nama_poli"] == nama_poli:
+                    # Cek apakah dokter sudah ada
+                    for dokter in poli["dokter_list"]:
+                        if dokter["nama"].lower() == nama_dokter.lower():
+                            QtWidgets.QMessageBox.warning(self.dialog, "Error", "Dokter sudah ada di poli ini!")
+                            return
+                            
+                    # Tambahkan dokter baru
+                    poli["dokter_list"].append({
+                        "nama": nama_dokter,
+                        "spesialis": spesialis
+                    })
+                    
+                    with open("JadwalPoli.json", "w") as file:
+                        json.dump(data, file, indent=4)
+                        
+                    QtWidgets.QMessageBox.information(self.dialog, "Sukses", "Dokter berhasil ditambahkan!")
+                    self.loadData()
+                    self.lineEdit_1.clear()
+                    self.lineEdit_2.clear()
+                    return
+                    
+            QtWidgets.QMessageBox.warning(self.dialog, "Error", "Poli tidak ditemukan!")
+            
+        except Exception as e:
+            QtWidgets.QMessageBox.warning(self.dialog, "Error", f"Terjadi kesalahan: {str(e)}")
+
+    def hapus_dokter(self):
+        nama_dokter = self.lineEdit_1.text().strip()
+        
+        if not nama_dokter:
+            QtWidgets.QMessageBox.warning(self.dialog, "Error", "Nama Dokter harus diisi!")
+            return
+            
+        try:
+            with open("JadwalPoli.json", "r") as file:
+                data = json.load(file)
+                
+            # Cari dan hapus dokter
+            for poli in data["daftar_poli"]:
+                for i, dokter in enumerate(poli["dokter_list"]):
+                    if dokter["nama"].lower() == nama_dokter.lower():
+                        poli["dokter_list"].pop(i)
+                        
+                        with open("JadwalPoli.json", "w") as file:
+                            json.dump(data, file, indent=4)
+                            
+                        QtWidgets.QMessageBox.information(self.dialog, "Sukses", "Dokter berhasil dihapus!")
+                        self.loadData()
+                        self.lineEdit_1.clear()
+                        return
+                        
+            QtWidgets.QMessageBox.warning(self.dialog, "Error", "Dokter tidak ditemukan!")
+            
+        except Exception as e:
+            QtWidgets.QMessageBox.warning(self.dialog, "Error", f"Terjadi kesalahan: {str(e)}")
+
+    def backToJadwalPoliDokter(self):
+        if self.parent_window:
+            self.parent_window.show()
+        self.dialog.close()
 
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
     Dialog = QtWidgets.QDialog()
-    ui = Ui_Dialog()
+    ui = Ui_WindowEditDokter()
     ui.setupUi(Dialog)
     Dialog.show()
     sys.exit(app.exec_())

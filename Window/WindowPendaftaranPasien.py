@@ -2,7 +2,6 @@
 # NIM/Kelas   : 241524012
 # Kelas       : 1-A D4 Teknik Informatika
 # Description : Window untuk pendaftaran pasien
-
 import sys
 import json
 import os
@@ -17,20 +16,31 @@ BASE_DIR = Path(__file__).parent.parent  # Naik satu level ke folder ETS
 POLIKLINIK_FILE = BASE_DIR / "Data" / "poliklinik_data.json"
 
 class HoverButton(QtWidgets.QPushButton):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, image_path=""):
         super().__init__(parent)
         self.setMouseTracking(True)
-        self.installEventFilter(self)
         self.opacity_effect = QtWidgets.QGraphicsOpacityEffect(self)
         self.setGraphicsEffect(self.opacity_effect)
+        self.opacity_animation = QtCore.QPropertyAnimation(self.opacity_effect, b"opacity")
+        self.opacity_animation.setDuration(200)
         self.opacity_effect.setOpacity(1.0)
+        self.image_path = image_path
+        if image_path:
+            self.setStyleSheet(f"QPushButton {{ border-image: url('{image_path}'); background: transparent; border: none; }}")
     
-    def eventFilter(self, obj, event):
-        if event.type() == QtCore.QEvent.HoverEnter:
-            self.opacity_effect.setOpacity(0.7)
-        elif event.type() == QtCore.QEvent.HoverLeave:
-            self.opacity_effect.setOpacity(1.0)
-        return super().eventFilter(obj, event)
+    def enterEvent(self, event):
+        self.opacity_animation.stop()
+        self.opacity_animation.setStartValue(self.opacity_effect.opacity())
+        self.opacity_animation.setEndValue(0.7)
+        self.opacity_animation.start()
+        super().enterEvent(event)
+    
+    def leaveEvent(self, event):
+        self.opacity_animation.stop()
+        self.opacity_animation.setStartValue(self.opacity_effect.opacity())
+        self.opacity_animation.setEndValue(1.0)
+        self.opacity_animation.start()
+        super().leaveEvent(event)
 
 class WindowPendaftaranPasien(QDialog):
     def __init__(self, username):
@@ -105,21 +115,18 @@ class WindowPendaftaranPasien(QDialog):
         self.jenis_layanan.addItems(["Mandiri", "Asuransi", "BPJS"])
         self.jenis_layanan.setStyleSheet("background: transparent; border: none;")
 
-        # Tombol Back dengan gambar melalui styleSheet (HoverButton)
-        self.back = HoverButton(self)
+        # Tombol Back dengan gambar melalui HoverButton
+        self.back = HoverButton(self, image_path="C:/ASSETS/BUTTON/BACK.png")
         self.back.setGeometry(QtCore.QRect(10, 20, 111, 101))
-        self.back.setStyleSheet("border-image: url(C:/ASSETS/BUTTON/BACK.png); background: transparent; border: none;")
         self.back.clicked.connect(self.back_to_menu)
 
-        # Tombol Daftar (Submit) dengan gambar melalui styleSheet (HoverButton)
-        self.daftar = HoverButton(self)
+        # Tombol Daftar (Submit) dengan gambar melalui HoverButton
+        self.daftar = HoverButton(self, image_path="C:/ASSETS/BUTTON/DAFTAR.png")
         self.daftar.setGeometry(QtCore.QRect(686, 741, 282, 88))
-        self.daftar.setStyleSheet("border-image: url(C:/ASSETS/BUTTON/DAFTAR.png); background: transparent; border: none;")
         self.daftar.clicked.connect(self.daftar_pasien)
         
         self.loadData()
         
-    
     def loadData(self):
         """Membaca file JSON dan mengisi dropdown poliklinik."""
         with open(POLIKLINIK_FILE, "r") as file:

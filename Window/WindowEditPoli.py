@@ -10,22 +10,45 @@ import json
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 
-class HoverOpacityFilter(QtCore.QObject):
-    def eventFilter(self, obj, event):
-        if event.type() == QtCore.QEvent.Enter:
-            if obj.graphicsEffect():
-                obj.graphicsEffect().setOpacity(0.7)
-        elif event.type() == QtCore.QEvent.Leave:
-            if obj.graphicsEffect():
-                obj.graphicsEffect().setOpacity(1.0)
-        return super().eventFilter(obj, event)
+class HoverButton(QtWidgets.QPushButton):
+    def __init__(self, parent=None, image_path=""):
+        super().__init__(parent)
+        self.opacity_effect = QtWidgets.QGraphicsOpacityEffect(self)
+        self.setGraphicsEffect(self.opacity_effect)
+        self.opacity_effect.setOpacity(1.0)
+        self.opacity_animation = QtCore.QPropertyAnimation(self.opacity_effect, b"opacity")
+        self.opacity_animation.setDuration(200)
+        if image_path:
+            self.setStyleSheet(
+                f"QPushButton {{ border-image: url('{image_path}'); background: transparent; border: none; }}"
+            )
+        self.setMouseTracking(True)
+
+    def enterEvent(self, event):
+        self.opacity_animation.stop()
+        self.opacity_animation.setStartValue(self.opacity_effect.opacity())
+        self.opacity_animation.setEndValue(0.7)
+        self.opacity_animation.start()
+        super().enterEvent(event)
+
+    def leaveEvent(self, event):
+        self.opacity_animation.stop()
+        self.opacity_animation.setStartValue(self.opacity_effect.opacity())
+        self.opacity_animation.setEndValue(1.0)
+        self.opacity_animation.start()
+        super().leaveEvent(event)
 
 class Ui_Dialog(object):
+    def __init__(self, parent_window=None):
+        self.parent_window = parent_window
+
     def setupUi(self, Dialog):
+        self.dialog = Dialog
         Dialog.setObjectName("Dialog")
         Dialog.resize(1600, 900)
         Dialog.setWindowFlags(QtCore.Qt.FramelessWindowHint)
-
+        
+        # ------ Input Field ------
         self.lineEdit_1 = QtWidgets.QLineEdit(Dialog)
         self.lineEdit_1.setGeometry(QtCore.QRect(963, 430, 481, 71))
         self.lineEdit_1.setStyleSheet(
@@ -39,47 +62,28 @@ class Ui_Dialog(object):
             "    border-bottom: 4px solid #ffbd59;"
             "}"
         )
-        self.lineEdit_1.setObjectName("lineEdit_1")
         self.lineEdit_1.setPlaceholderText("Masukkan Nama Poli! (Contoh: Umum)")
-
-        self.pushButton_3 = QtWidgets.QPushButton(Dialog)
+        
+        # ------ BACK BUTTON ------
+        self.pushButton_3 = HoverButton(Dialog, image_path="C:/ASSETS/BUTTON/BACK.png")
         self.pushButton_3.setGeometry(QtCore.QRect(10, 20, 111, 101))
-        self.pushButton_3.setStyleSheet(
-            "border-image: url(C:/ASSETS/BUTTON/BACK.png);"
-        )
-        self.pushButton_3.setText("")
-        self.pushButton_3.setObjectName("pushButton_3")
-
+        self.pushButton_3.clicked.connect(self.backToParent)
+        
+        # ------ BACKGROUND LABEL ------
         self.label = QtWidgets.QLabel(Dialog)
         self.label.setGeometry(QtCore.QRect(-4, 0, 1611, 901))
-        self.label.setText("")
-        self.label.setPixmap(QtGui.QPixmap(
-            "C:/ASSETS/BACKGROUND/10.png"
-        ))
+        self.label.setPixmap(QtGui.QPixmap("C:/ASSETS/BACKGROUND/10.png"))
         self.label.setScaledContents(True)
-        self.label.setObjectName("label")
-
-        self.pushButton_1 = QtWidgets.QPushButton(Dialog)
+        
+        # ------ TOMBOL TAMBAH POLI ------ 
+        self.pushButton_1 = HoverButton(Dialog, image_path="C:/ASSETS/BUTTON/TAMBAH_POLI.png")
         self.pushButton_1.setGeometry(QtCore.QRect(911, 547, 591, 87))
-        self.pushButton_1.setStyleSheet(
-            "QPushButton{"
-            "    border-image: url(C:/ASSETS/BUTTON/TAMBAH_POLI.png);"
-            "}"
-        )
-        self.pushButton_1.setText("")
-        self.pushButton_1.setObjectName("pushButton_1")
-
-        self.pushButton_2 = QtWidgets.QPushButton(Dialog)
+        
+        # ------ TOMBOL HAPUS POLI ------ 
+        self.pushButton_2 = HoverButton(Dialog, image_path="C:/ASSETS/BUTTON/HAPUS_POLI.png")
         self.pushButton_2.setGeometry(QtCore.QRect(911, 663, 591, 87))
-        self.pushButton_2.setStyleSheet(
-            "QPushButton{"
-            "    border-image: url(C:/Users/Rangga/Documents/KULIAH/SEMESTER 2/"
-            "PROYEK 1/TUBES PRA ETS/ASSETS/BUTTON/HAPUS_POLI.png);"
-            "}"
-        )
-        self.pushButton_2.setText("")
-        self.pushButton_2.setObjectName("pushButton_2")
-
+        
+        # ------ TABEL VIEW ------
         self.tableView = QtWidgets.QTableView(Dialog)
         self.tableView.setGeometry(QtCore.QRect(100, 238, 601, 571))
         self.tableView.setStyleSheet(
@@ -97,54 +101,39 @@ class Ui_Dialog(object):
             }
             """
         )
-        self.tableView.setObjectName("tableView")
-
-        self.label.raise_()
-        self.lineEdit_1.raise_()
-        self.pushButton_3.raise_()
-        self.pushButton_1.raise_()
-        self.pushButton_2.raise_()
-        self.tableView.raise_()
-
-        self.retranslateUi(Dialog)
-        QtCore.QMetaObject.connectSlotsByName(Dialog)
-
+        
+        # Init model dan load data
         self.initModel()
         self.loadData()
-
+        
+        # Konfigurasi tabel
         self.tableView.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.tableView.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
         self.tableView.setFocusPolicy(QtCore.Qt.NoFocus)
-
         self.tableView.verticalHeader().setVisible(False)
         self.tableView.setShowGrid(True)
 
         header = self.tableView.horizontalHeader()
         header.setSectionsMovable(False)
         header.setDefaultAlignment(QtCore.Qt.AlignCenter)
-
         header.setFixedHeight(100)
-        self.tableView.verticalHeader().setDefaultSectionSize(100) 
+        self.tableView.verticalHeader().setDefaultSectionSize(100)
 
         header.setSectionResizeMode(0, QtWidgets.QHeaderView.Fixed)
         self.tableView.setColumnWidth(0, 70)
         header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
 
-        self.addHoverOpacity(self.pushButton_1)
-        self.addHoverOpacity(self.pushButton_2)
-        self.addHoverOpacity(self.pushButton_3)
+        # Z-order
+        self.label.lower()
+        self.lineEdit_1.raise_()
+        self.pushButton_3.raise_()
+        self.pushButton_1.raise_()
+        self.pushButton_2.raise_()
+        self.tableView.raise_()
 
-    def addHoverOpacity(self, button):
-        """
-        Pasang QGraphicsOpacityEffect dan event filter HoverOpacityFilter
-        pada sebuah tombol, agar opasitas berubah saat mouse hover.
-        """
-        effect = QtWidgets.QGraphicsOpacityEffect(button)
-        effect.setOpacity(1.0)
-        button.setGraphicsEffect(effect)
-
-        hoverFilter = HoverOpacityFilter(button)
-        button.installEventFilter(hoverFilter)
+        # Hubungkan tombol
+        self.pushButton_1.clicked.connect(self.tambah_poli)
+        self.pushButton_2.clicked.connect(self.hapus_poli)
 
     def initModel(self):
         self.model = QStandardItemModel()
@@ -152,31 +141,89 @@ class Ui_Dialog(object):
         self.tableView.setModel(self.model)
 
     def loadData(self):
-        file_path = "poliklinik_data.json"
         try:
-            with open(file_path, "r") as file:
+            with open("JadwalPoli.json", "r") as file:
                 data = json.load(file)
-            poliklinik_data = data.get("poliklinik", {})
-
+            
             self.model.setRowCount(0)
-            row_num = 0
-            for poli_name in poliklinik_data.keys():
-                if poli_name.strip():
-                    item_no = QStandardItem(str(row_num + 1))
-                    item_no.setTextAlignment(QtCore.Qt.AlignCenter)
-
-                    item_poli = QStandardItem(poli_name.capitalize())
-                    item_poli.setTextAlignment(QtCore.Qt.AlignCenter)
-
-                    self.model.appendRow([item_no, item_poli])
-                    row_num += 1
-
+            for idx, poli in enumerate(data["daftar_poli"], start=1):
+                item_no = QStandardItem(str(idx))
+                item_no.setTextAlignment(QtCore.Qt.AlignCenter)
+                
+                item_poli = QStandardItem(poli["nama_poli"])
+                item_poli.setTextAlignment(QtCore.Qt.AlignCenter)
+                
+                self.model.appendRow([item_no, item_poli])
+                
         except Exception as e:
             print("Error membaca file JSON:", e)
 
-    def retranslateUi(self, Dialog):
-        _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", "Splash Screen"))
+    def tambah_poli(self):
+        nama_poli = self.lineEdit_1.text().strip()
+        
+        if not nama_poli:
+            QtWidgets.QMessageBox.warning(self.dialog, "Error", "Nama Poli harus diisi!")
+            return
+            
+        try:
+            with open("JadwalPoli.json", "r") as file:
+                data = json.load(file)
+        except:
+            data = {"daftar_poli": []}
+            
+        # Cek apakah poli sudah ada
+        for poli in data["daftar_poli"]:
+            if poli["nama_poli"].lower() == nama_poli.lower():
+                QtWidgets.QMessageBox.warning(self.dialog, "Error", "Poli sudah ada!")
+                return
+                
+        # Tambahkan poli baru dengan kuota default 20
+        new_poli = {
+            "nama_poli": nama_poli,
+            "kuota": 20,
+            "dokter_list": [],
+            "jadwal_list": []
+        }
+        data["daftar_poli"].append(new_poli)
+        
+        with open("JadwalPoli.json", "w") as file:
+            json.dump(data, file, indent=4)
+            
+        QtWidgets.QMessageBox.information(self.dialog, "Sukses", "Poli berhasil ditambahkan!")
+        self.loadData()
+        self.lineEdit_1.clear()
+
+    def hapus_poli(self):
+        nama_poli = self.lineEdit_1.text().strip()
+        
+        if not nama_poli:
+            QtWidgets.QMessageBox.warning(self.dialog, "Error", "Nama Poli harus diisi!")
+            return
+            
+        try:
+            with open("JadwalPoli.json", "r") as file:
+                data = json.load(file)
+        except:
+            QtWidgets.QMessageBox.warning(self.dialog, "Error", "Data poli tidak ditemukan!")
+            return
+            
+        # Cari dan hapus poli
+        for i, poli in enumerate(data["daftar_poli"]):
+            if poli["nama_poli"].lower() == nama_poli.lower():
+                data["daftar_poli"].pop(i)
+                with open("JadwalPoli.json", "w") as file:
+                    json.dump(data, file, indent=4)
+                QtWidgets.QMessageBox.information(self.dialog, "Sukses", "Poli berhasil dihapus!")
+                self.loadData()
+                self.lineEdit_1.clear()
+                return
+                
+        QtWidgets.QMessageBox.warning(self.dialog, "Error", "Poli tidak ditemukan!")
+
+    def backToParent(self):
+        if self.parent_window:
+            self.parent_window.show()
+        self.dialog.close()
 
 if __name__ == "__main__":
     import sys

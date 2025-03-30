@@ -1,14 +1,42 @@
 # WindowSignUp.py
-#Nama: Rangga Muhamad Fajar
-#Kelas: 1A - D4
-#NIM: 241524026
-#Desc: - Tampilan sign-up untuk user baru.
-#      - Menyediakan form untuk input nama, email, dan password.
-#      - Data user disimpan ke file 'users.txt'.
+# Nama: Rangga Muhamad Fajar
+# Kelas: 1A - D4
+# NIM: 241524026
+# Desc: - Tampilan sign-up untuk user baru.
+#       - Menyediakan form untuk input nama, email, dan password.
+#       - Data user disimpan ke file 'daftarUsers.json'.
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from Register import register_user 
 import os
+
+class HoverButton(QtWidgets.QPushButton):
+    def __init__(self, parent=None, image_path=""):
+        super().__init__(parent)
+        self.opacity_effect = QtWidgets.QGraphicsOpacityEffect(self)
+        self.setGraphicsEffect(self.opacity_effect)
+        self.opacity_animation = QtCore.QPropertyAnimation(self.opacity_effect, b"opacity")
+        self.opacity_animation.setDuration(200)
+        self.opacity_effect.setOpacity(1.0)
+        self.image_path = image_path
+        if image_path:
+            self.setStyleSheet(f"QPushButton {{ border-image: url('{self.image_path}'); }}")
+        # Aktifkan mouse tracking agar event enter/leave terdeteksi
+        self.setMouseTracking(True)
+
+    def enterEvent(self, event):
+        self.opacity_animation.stop()
+        self.opacity_animation.setStartValue(self.opacity_effect.opacity())
+        self.opacity_animation.setEndValue(0.7)
+        self.opacity_animation.start()
+        super().enterEvent(event)
+
+    def leaveEvent(self, event):
+        self.opacity_animation.stop()
+        self.opacity_animation.setStartValue(self.opacity_effect.opacity())
+        self.opacity_animation.setEndValue(1.0)
+        self.opacity_animation.start()
+        super().leaveEvent(event)
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
@@ -37,7 +65,6 @@ class Ui_Dialog(object):
             }
         """)
         self.lineEdit.setPlaceholderText("Masukkan Username Anda!")
-
         
         # Field untuk Password
         self.lineEdit_3 = QtWidgets.QLineEdit(Dialog)
@@ -60,22 +87,18 @@ class Ui_Dialog(object):
         self.show_password_button = QtWidgets.QPushButton(Dialog)
         self.show_password_button.setGeometry(QtCore.QRect(676, 520, 61, 61))
         self.show_password_button.setStyleSheet("border: none;")
-        self.show_password_button.setIcon(QtGui.QIcon("C:/BUTTON/EYE.png"))
+        self.show_password_button.setIcon(QtGui.QIcon("C:/ASSETS/BUTTON/EYE.png"))
         self.show_password_button.setIconSize(QtCore.QSize(30, 30))
         self.show_password_button.setCheckable(True)
         self.show_password_button.clicked.connect(self.toggle_password_visibility)
         
-        # Tombol Sign Up
-        self.pushButton = QtWidgets.QPushButton(Dialog)
+        # Tombol Sign Up (menggunakan HoverButton)
+        self.pushButton = HoverButton(Dialog, image_path="C:/ASSETS/BUTTON/SIGN_UP_PD.png")
         self.pushButton.setGeometry(QtCore.QRect(330, 620, 251, 91))
-        self.pushButton.setStyleSheet("border-image: url(C:/ASSETS/BUTTON/SIGN_UP_PD.png);")
-        self.add_hover_effect(self.pushButton)
         
-        # Tombol Back
-        self.pushButton_2 = QtWidgets.QPushButton(Dialog)
+        # Tombol Back (menggunakan HoverButton)
+        self.pushButton_2 = HoverButton(Dialog, image_path="C:/ASSETS/BUTTON/BACK.png")
         self.pushButton_2.setGeometry(QtCore.QRect(10, 20, 111, 101))
-        self.pushButton_2.setStyleSheet("border-image: url(C:/ASSETS/BUTTON/BACK.png);")
-        self.add_hover_effect(self.pushButton_2)
         
         # Atur urutan tampilan widget
         self.label.raise_()
@@ -98,17 +121,7 @@ class Ui_Dialog(object):
             self.lineEdit_3.setEchoMode(QtWidgets.QLineEdit.Normal)
         else:
             self.lineEdit_3.setEchoMode(QtWidgets.QLineEdit.Password)
-    
-    def add_hover_effect(self, button):
-        # Tambahkan efek hover pada tombol
-        button.enterEvent = lambda event: self.set_button_opacity(button, 0.7)
-        button.leaveEvent = lambda event: self.set_button_opacity(button, 1.0)
 
-    def set_button_opacity(self, button, opacity):
-        # Terapkan efek opacity pada tombol
-        effect = QtWidgets.QGraphicsOpacityEffect(button)
-        effect.setOpacity(opacity)
-        button.setGraphicsEffect(effect)
 # Kelas pembungkus untuk WindowSignUp
 class WindowSignUp(QtWidgets.QDialog):
     def __init__(self):
