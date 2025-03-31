@@ -1,7 +1,7 @@
 # WindowRiwayat.py
-# Nama: Rangga Muhamad Fajar
+# Nama: Rangga Muhamad Fajar dan Nauval Khairiyan
 # Kelas: 1A - D4
-# NIM: 241524026
+# NIM: 241524026 dan 241524021
 # Desc: - Program ini digunakan untuk melihat detail riwayat pendaftaran pasien di rumah sakit.
 
 # WindowRiwayat.py
