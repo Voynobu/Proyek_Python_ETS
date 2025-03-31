@@ -180,7 +180,7 @@ class Ui_Dialog(object):
         # Tambahkan poli baru dengan kuota default 20
         new_poli = {
             "nama_poli": nama_poli,
-            "kuota": 20,
+            "kuota": 5,
             "dokter_list": [],
             "jadwal_list": []
         }
