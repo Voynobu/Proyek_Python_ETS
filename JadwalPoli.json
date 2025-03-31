@@ -3,7 +3,7 @@
     "daftar_poli": [
         {
             "nama_poli": "Poli Mata",
-            "kuota": 15,
+            "kuota": 5,
             "dokter_list": [
                 {
                     "nama": "Dr. Ahmad",
@@ -22,7 +22,7 @@
         },
         {
             "nama_poli": "Poli THT-KL",
-            "kuota": 25,
+            "kuota": 5,
             "dokter_list": [
                 {
                     "nama": "Dr. Messi",
@@ -48,7 +48,7 @@
         },
         {
             "nama_poli": "Poli Saraf",
-            "kuota": 18,
+            "kuota": 5,
             "dokter_list": [
                 {
                     "nama": "Dr. Jajang",
@@ -74,7 +74,7 @@
         },
         {
             "nama_poli": "Poli Anak",
-            "kuota": 30,
+            "kuota": 5,
             "dokter_list": [
                 {
                     "nama": "Dr.Radhit",
@@ -88,6 +88,24 @@
                     "jam_awal": "10:00",
                     "jam_akhir": "17:00",
                     "status": "AVAILABLE"
+                }
+            ]
+        },
+        {
+            "nama_poli": "Poli Gigi",
+            "kuota": 5,
+            "dokter_list": [
+                {
+                    "nama": "Dr. Sarifudin",
+                    "spesialis": "Gigi"
+                }
+            ],
+            "jadwal_list": [
+                {
+                    "hari": "Wednesday",
+                    "jam_awal": "08:00",
+                    "jam_akhir": "20:00",
+                    "status": "Available"
                 }
             ]
         }

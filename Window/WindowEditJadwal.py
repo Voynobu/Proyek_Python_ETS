@@ -167,13 +167,12 @@ class Ui_Dialog(object):
         )
         self.comboBox_2.setObjectName("comboBox_2")
         self.comboBox_2.addItem("Pilih Poli")
-        self.comboBox_2.addItem("POLI JANTUNG")
-        self.comboBox_2.addItem("POLI MATA")
-        self.comboBox_2.addItem("POLI THT-KL")
-        self.comboBox_2.addItem("POLI SARAF")
-        self.comboBox_2.addItem("POLI ANAK")
-        self.comboBox_2.setCurrentIndex(0)
         self.comboBox_2.model().item(0).setEnabled(False)
+        
+        # Load poli data from JSON
+        for poli in self.current_data["daftar_poli"]:
+            self.comboBox_2.addItem(poli["nama_poli"])
+        
         self.comboBox_2.currentIndexChanged.connect(self.update_dokter_combo)
         
         # ------ COMBOBOX (Pilih Dokter) ------
@@ -241,31 +240,31 @@ class Ui_Dialog(object):
                         "nama_poli": "POLI JANTUNG",
                         "dokter_list": [{"nama": "Dr. Asep", "spesialis": "Kardiolog"}],
                         "jadwal_list": [],
-                        "kuota": 20
+                        "kuota": 5
                     },
                     {
                         "nama_poli": "POLI MATA",
                         "dokter_list": [{"nama": "Dr. Ahmad", "spesialis": "Oftalmolog"}],
                         "jadwal_list": [],
-                        "kuota": 15
+                        "kuota": 5
                     },
                     {
                         "nama_poli": "POLI THT-KL",
                         "dokter_list": [{"nama": "Dr. Messi", "spesialis": "Spesialis THT-KH"}],
                         "jadwal_list": [],
-                        "kuota": 25
+                        "kuota": 5
                     },
                     {
                         "nama_poli": "POLI SARAF",
                         "dokter_list": [{"nama": "Dr. Jajang", "spesialis": "Neurolog"}],
                         "jadwal_list": [],
-                        "kuota": 18
+                        "kuota": 5
                     },
                     {
                         "nama_poli": "POLI ANAK",
                         "dokter_list": [{"nama": "Dr. Radhit", "spesialis": "Pediatrik Gawat Darurat"}],
                         "jadwal_list": [],
-                        "kuota": 30
+                        "kuota": 5
                     }
                 ]
             }
@@ -280,13 +279,15 @@ class Ui_Dialog(object):
             return False
 
     def update_dokter_combo(self):
+        """Update dokter combo box based on selected poli"""
         self.comboBox_3.clear()
         self.comboBox_3.addItem("Pilih Dokter")
         self.comboBox_3.model().item(0).setEnabled(False)
         
         poli_index = self.comboBox_2.currentIndex() - 1
-        if poli_index >= 0 and poli_index < len(self.current_data["daftar_poli"]):
-            for dokter in self.current_data["daftar_poli"][poli_index]["dokter_list"]:
+        if 0 <= poli_index < len(self.current_data["daftar_poli"]):
+            selected_poli = self.current_data["daftar_poli"][poli_index]
+            for dokter in selected_poli["dokter_list"]:
                 self.comboBox_3.addItem(f"{dokter['nama']} ({dokter['spesialis']})")
 
     def validate_input(self):
