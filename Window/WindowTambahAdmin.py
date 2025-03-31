@@ -170,7 +170,7 @@ class Ui_WindowTambahAdmin(object):
     def kembali(self):
         self.windowTambahAdmin.close()
         if self.parent_window:
-            self.parent_window.enableWindow()
+            self.parent_window.show()
 
 
 
