@@ -85,9 +85,8 @@ class Ui_WindowMenuAdmin(object):
 
     def bukaWindowTambahAdmin(self):
         self.windowMenuAdmin.hide()
-        from WindowTambahAdmin import Ui_WindowTambahAdmin
         self.windowTambahAdmin = QtWidgets.QMainWindow()
-        self.ui_tambah = Ui_WindowTambahAdmin(parent_window=self.windowMenuAdmin)
+        self.ui_tambah = Ui_WindowTambahAdmin(parent_window=self.windowMenuAdmin)  # Pass the main window instance
         self.ui_tambah.setupUi(self.windowTambahAdmin)
         self.windowTambahAdmin.show()
 
@@ -111,6 +110,7 @@ class WindowMenuAdmin(QtWidgets.QMainWindow):
         super().__init__()
         self.ui = Ui_WindowMenuAdmin()
         self.ui.setupUi(self)
+    
     def enableWindow(self):
         self.show()
 
