@@ -11,6 +11,7 @@
 
 import json
 import os
+import datetime
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 
@@ -50,17 +51,76 @@ class Ui_Dialog(object):
 
     def setupAutoRefresh(self):
         self.timer = QtCore.QTimer()
-        self.timer.timeout.connect(self.checkFileChanges)
+        self.timer.timeout.connect(self.checkFileAndTimeChanges)
         self.timer.start(1000)
 
-    def checkFileChanges(self):
+    def checkFileAndTimeChanges(self):
         try:
             modified = os.path.getmtime(self.json_file)
             if modified > self.last_modified:
                 self.last_modified = modified
                 self.loadData()
+            else:
+                self.updateStatuses()
         except Exception as e:
             print(f"Error checking file changes: {e}")
+
+    def checkScheduleStatus(self, jadwal_list):
+        now = datetime.datetime.now()
+        current_day = now.strftime("%A")
+        current_time = now.time()
+        
+        status_list = []
+        
+        for jadwal in jadwal_list:
+            schedule_day = jadwal.get("hari", "")
+            
+            if schedule_day.lower() != current_day.lower():
+                status_list.append("UNAVAILABLE")
+                continue
+                
+            try:
+                start_time = datetime.datetime.strptime(jadwal.get("jam_awal", "00:00"), "%H:%M").time()
+                end_time = datetime.datetime.strptime(jadwal.get("jam_akhir", "00:00"), "%H:%M").time()
+                
+                if start_time <= current_time <= end_time:
+                    status_list.append("AVAILABLE")
+                else:
+                    status_list.append("UNAVAILABLE")
+            except Exception as e:
+                print(f"Error parsing time: {e}")
+                status_list.append("UNAVAILABLE")
+        
+        return status_list
+
+    def updateStatuses(self):
+        try:
+            with open(self.json_file, "r", encoding='utf-8') as file:
+                data = json.load(file)
+            
+            row_index = 0
+            for poli in data.get("daftar_poli", []):
+                for dokter in poli.get("dokter_list", []):
+                    nama_dokter = dokter.get("nama", "")
+                    jadwal_list = []
+                    
+                    for jadwal in poli.get("jadwal_list", []):
+                        if jadwal.get("dokter", "") == nama_dokter:
+                            jadwal_list.append(jadwal)
+                    
+                    if jadwal_list:
+                        status_list = self.checkScheduleStatus(jadwal_list)
+                        status_item = QStandardItem("\n".join(status_list))
+                        status_item.setTextAlignment(QtCore.Qt.AlignCenter)
+                        font = QtGui.QFont()
+                        font.setPointSize(14)
+                        status_item.setFont(font)
+                        status_item.setFlags(QtCore.Qt.ItemIsEnabled)
+                        self.model.setItem(row_index, 6, status_item)
+                        row_index += 1
+            
+        except Exception as e:
+            print(f"Error updating statuses: {e}")
 
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
@@ -154,13 +214,13 @@ class Ui_Dialog(object):
         
         # Atur lebar kolom dan resize mode
         header = self.tableView.horizontalHeader()
-        self.tableView.setColumnWidth(0, 60)    # NO
-        self.tableView.setColumnWidth(1, 200)   # NAMA POLI
-        self.tableView.setColumnWidth(2, 80)    # KUOTA
-        self.tableView.setColumnWidth(3, 220)   # DOKTER
-        header.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeToContents)  # SPESIALISASI
-        header.setSectionResizeMode(5, QtWidgets.QHeaderView.ResizeToContents)  # JADWAL PRAKTEK
-        header.setSectionResizeMode(6, QtWidgets.QHeaderView.Stretch)  # STATUS
+        self.tableView.setColumnWidth(0, 60)
+        self.tableView.setColumnWidth(1, 200)
+        self.tableView.setColumnWidth(2, 80)
+        self.tableView.setColumnWidth(3, 220)
+        header.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeToContents)
+        header.setSectionResizeMode(5, QtWidgets.QHeaderView.ResizeToContents)
+        header.setSectionResizeMode(6, QtWidgets.QHeaderView.Stretch)
     
     def loadData(self):
         try:
@@ -180,23 +240,24 @@ class Ui_Dialog(object):
                     
                     # Kumpulkan semua jadwal
                     jadwal_list = []
-                    status_list = []
+                    jadwal_details = []
                     
                     for jadwal in poli.get("jadwal_list", []):
                         if jadwal.get("dokter", "") == nama_dokter:
                             jadwal_str = f"{jadwal.get('hari', '')} {jadwal.get('jam_awal', '')}-{jadwal.get('jam_akhir', '')}"
-                            jadwal_list.append(jadwal_str)
-                            status_list.append(jadwal.get("status", ""))
+                            jadwal_list.append(jadwal)
+                            jadwal_details.append(jadwal_str)
                     
                     if jadwal_list:
                         row_count += 1
+                        status_list = self.checkScheduleStatus(jadwal_list)
                         self.addTableRow(
                             row_count,
                             nama_poli,
                             kuota,
                             nama_dokter,
                             spesialisasi,
-                            "\n".join(jadwal_list),
+                            "\n".join(jadwal_details),
                             "\n".join(status_list)
                         )
             
@@ -229,7 +290,7 @@ class Ui_Dialog(object):
             font.setPointSize(14)
             item.setFont(font)
             item.setFlags(QtCore.Qt.ItemIsEnabled)
-            item.setToolTip(item.text())  # Tooltip untuk teks lengkap
+            item.setToolTip(item.text())
             
         self.model.appendRow(items)
     
