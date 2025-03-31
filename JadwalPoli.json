@@ -96,16 +96,17 @@
             "kuota": 5,
             "dokter_list": [
                 {
-                    "nama": "Dr. Sarifudin",
+                    "nama": "Dr. Zaidan",
                     "spesialis": "Gigi"
                 }
             ],
             "jadwal_list": [
                 {
-                    "hari": "Wednesday",
+                    "dokter": "Dr. Zaidan",
+                    "hari": "Monday",
                     "jam_awal": "08:00",
-                    "jam_akhir": "20:00",
-                    "status": "Available"
+                    "jam_akhir": "13:00",
+                    "status": "UNAVAILABLE"
                 }
             ]
         }

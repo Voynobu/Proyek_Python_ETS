@@ -43,19 +43,19 @@ class Ui_Dialog(object):
         self.parent_window = parent_window
 
     def setupUi(self, Dialog):
-        self.dialog = Dialog  # Simpan referensi dialog
+        self.dialog = Dialog
         Dialog.setObjectName("Dialog")
         Dialog.resize(1600, 900)
         Dialog.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 
-        # ------ BACK BUTTON ------
+        # Back Button
         self.pushButton_4 = HoverButton(Dialog, image_path="C:/ASSETS/BUTTON/BACK.png")
         self.pushButton_4.setGeometry(QtCore.QRect(10, 20, 111, 101))
         self.pushButton_4.setText("")
         self.pushButton_4.setObjectName("pushButton_4")
         self.pushButton_4.clicked.connect(self.backToMenuAdmin)
 
-        # ------ BACKGROUND LABEL ------
+        # Background Label
         self.label = QtWidgets.QLabel(Dialog)
         self.label.setGeometry(QtCore.QRect(-4, 0, 1611, 901))
         self.label.setText("")
@@ -63,11 +63,10 @@ class Ui_Dialog(object):
         self.label.setScaledContents(True)
         self.label.setObjectName("label")
 
-        # ------ TABLE VIEW ------
+        # Table View
         self.tableView = QtWidgets.QTableView(Dialog)
         self.tableView.setGeometry(QtCore.QRect(440, 170, 1131, 696))
-        self.tableView.setStyleSheet(
-            """
+        self.tableView.setStyleSheet("""
             QTableView {
                 gridline-color: gray;
                 font-size: 20px;
@@ -79,47 +78,42 @@ class Ui_Dialog(object):
                 font-weight: bold;
                 font-size: 20px;
             }
-            """
-        )
+        """)
         self.tableView.setObjectName("tableView")
 
-        # ------ BUTTON EDIT JADWAL ------
+        # Buttons
         self.pushButton_1 = HoverButton(Dialog, image_path="C:/ASSETS/BUTTON/EDIT_JADWAL.png")
         self.pushButton_1.setGeometry(QtCore.QRect(-2, 219, 411, 201))
         self.pushButton_1.setText("")
         self.pushButton_1.setObjectName("pushButton_1")
         self.pushButton_1.clicked.connect(self.openEditJadwal)
 
-        # ------ BUTTON EDIT POLI ------
         self.pushButton_2 = HoverButton(Dialog, image_path="C:/ASSETS/BUTTON/EDIT_POLI.png")
         self.pushButton_2.setGeometry(QtCore.QRect(-2, 444, 411, 201))
         self.pushButton_2.setText("")
         self.pushButton_2.setObjectName("pushButton_2")
         self.pushButton_2.clicked.connect(self.openEditPoli)
 
-        # ------ BUTTON EDIT DOKTER ------
         self.pushButton_3 = HoverButton(Dialog, image_path="C:/ASSETS/BUTTON/EDIT_DOK.png")
         self.pushButton_3.setGeometry(QtCore.QRect(-7, 669, 421, 201))
         self.pushButton_3.setText("")
         self.pushButton_3.setObjectName("pushButton_3")
         self.pushButton_3.clicked.connect(self.openEditDokter)
 
-        # ------ LABEL DATETIME ------
+        # Datetime Label
         self.label_datetime = QtWidgets.QLabel(Dialog)
         self.label_datetime.setGeometry(QtCore.QRect(431, 36, 691, 96))
         self.label_datetime.setAlignment(QtCore.Qt.AlignCenter)
-        self.label_datetime.setStyleSheet(
-            """
+        self.label_datetime.setStyleSheet("""
             QLabel {
                 color: #12c2e8;
                 font-size: 30px;
                 font-weight: bold;
             }
-            """
-        )
+        """)
         self.label_datetime.setObjectName("label_datetime")
 
-        # Z-order: pastikan background di bawah
+        # Z-order
         self.label.raise_()
         self.pushButton_4.raise_()
         self.pushButton_1.raise_()
@@ -131,10 +125,8 @@ class Ui_Dialog(object):
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
-        # ------ INIT TABEL ------
+        # Initialize table
         self.initTable()
-
-        # Nonaktifkan interaksi tabel
         self.tableView.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.tableView.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
         self.tableView.setFocusPolicy(QtCore.Qt.NoFocus)
@@ -149,23 +141,23 @@ class Ui_Dialog(object):
 
         # Set column widths
         header.setSectionResizeMode(0, QtWidgets.QHeaderView.Fixed)
-        self.tableView.setColumnWidth(0, 50)  # NO
-        header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)  # POLI
-        header.setSectionResizeMode(2, QtWidgets.QHeaderView.Stretch)  # DOKTER
-        header.setSectionResizeMode(3, QtWidgets.QHeaderView.Stretch)  # JADWAL
-        header.setSectionResizeMode(4, QtWidgets.QHeaderView.Fixed)    # STATUS
+        self.tableView.setColumnWidth(0, 50)
+        header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
+        header.setSectionResizeMode(2, QtWidgets.QHeaderView.Stretch)
+        header.setSectionResizeMode(3, QtWidgets.QHeaderView.Stretch)
+        header.setSectionResizeMode(4, QtWidgets.QHeaderView.Fixed)
         self.tableView.setColumnWidth(4, 150)
-        header.setSectionResizeMode(5, QtWidgets.QHeaderView.Fixed)   # KUOTA AWAL
+        header.setSectionResizeMode(5, QtWidgets.QHeaderView.Fixed)
         self.tableView.setColumnWidth(5, 120)
-        header.setSectionResizeMode(6, QtWidgets.QHeaderView.Fixed)   # KUOTA LEFT
+        header.setSectionResizeMode(6, QtWidgets.QHeaderView.Fixed)
         self.tableView.setColumnWidth(6, 120)
 
         self.loadData()
 
         self.timer = QtCore.QTimer(Dialog)
-        self.timer.timeout.connect(self.updateDateTime)
+        self.timer.timeout.connect(self.updateDateTimeAndStatus)
         self.timer.start(1000)
-        self.updateDateTime()
+        self.updateDateTimeAndStatus()
 
     def initTable(self):
         self.model = QStandardItemModel()
@@ -173,6 +165,37 @@ class Ui_Dialog(object):
             "NO", "POLI", "DOKTER", "JADWAL", "STATUS", "KUOTA", "TERSEDIA"
         ])
         self.tableView.setModel(self.model)
+
+    def checkScheduleStatus(self, jadwal_list):
+        now = datetime.datetime.now()
+        current_day = now.strftime("%A")  # Full day name (e.g. "Thursday")
+        current_time = now.time()
+        
+        status_list = []
+        
+        for jadwal in jadwal_list:
+            schedule_day = jadwal["hari"]
+            
+            # Check if it's the correct day
+            if schedule_day.lower() != current_day.lower():
+                status_list.append("UNAVAILABLE")
+                continue
+                
+            try:
+                # Parse time strings
+                start_time = datetime.datetime.strptime(jadwal["jam_awal"], "%H:%M").time()
+                end_time = datetime.datetime.strptime(jadwal["jam_akhir"], "%H:%M").time()
+                
+                # Check if current time is within schedule
+                if start_time <= current_time <= end_time:
+                    status_list.append("AVAILABLE")
+                else:
+                    status_list.append("UNAVAILABLE")
+            except Exception as e:
+                print(f"Error parsing time: {e}")
+                status_list.append("UNAVAILABLE")
+        
+        return status_list
 
     def loadData(self):
         try:
@@ -184,31 +207,31 @@ class Ui_Dialog(object):
                     nama_poli = poli["nama_poli"].upper()
                     kuota = str(poli.get("kuota", "N/A"))
                     
-                    # Calculate tersedia (80% of kuota for demo)
+                    # Calculate available slots (80% of quota)
                     try:
                         tersedia = str(int(int(kuota) * 0.8))
                     except:
                         tersedia = "N/A"
                     
-                    # Format dokter
+                    # Format doctors
                     dokter_str = "\n".join([
                         f"{dokter['nama']} ({dokter['spesialis']})" 
                         for dokter in poli["dokter_list"]
                     ])
                     
-                    # Format jadwal dan status
+                    # Format schedules and get current statuses
                     jadwal_entries = []
-                    status_entries = []
-                    for jadwal in poli["jadwal_list"]:
+                    status_list = self.checkScheduleStatus(poli["jadwal_list"])
+                    
+                    for jadwal, status in zip(poli["jadwal_list"], status_list):
                         hari = jadwal["hari"].upper()
                         jam = f"{jadwal['jam_awal']} - {jadwal['jam_akhir']}"
                         jadwal_entries.append(f"{hari} ({jam})")
-                        status_entries.append(jadwal.get("status", "N/A").upper())
                     
                     jadwal_str = "\n".join(jadwal_entries)
-                    status_str = "\n".join(status_entries)
+                    status_str = "\n".join(status_list)
                     
-                    # Tambahkan baris ke tabel
+                    # Add row to table
                     row_data = [
                         str(idx), 
                         nama_poli, 
@@ -228,16 +251,15 @@ class Ui_Dialog(object):
                     
         except Exception as e:
             print(f"Error loading JSON data: {e}")
-            # Fallback data jika file tidak ditemukan
             self.loadFallbackData()
 
     def loadFallbackData(self):
         fallback_data = [
-            ("1", "POLI JANTUNG", "Dr. Asep (Kardiolog)", "TUESDAY (08:00 - 12:00)\nFRIDAY (13:00 - 18:00)", "AVAILABLE\nAVAILABLE", "20", "16"),
-            ("2", "POLI MATA", "Dr. Ahmad (Oftalmolog)", "MONDAY (09:00 - 15:00)\nTHURSDAY (07:00 - 12:00)", "AVAILABLE\nUNAVAILABLE", "15", "12"),
-            ("3", "POLI THT-KL", "Dr. Messi (Spesialis THT-KH)", "TUESDAY (11:00 - 18:00)\nWEDNESDAY (18:00 - 21:00)", "AVAILABLE\nAVAILABLE", "25", "20"),
-            ("4", "POLI SARAF", "Dr. Jajang (Neurolog)", "TUESDAY (08:00 - 13:00)\nSUNDAY (10:00 - 17:00)", "AVAILABLE\nUNAVAILABLE", "18", "14"),
-            ("5", "POLI ANAK", "Dr.Radhit (Pediatrik Gawat Darurat)", "THURSDAY (10:00 - 17:00)", "AVAILABLE", "30", "24")
+            ("1", "POLI MATA", "Dr. Ahmad (Oftalmolog)", "THURSDAY (07:00 - 12:00)", "UNAVAILABLE", "5", "4"),
+            ("2", "POLI THT-KL", "Dr. Messi (Spesialis THT-KH)", "TUESDAY (11:00 - 18:00)\nWEDNESDAY (18:00 - 21:00)", "UNAVAILABLE\nUNAVAILABLE", "5", "4"),
+            ("3", "POLI SARAF", "Dr. Jajang (Neurolog)", "TUESDAY (08:00 - 13:00)\nSUNDAY (10:00 - 17:00)", "UNAVAILABLE\nUNAVAILABLE", "5", "4"),
+            ("4", "POLI ANAK", "Dr.Radhit (Pediatrik Gawat Darurat)", "THURSDAY (10:00 - 17:00)", "UNAVAILABLE", "5", "4"),
+            ("5", "POLI GIGI", "Dr. Sarifudin (Gigi)", "WEDNESDAY (08:00 - 20:00)", "UNAVAILABLE", "5", "4")
         ]
         self.model.setRowCount(0)
         for row_data in fallback_data:
@@ -248,40 +270,20 @@ class Ui_Dialog(object):
                 items.append(item)
             self.model.appendRow(items)
 
-    def updateDateTime(self):
+    def updateDateTimeAndStatus(self):
+        # Update datetime display
         now = QtCore.QDateTime.currentDateTime()
         day_of_week = now.toString("dddd").upper()
         date_str = now.toString("yyyy-MM-dd")
         time_str = now.toString("HH:mm:ss")
         self.label_datetime.setText(f"{day_of_week} | {date_str} | {time_str}")
+        
+        # Reload data to update statuses
+        self.loadData()
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "Window Edit Jadwal Poli Dokter"))
-
-    def openEditJadwal(self):
-        self.dialog.hide()
-        from WindowEditJadwal import Ui_Dialog as Ui_WindowEditJadwal
-        self.edit_jadwal_dialog = QtWidgets.QDialog()
-        self.ui_edit_jadwal = Ui_WindowEditJadwal(parent_window=self.dialog)
-        self.ui_edit_jadwal.setupUi(self.edit_jadwal_dialog)
-        self.edit_jadwal_dialog.show()
-
-    def openEditPoli(self):
-        self.dialog.hide()
-        from WindowEditPoli import Ui_Dialog as Ui_WindowEditPoli
-        self.edit_poli_dialog = QtWidgets.QDialog()
-        self.ui_edit_poli = Ui_WindowEditPoli(parent_window=self.dialog)
-        self.ui_edit_poli.setupUi(self.edit_poli_dialog)
-        self.edit_poli_dialog.show()
-
-    def openEditDokter(self):
-        self.dialog.hide()
-        from WindowEditDokter import Ui_WindowEditDokter
-        self.edit_dokter_dialog = QtWidgets.QDialog()
-        self.ui_edit_dokter = Ui_WindowEditDokter(parent_window=self.dialog)
-        self.ui_edit_dokter.setupUi(self.edit_dokter_dialog)
-        self.edit_dokter_dialog.show()
 
     def backToMenuAdmin(self):
         if self.parent_window:
@@ -294,8 +296,6 @@ class Ui_Dialog(object):
         self.edit_jadwal_dialog = QtWidgets.QDialog()
         self.ui_edit_jadwal = Ui_WindowEditJadwal(parent_window=self.dialog)
         self.ui_edit_jadwal.setupUi(self.edit_jadwal_dialog)
-        
-        # Connect the dialog's finished signal to refresh data
         self.edit_jadwal_dialog.finished.connect(self.loadData)
         self.edit_jadwal_dialog.show()
 
@@ -305,8 +305,6 @@ class Ui_Dialog(object):
         self.edit_poli_dialog = QtWidgets.QDialog()
         self.ui_edit_poli = Ui_WindowEditPoli(parent_window=self.dialog)
         self.ui_edit_poli.setupUi(self.edit_poli_dialog)
-        
-        # Connect the dialog's finished signal to refresh data
         self.edit_poli_dialog.finished.connect(self.loadData)
         self.edit_poli_dialog.show()
 
@@ -316,11 +314,8 @@ class Ui_Dialog(object):
         self.edit_dokter_dialog = QtWidgets.QDialog()
         self.ui_edit_dokter = Ui_WindowEditDokter(parent_window=self.dialog)
         self.ui_edit_dokter.setupUi(self.edit_dokter_dialog)
-        
-        # Connect the dialog's finished signal to refresh data
         self.edit_dokter_dialog.finished.connect(self.loadData)
         self.edit_dokter_dialog.show()
-
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)

@@ -5,6 +5,7 @@
 # Desc: Program untuk mengelola jadwal layanan poli di rumah sakit
 
 import json
+import datetime
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox
 
@@ -342,6 +343,28 @@ class Ui_Dialog(object):
         self.lineEdit_2.clear()
         self.lineEdit_3.clear()
 
+    def get_dokter_name(self):
+        """Extract doctor name from combobox text"""
+        dokter_text = self.comboBox_3.currentText()
+        return dokter_text.split(" (")[0] if " (" in dokter_text else dokter_text
+
+    def get_jadwal_status(self, hari, jam_awal, jam_akhir):
+        """Determine status based on current time"""
+        try:
+            now = datetime.datetime.now()
+            current_day = now.strftime("%A")
+            current_time = now.time()
+            
+            # Convert schedule time to time objects
+            start = datetime.datetime.strptime(jam_awal, "%H:%M").time()
+            end = datetime.datetime.strptime(jam_akhir, "%H:%M").time()
+            
+            if current_day.upper() == hari.upper() and start <= current_time <= end:
+                return "AVAILABLE"
+            return "UNAVAILABLE"
+        except:
+            return "UNAVAILABLE"
+
     def tambah_jadwal(self):
         if not self.validate_input():
             return
@@ -350,11 +373,16 @@ class Ui_Dialog(object):
         if poli_index < 0:
             return
 
+        hari = self.lineEdit_1.text()
+        jam_awal = self.lineEdit_2.text()
+        jam_akhir = self.lineEdit_3.text()
+
         new_jadwal = {
-            "hari": self.lineEdit_1.text(),
-            "jam_awal": self.lineEdit_2.text(),
-            "jam_akhir": self.lineEdit_3.text(),
-            "status": "Available"
+            "dokter": self.get_dokter_name(),
+            "hari": hari,
+            "jam_awal": jam_awal,
+            "jam_akhir": jam_akhir,
+            "status": self.get_jadwal_status(hari, jam_awal, jam_akhir)
         }
 
         self.current_data["daftar_poli"][poli_index]["jadwal_list"].append(new_jadwal)
@@ -370,7 +398,6 @@ class Ui_Dialog(object):
         if poli_index < 0:
             return
 
-        # Jika belum memilih jadwal, tampilkan dialog pilihan
         if self.selected_jadwal_index == -1:
             jadwal_items = [
                 f"{j['hari']} ({j['jam_awal']}-{j['jam_akhir']}) - {j.get('status', 'Available')}"
@@ -391,12 +418,16 @@ class Ui_Dialog(object):
                 
             self.selected_jadwal_index = jadwal_items.index(item)
 
-        # Update jadwal
+        hari = self.lineEdit_1.text()
+        jam_awal = self.lineEdit_2.text()
+        jam_akhir = self.lineEdit_3.text()
+
         self.current_data["daftar_poli"][poli_index]["jadwal_list"][self.selected_jadwal_index] = {
-            "hari": self.lineEdit_1.text(),
-            "jam_awal": self.lineEdit_2.text(),
-            "jam_akhir": self.lineEdit_3.text(),
-            "status": "Available"
+            "dokter": self.get_dokter_name(),
+            "hari": hari,
+            "jam_awal": jam_awal,
+            "jam_akhir": jam_akhir,
+            "status": self.get_jadwal_status(hari, jam_awal, jam_akhir)
         }
 
         if self.save_data():
