@@ -4,7 +4,7 @@
 
 import json
 from datetime import datetime
-from utils.FileHandler import FileHandler
+from Utils.FileHandler import FileHandler
 
 class Admin:
     """

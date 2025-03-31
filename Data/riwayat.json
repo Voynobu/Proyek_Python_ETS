@@ -9,7 +9,22 @@
             "jadwal": "08:00 - 12:00",
             "tanggal_temu": "01-04-2025",
             "keluhan": "sakit",
-            "nomor antrian": "MNDR-Poli Jantung-1"
+            "nomor antrian": "MNDR-Poli Jantung-1",
+            "status": "On going"
+        }
+    ],
+    "NauvalRyan123": [
+        {
+            "nama": "Denis",
+            "jenis_kelamin": "Pria",
+            "jenis_layanan": "Mandiri",
+            "poli": "Poli Mata",
+            "dokter": "Dr. Ahmad",
+            "jadwal": "09:00 - 15:00",
+            "tanggal_temu": "07-04-2025",
+            "keluhan": "Ganjel mata denis",
+            "nomor antrian": "MNDR-Poli Mata-1",
+            "status": "On going"
         }
     ]
 }

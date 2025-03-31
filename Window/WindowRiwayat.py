@@ -86,30 +86,62 @@ class Ui_Dialog(object):
         
     def initModel(self):
         self.model = QStandardItemModel()
-        self.model.setHorizontalHeaderLabels(["NO", "NAMA POLI"])
+        self.model.setHorizontalHeaderLabels(["NAMA PASIEN", "POLI", "DOKTER", "JADWAL", "TANGGAL TEMU", "STATUS"])
         self.tableView.setModel(self.model)
     
     def loadData(self):
-        file_path = "poliklinik_data.json"
+        file_path = "data/riwayat.json"
+    
         try:
             with open(file_path, "r") as file:
-                data = json.load(file)
-            poliklinik_data = data.get("poliklinik", {})
-            
+                riwayat_data = json.load(file)
+
+            today = QtCore.QDate.currentDate()
             self.model.setRowCount(0)
-            row_num = 0
-            for poli_name in poliklinik_data.keys():
-                if poli_name.strip():
-                    item_no = QStandardItem(str(row_num + 1))
-                    item_no.setTextAlignment(QtCore.Qt.AlignCenter)
-                    
-                    item_poli = QStandardItem(poli_name.capitalize())
-                    item_poli.setTextAlignment(QtCore.Qt.AlignCenter)
-                    
-                    self.model.appendRow([item_no, item_poli])
-                    row_num += 1
+
+            for username, records in riwayat_data.items():
+                for entry in records:
+                    nama = entry.get("nama", "Unknown")
+                    poli = entry.get("poli", "Unknown")
+                    dokter = entry.get("dokter", "Unknown")
+                    jadwal = entry.get("jadwal", "Unknown")
+                    tanggal_temu = entry.get("tanggal_temu", "Unknown")
+                    status = entry.get("status", "Ongoing")  # Default: Ongoing
+
+                    # Hitung status berdasarkan tanggal temu
+                    try:
+                        temu_date = QtCore.QDate.fromString(tanggal_temu, "dd-MM-yyyy")
+                        if temu_date.isValid():
+                            if temu_date < today:
+                                status = "Finished"
+                            elif temu_date > today:
+                                status = "On going"
+                        else:
+                            status = "Invalid Date"
+                    except ValueError:
+                        status = "Invalid Date"
+
+                    # Simpan status terbaru ke riwayat.json
+                    entry["status"] = status
+
+                    # Buat item tabel
+                    item_nama = QStandardItem(nama)
+                    item_poli = QStandardItem(poli)
+                    item_dokter = QStandardItem(dokter)
+                    item_jadwal = QStandardItem(jadwal)
+                    item_tanggal = QStandardItem(tanggal_temu)
+                    item_status = QStandardItem(status)
+
+                    # Tambahkan ke model tabel
+                    self.model.appendRow([item_nama, item_poli, item_dokter, item_jadwal, item_tanggal, item_status])
+
+                    # Simpan perubahan status ke riwayat.json
+                    with open(file_path, "w") as file:
+                        json.dump(riwayat_data, file, indent=4)
+
         except Exception as e:
             print("Error membaca file JSON:", e)
+
     
     def backToMenu(self):
         # Import dan buka WindowMenuUser ketika tombol back diklik
