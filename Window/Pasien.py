@@ -41,6 +41,7 @@ def simpan_data(nama, jenis_kelamin, tanggal_temu, jenis_layanan, poli, dokter, 
         "tanggal_temu": new_pasien.tanggal_temu,
         "keluhan": new_pasien.keluhan,
         "nomor antrian" : nomor_antrian,
+        "status" : "On going"
     }
 
     # Cek apakah file sudah ada
