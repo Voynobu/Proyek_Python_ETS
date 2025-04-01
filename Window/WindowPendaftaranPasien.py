@@ -4,8 +4,6 @@
 # Description : Window untuk pendaftaran pasien
 import sys
 import json
-import os
-from pathlib import Path
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QDialog, QApplication, QCalendarWidget, QDateEdit, QMessageBox
 from PyQt5.QtCore import QDate
@@ -13,8 +11,7 @@ from Pasien import simpan_data
 from Register import load_users
 from Antrian import ambil_nomor_antrian, is_antrian_penuh
 
-BASE_DIR = Path(__file__).parent.parent  # Naik satu level ke folder ETS
-POLIKLINIK_FILE = BASE_DIR / "Data" / "jadwalPoli.json"
+POLIKLINIK_FILE = "JadwalPoli.json"
 with open(POLIKLINIK_FILE, "r", encoding="utf-8") as file:
     data = json.load(file)
 
