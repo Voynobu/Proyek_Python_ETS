@@ -7,7 +7,7 @@
 # Nama : Muhamad Dino Dermawan
 # NIM  : 241524015
 # - Menampilkan tabel yang memungkinkan melakukan pembatalan pendaftaran
-# - saat melakukan pembatalan, pendaftaran akan terhapus dari database
+# - saat melakukan pembatalan, pendaftaran yang dari ongoing, berubah menjadi dibatalkan
 
 # WindowCancel.py - Modified Version (Non-Interactive Table)
 import sys
