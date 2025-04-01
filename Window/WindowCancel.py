@@ -9,6 +9,7 @@
 # - Menampilkan tabel yang memungkinkan melakukan pembatalan pendaftaran
 # - saat melakukan pembatalan, pendaftaran akan terhapus dari database
 
+# WindowCancel.py - Modified Version (Non-Interactive Table)
 import sys
 import json
 import os
@@ -79,6 +80,8 @@ class Ui_Dialog(object):
                 background-color: white;
                 gridline-color: #dddddd;
                 border: 2px solid #0cc0df;
+                selection-background-color: transparent;
+                selection-color: black;
             }
             QHeaderView::section {
                 background-color: #0cc0df;
@@ -92,12 +95,21 @@ class Ui_Dialog(object):
                 border-right: 1px solid #dddddd;
                 border-bottom: 1px solid #dddddd;
             }
+            QTableView::item:selected {
+                background: transparent;
+                color: black;
+            }
+            QTableView::item:hover {
+                background: #f0f0f0;
+            }
         """)
         self.tableView.setObjectName("tableView")
         self.tableView.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.tableView.verticalHeader().setVisible(False)
-        self.tableView.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Fixed)
+        self.tableView.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
         self.tableView.setFixedSize(1398, 650)  # Ukuran fixed
+        self.tableView.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
+        self.tableView.setFocusPolicy(QtCore.Qt.NoFocus)
         
         self.label.raise_()
         self.pushButton_3.raise_()
@@ -111,12 +123,12 @@ class Ui_Dialog(object):
         
     def initTable(self):
         self.model = QStandardItemModel()
-        headers = ["NO", "NAMA", "POLI", "JENIS LAYANAN", "TANGGAL", "NO. ANTRIAN", "AKSI"]
+        headers = ["NO", "NAMA", "POLI", "JENIS LAYANAN", "TANGGAL", "NO. ANTRIAN", "STATUS", "AKSI"]
         self.model.setHorizontalHeaderLabels(headers)
         self.tableView.setModel(self.model)
         
         # Lebar kolom disesuaikan untuk memenuhi lebar tabel (total 1398)
-        column_widths = [70, 250, 250, 220, 180, 308, 120]  # Total: 70+250+250+220+180+308+120=1398
+        column_widths = [60, 200, 200, 200, 150, 250, 120, 118]  # Adjusted for new STATUS column
         for i, width in enumerate(column_widths):
             self.tableView.setColumnWidth(i, width)
         
@@ -133,27 +145,36 @@ class Ui_Dialog(object):
             
             for username, registrations in data.items():
                 for reg in registrations:
-                    # Format data sesuai contoh
-                    row = [
-                        QStandardItem(str(row_count + 1)),
-                        QStandardItem(reg['nama'].lower()),  # Nama lowercase seperti contoh
-                        QStandardItem(reg['poli']),
-                        QStandardItem(reg['jenis_layanan']),
-                        QStandardItem(reg['tanggal_temu']),
-                        QStandardItem(reg['nomor antrian'])
-                    ]
+                    # Get status (case-insensitive check)
+                    status = reg.get('status', 'On going')
+                    normalized_status = status.lower().replace(" ", "")
                     
-                    font = QtGui.QFont()
-                    font.setPointSize(11)
-                    
-                    for item in row:
-                        item.setTextAlignment(QtCore.Qt.AlignCenter)
-                        item.setFont(font)
-                        item.setForeground(QtGui.QColor(50, 50, 50))
-                        item.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable)
-                    
-                    self.model.appendRow(row)
-                    row_count += 1
+                    # Only show ongoing registrations
+                    if normalized_status in ['ongoing', 'on-going', 'on going']:
+                        row = [
+                            QStandardItem(str(row_count + 1)),
+                            QStandardItem(reg['nama']),
+                            QStandardItem(reg['poli']),
+                            QStandardItem(reg['jenis_layanan']),
+                            QStandardItem(reg['tanggal_temu']),
+                            QStandardItem(reg['nomor antrian']),
+                            QStandardItem(status)
+                        ]
+                        
+                        # Set red color for cancelled status
+                        if normalized_status == 'dibatalkan':
+                            row[6].setForeground(QtGui.QColor(255, 0, 0))
+                        
+                        font = QtGui.QFont()
+                        font.setPointSize(11)
+                        
+                        for item in row:
+                            item.setTextAlignment(QtCore.Qt.AlignCenter)
+                            item.setFont(font)
+                            item.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable)
+                        
+                        self.model.appendRow(row)
+                        row_count += 1
             
             self.addCancelButtons()
             
@@ -162,11 +183,12 @@ class Ui_Dialog(object):
 
     def addCancelButtons(self):
         for row in range(self.model.rowCount()):
-            btn = QtWidgets.QPushButton("Batalkan")
+            status_item = self.model.item(row, 6)
+            status = status_item.text().lower().replace(" ", "")
+            
+            btn = QtWidgets.QPushButton()
             btn.setStyleSheet("""
                 QPushButton {
-                    background-color: #ff5555;
-                    color: white;
                     border-radius: 4px;
                     padding: 6px 10px;
                     font-weight: bold;
@@ -174,51 +196,103 @@ class Ui_Dialog(object):
                     min-width: 90px;
                     border: none;
                 }
-                QPushButton:hover {
-                    background-color: #ff3333;
-                }
             """)
-            btn.clicked.connect(lambda _, r=row: self.confirmCancel(r))
-            self.tableView.setIndexWidget(self.model.index(row, 6), btn)
+            
+            if status == 'dibatalkan':
+                btn.setText("Dibatalkan")
+                btn.setStyleSheet(btn.styleSheet() + """
+                    QPushButton {
+                        background-color: #cccccc;
+                        color: #666666;
+                    }
+                """)
+                btn.setEnabled(False)
+            else:
+                btn.setText("Batalkan")
+                btn.setStyleSheet(btn.styleSheet() + """
+                    QPushButton {
+                        background-color: #ff5555;
+                        color: white;
+                    }
+                    QPushButton:hover {
+                        background-color: #ff3333;
+                    }
+                """)
+                btn.clicked.connect(lambda _, r=row: self.confirmCancel(r))
+            
+            self.tableView.setIndexWidget(self.model.index(row, 7), btn)
 
     def confirmCancel(self, row):
-        no_antrian = self.model.item(row, 5).text()
+        no_antrian = self.model.item(row, 5).text()  # NO. ANTRIAN is at index 5
+        nama_pasien = self.model.item(row, 1).text()
         
         reply = QtWidgets.QMessageBox.question(
             None,
             'Konfirmasi Pembatalan',
-            f'Apakah Anda yakin ingin membatalkan pendaftaran dengan nomor antrian:\n{no_antrian}?',
+            f'Apakah Anda yakin ingin membatalkan pendaftaran:\n\n'
+            f'Atas nama: {nama_pasien}\n'
+            f'Nomor antrian: {no_antrian}?',
             QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
             QtWidgets.QMessageBox.No
         )
         
         if reply == QtWidgets.QMessageBox.Yes:
-            self.cancelRegistration(no_antrian)
+            self.updateRegistrationStatus(row, no_antrian)
 
-    def cancelRegistration(self, no_antrian):
+    def updateRegistrationStatus(self, row, no_antrian):
         try:
             with open(self.riwayat_path, 'r') as file:
                 data = json.load(file)
             
             for username in list(data.keys()):
-                for i, reg in enumerate(data[username]):
+                for reg in data[username]:
                     if reg['nomor antrian'] == no_antrian:
-                        data[username].pop(i)
-                        
-                        if not data[username]:
-                            del data[username]
+                        # Update status to "Dibatalkan"
+                        reg['status'] = 'Dibatalkan'
                         
                         with open(self.riwayat_path, 'w') as file:
                             json.dump(data, file, indent=4)
                         
-                        self.loadData()
-                        QtWidgets.QMessageBox.information(None, 'Berhasil', 'Pendaftaran berhasil dibatalkan!')
+                        # Update the table view
+                        self.model.item(row, 6).setText("Dibatalkan")
+                        self.model.item(row, 6).setForeground(QtGui.QColor(255, 0, 0))
+                        
+                        # Update the cancel button
+                        btn = self.tableView.indexWidget(self.model.index(row, 7))
+                        btn.setText("Dibatalkan")
+                        btn.setStyleSheet("""
+                            QPushButton {
+                                background-color: #cccccc;
+                                color: #666666;
+                                border-radius: 4px;
+                                padding: 6px 10px;
+                                font-weight: bold;
+                                font-size: 11pt;
+                                min-width: 90px;
+                                border: none;
+                            }
+                        """)
+                        btn.setEnabled(False)
+                        
+                        QtWidgets.QMessageBox.information(
+                            None,
+                            'Berhasil',
+                            'Status pendaftaran berhasil diubah menjadi "Dibatalkan"'
+                        )
                         return
             
-            QtWidgets.QMessageBox.warning(None, 'Data Tidak Ditemukan', 'Nomor antrian tidak ditemukan!')
+            QtWidgets.QMessageBox.warning(
+                None,
+                'Data Tidak Ditemukan',
+                'Nomor antrian tidak ditemukan dalam database!'
+            )
             
         except Exception as e:
-            QtWidgets.QMessageBox.critical(None, 'Error', f'Gagal membatalkan pendaftaran: {str(e)}')
+            QtWidgets.QMessageBox.critical(
+                None,
+                'Error',
+                f'Gagal mengubah status pendaftaran: {str(e)}'
+            )
 
     def backToMenuUser(self):
         from WindowMenuUser import WindowMenuUser
