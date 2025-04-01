@@ -8,5 +8,13 @@
         "Mandiri": {
             "Poli Mata": 1
         }
+    },
+    "08-04-2025": {
+        "Mandiri": {
+            "Poli Jantung": 3
+        },
+        "BPJS": {
+            "Poli Jantung": 1
+        }
     }
 }

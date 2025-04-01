@@ -243,7 +243,7 @@ class WindowPendaftaranPasien(QDialog):
             return
         nomor_antrian = ambil_nomor_antrian(tanggal_temu, jenis_layanan, poli)
         simpan_data(nama, jenis_kelamin, tanggal_temu, jenis_layanan, poli, dokter, keluhan, pilih_jadwal, self.username, nomor_antrian)
-        QMessageBox.information(self, "Sukses", "Pendaftaran berhasil!")
+        QMessageBox.information(self, "Sukses", "Pendaftaran berhasil!. Lihat menu riwayat untuk melihat detail pendaftaran. ")
         self.close()
         self.back_to_menu()
 

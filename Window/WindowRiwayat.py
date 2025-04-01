@@ -38,7 +38,7 @@ class HoverButton(QtWidgets.QPushButton):
         super().leaveEvent(event)
 
 class Ui_Dialog(object):
-    def setupUi(self, Dialog):
+    def setupUi(self, Dialog, username):
         self.dialog = Dialog  # simpan referensi dialog untuk nanti digunakan di method backToMenu
         Dialog.setObjectName("Dialog")
         Dialog.resize(1598, 900)
@@ -83,7 +83,8 @@ class Ui_Dialog(object):
         # Inisialisasi model tabel dan load data (sesuaikan dengan kebutuhan Anda)
         self.initModel()
         self.loadData()
-        
+        self.username = username
+
     def initModel(self):
         self.model = QStandardItemModel()
         self.model.setHorizontalHeaderLabels(["NAMA PASIEN", "POLI", "DOKTER", "JADWAL", "TANGGAL TEMU", "STATUS"])
@@ -146,7 +147,7 @@ class Ui_Dialog(object):
     def backToMenu(self):
         # Import dan buka WindowMenuUser ketika tombol back diklik
         from WindowMenuUser import WindowMenuUser
-        self.menu = WindowMenuUser("test")  # Anda dapat mengganti "test" dengan username yang sesuai
+        self.menu = WindowMenuUser(self.username)  # Anda dapat mengganti "test" dengan username yang sesuai
         self.menu.show()
         self.dialog.close()
     
@@ -159,6 +160,6 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     Dialog = QtWidgets.QDialog()
     ui = Ui_Dialog()
-    ui.setupUi(Dialog)
+    ui.setupUi(Dialog, "test")
     Dialog.show()
     sys.exit(app.exec_())

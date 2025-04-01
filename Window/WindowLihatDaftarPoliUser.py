@@ -44,11 +44,11 @@ class HoverButton(QtWidgets.QPushButton):
         super().leaveEvent(event)
 
 class Ui_Dialog(object):
-    def __init__(self):
+    def __init__(self, username):
         self.json_file = "JadwalPoli.json"
         self.last_modified = 0
         self.setupAutoRefresh()
-
+        self.username = username
     def setupAutoRefresh(self):
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.checkFileAndTimeChanges)
@@ -193,7 +193,7 @@ class Ui_Dialog(object):
         
     def backToMenu(self):
         from WindowMenuUser import WindowMenuUser
-        self.menu = WindowMenuUser("test")
+        self.menu = WindowMenuUser(self.username)
         self.menu.show()
         self.dialog = self.pushButton_3.parent()
         self.dialog.close()

@@ -87,7 +87,7 @@ class WindowMenuUser(QtWidgets.QDialog):
         from WindowRiwayat import Ui_Dialog  # Pastikan nama file dan class sesuai
         self.riwayat_dialog = QtWidgets.QDialog()
         self.ui_riwayat = Ui_Dialog()
-        self.ui_riwayat.setupUi(self.riwayat_dialog)
+        self.ui_riwayat.setupUi(self.riwayat_dialog, self.username)
         self.riwayat_dialog.show()
         self.close()
 
@@ -100,7 +100,7 @@ class WindowMenuUser(QtWidgets.QDialog):
     def open_LihatPoli(self):
         from WindowLihatDaftarPoliUser import Ui_Dialog  # Pastikan nama class dan path sudah benar
         self.dialog = QtWidgets.QDialog()
-        self.ui_lihat = Ui_Dialog()
+        self.ui_lihat = Ui_Dialog(self.username)
         self.ui_lihat.setupUi(self.dialog)
         self.dialog.show()
         self.close()
@@ -109,7 +109,7 @@ class WindowMenuUser(QtWidgets.QDialog):
     def open_Cancel(self):
         from WindowCancel import Ui_Dialog as CancelUi
         self.cancel_dialog = QtWidgets.QDialog()
-        self.cancel_ui = CancelUi()
+        self.cancel_ui = CancelUi(self.username)
         self.cancel_ui.setupUi(self.cancel_dialog)
         self.cancel_dialog.show()
         self.close()

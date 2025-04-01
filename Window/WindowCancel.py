@@ -45,10 +45,11 @@ class HoverButton(QtWidgets.QPushButton):
         super().leaveEvent(event)
 
 class Ui_Dialog(object):
-    def __init__(self):
+    def __init__(self,username):
         current_dir = os.path.dirname(os.path.abspath(__file__))
         parent_dir = os.path.dirname(current_dir)
         self.riwayat_path = os.path.join(parent_dir, "Data", "riwayat.json")
+        self.username = username
 
     def setupUi(self, Dialog):
         self.dialog = Dialog
@@ -296,7 +297,7 @@ class Ui_Dialog(object):
 
     def backToMenuUser(self):
         from WindowMenuUser import WindowMenuUser
-        self.menu_user = WindowMenuUser("test")
+        self.menu_user = WindowMenuUser(self.username)
         self.menu_user.show()
         self.dialog.close()
     
