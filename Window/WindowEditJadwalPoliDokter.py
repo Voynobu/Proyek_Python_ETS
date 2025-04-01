@@ -4,7 +4,7 @@
 # NIM: 241524026
 # Desc: Program ini menampilkan dan mengatur jadwal layanan poli beserta dokter di rumah sakit.
 #       Admin dapat melihat, menambah, mengubah, dan menghapus jadwal dokter (termasuk status dan kuota).
-#       Tabel menampilkan informasi lengkap: nomor, poli, dokter (spesialisasi), jadwal, status, serta kuota.
+#       Tabel menampilkan informasi lengkap: nomor, poli, dokter (spesialisasi), jadwal, status, serta kuota maksimum.
 
 import sys
 import json
@@ -141,16 +141,14 @@ class Ui_Dialog(object):
 
         # Set column widths
         header.setSectionResizeMode(0, QtWidgets.QHeaderView.Fixed)
-        self.tableView.setColumnWidth(0, 50)
-        header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
-        header.setSectionResizeMode(2, QtWidgets.QHeaderView.Stretch)
-        header.setSectionResizeMode(3, QtWidgets.QHeaderView.Stretch)
-        header.setSectionResizeMode(4, QtWidgets.QHeaderView.Fixed)
+        self.tableView.setColumnWidth(0, 50)  # NO
+        header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)  # POLI
+        header.setSectionResizeMode(2, QtWidgets.QHeaderView.Stretch)  # DOKTER
+        header.setSectionResizeMode(3, QtWidgets.QHeaderView.Stretch)  # JADWAL
+        header.setSectionResizeMode(4, QtWidgets.QHeaderView.Fixed)    # STATUS
         self.tableView.setColumnWidth(4, 150)
-        header.setSectionResizeMode(5, QtWidgets.QHeaderView.Fixed)
+        header.setSectionResizeMode(5, QtWidgets.QHeaderView.Fixed)   # KUOTA
         self.tableView.setColumnWidth(5, 120)
-        header.setSectionResizeMode(6, QtWidgets.QHeaderView.Fixed)
-        self.tableView.setColumnWidth(6, 120)
 
         self.loadData()
 
@@ -162,7 +160,7 @@ class Ui_Dialog(object):
     def initTable(self):
         self.model = QStandardItemModel()
         self.model.setHorizontalHeaderLabels([
-            "NO", "POLI", "DOKTER", "JADWAL", "STATUS", "KUOTA", "TERSEDIA"
+            "NO", "POLI", "DOKTER", "JADWAL", "STATUS", "KUOTA"  # Removed "TERSEDIA"
         ])
         self.tableView.setModel(self.model)
 
@@ -176,17 +174,14 @@ class Ui_Dialog(object):
         for jadwal in jadwal_list:
             schedule_day = jadwal["hari"]
             
-            # Check if it's the correct day
             if schedule_day.lower() != current_day.lower():
                 status_list.append("UNAVAILABLE")
                 continue
                 
             try:
-                # Parse time strings
                 start_time = datetime.datetime.strptime(jadwal["jam_awal"], "%H:%M").time()
                 end_time = datetime.datetime.strptime(jadwal["jam_akhir"], "%H:%M").time()
                 
-                # Check if current time is within schedule
                 if start_time <= current_time <= end_time:
                     status_list.append("AVAILABLE")
                 else:
@@ -206,12 +201,6 @@ class Ui_Dialog(object):
                 for idx, poli in enumerate(data["daftar_poli"], start=1):
                     nama_poli = poli["nama_poli"].upper()
                     kuota = str(poli.get("kuota", "N/A"))
-                    
-                    # Calculate available slots (80% of quota)
-                    try:
-                        tersedia = str(int(int(kuota) * 0.8))
-                    except:
-                        tersedia = "N/A"
                     
                     # Format doctors
                     dokter_str = "\n".join([
@@ -238,8 +227,7 @@ class Ui_Dialog(object):
                         dokter_str, 
                         jadwal_str, 
                         status_str, 
-                        kuota,
-                        tersedia
+                        kuota  # Only showing max quota
                     ]
                     
                     items = []
@@ -255,11 +243,11 @@ class Ui_Dialog(object):
 
     def loadFallbackData(self):
         fallback_data = [
-            ("1", "POLI MATA", "Dr. Ahmad (Oftalmolog)", "THURSDAY (07:00 - 12:00)", "UNAVAILABLE", "5", "4"),
-            ("2", "POLI THT-KL", "Dr. Messi (Spesialis THT-KH)", "TUESDAY (11:00 - 18:00)\nWEDNESDAY (18:00 - 21:00)", "UNAVAILABLE\nUNAVAILABLE", "5", "4"),
-            ("3", "POLI SARAF", "Dr. Jajang (Neurolog)", "TUESDAY (08:00 - 13:00)\nSUNDAY (10:00 - 17:00)", "UNAVAILABLE\nUNAVAILABLE", "5", "4"),
-            ("4", "POLI ANAK", "Dr.Radhit (Pediatrik Gawat Darurat)", "THURSDAY (10:00 - 17:00)", "UNAVAILABLE", "5", "4"),
-            ("5", "POLI GIGI", "Dr. Sarifudin (Gigi)", "WEDNESDAY (08:00 - 20:00)", "UNAVAILABLE", "5", "4")
+            ("1", "POLI MATA", "Dr. Ahmad (Oftalmolog)", "THURSDAY (07:00 - 12:00)", "UNAVAILABLE", "5"),
+            ("2", "POLI THT-KL", "Dr. Messi (Spesialis THT-KH)", "TUESDAY (11:00 - 18:00)\nWEDNESDAY (18:00 - 21:00)", "UNAVAILABLE\nUNAVAILABLE", "5"),
+            ("3", "POLI SARAF", "Dr. Jajang (Neurolog)", "TUESDAY (08:00 - 13:00)\nSUNDAY (10:00 - 17:00)", "UNAVAILABLE\nUNAVAILABLE", "5"),
+            ("4", "POLI ANAK", "Dr.Radhit (Pediatrik Gawat Darurat)", "THURSDAY (10:00 - 17:00)", "UNAVAILABLE", "5"),
+            ("5", "POLI GIGI", "Dr. Sarifudin (Gigi)", "WEDNESDAY (08:00 - 20:00)", "UNAVAILABLE", "5")
         ]
         self.model.setRowCount(0)
         for row_data in fallback_data:
