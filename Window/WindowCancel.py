@@ -10,6 +10,7 @@
 # - saat melakukan pembatalan, pendaftaran yang dari ongoing, berubah menjadi dibatalkan
 
 # WindowCancel.py - Modified Version (Non-Interactive Table)
+# WindowCancel.py - Modified Version (Non-Interactive Table)
 import sys
 import json
 import os
@@ -45,11 +46,11 @@ class HoverButton(QtWidgets.QPushButton):
         super().leaveEvent(event)
 
 class Ui_Dialog(object):
-    def __init__(self,username):
+    def __init__(self, username):
         current_dir = os.path.dirname(os.path.abspath(__file__))
         parent_dir = os.path.dirname(current_dir)
         self.riwayat_path = os.path.join(parent_dir, "Data", "riwayat.json")
-        self.username = username
+        self.username = username  # Store the username
 
     def setupUi(self, Dialog):
         self.dialog = Dialog
@@ -138,44 +139,58 @@ class Ui_Dialog(object):
     
     def loadData(self):
         try:
+            # Check if file exists
+            if not os.path.exists(self.riwayat_path):
+                QtWidgets.QMessageBox.critical(self.dialog, "Error", "File riwayat.json tidak ditemukan!")
+                return
+                
+            # Check if username is provided
+            if not self.username:
+                QtWidgets.QMessageBox.warning(self.dialog, "Warning", "Username tidak terdeteksi!")
+                return
+
             with open(self.riwayat_path, 'r') as file:
                 data = json.load(file)
             
             self.model.setRowCount(0)
             row_count = 0
             
-            for username, registrations in data.items():
-                for reg in registrations:
-                    # Get status (case-insensitive check)
-                    status = reg.get('status', 'On going')
-                    normalized_status = status.lower().replace(" ", "")
+            # Check if user has records
+            if self.username not in data:
+                QtWidgets.QMessageBox.information(self.dialog, "Info", "Tidak ada pendaftaran untuk user ini")
+                return
+
+            for reg in data[self.username]:
+                # Get status (case-insensitive check)
+                status = reg.get('status', 'On going')
+                normalized_status = status.lower().replace(" ", "")
+                
+                # Only show ongoing registrations
+                if normalized_status in ['ongoing', 'on-going', 'on going']:
+                    row = [
+                        QStandardItem(str(row_count + 1)),
+                        QStandardItem(reg['nama']),
+                        QStandardItem(reg['poli']),
+                        QStandardItem(reg['jenis_layanan']),
+                        QStandardItem(reg['tanggal_temu']),
+                        QStandardItem(reg['nomor antrian']),
+                        QStandardItem(status)
+                    ]
                     
-                    # Only show ongoing registrations
-                    if normalized_status in ['ongoing', 'on-going', 'on going']:
-                        row = [
-                            QStandardItem(str(row_count + 1)),
-                            QStandardItem(reg['nama']),
-                            QStandardItem(reg['poli']),
-                            QStandardItem(reg['jenis_layanan']),
-                            QStandardItem(reg['tanggal_temu']),
-                            QStandardItem(reg['nomor antrian']),
-                            QStandardItem(status)
-                        ]
-                        
-                        # Set red color for cancelled status
-                        if normalized_status == 'dibatalkan':
-                            row[6].setForeground(QtGui.QColor(255, 0, 0))
-                        
-                        font = QtGui.QFont()
-                        font.setPointSize(11)
-                        
-                        for item in row:
-                            item.setTextAlignment(QtCore.Qt.AlignCenter)
-                            item.setFont(font)
-                            item.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable)
-                        
-                        self.model.appendRow(row)
-                        row_count += 1
+                    # Set red color for cancelled status
+                    if normalized_status == 'dibatalkan':
+                        row[6].setForeground(QtGui.QColor(255, 0, 0))
+                    
+                    font = QtGui.QFont()
+                    font.setPointSize(11)
+                    
+                    for item in row:
+                        item.setTextAlignment(QtCore.Qt.AlignCenter)
+                        item.setFont(font)
+                        item.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable)
+                    
+                    self.model.appendRow(row)
+                    row_count += 1
             
             self.addCancelButtons()
             
@@ -245,8 +260,9 @@ class Ui_Dialog(object):
             with open(self.riwayat_path, 'r') as file:
                 data = json.load(file)
             
-            for username in list(data.keys()):
-                for reg in data[username]:
+            # Only check the current user's registrations
+            if self.username in data:
+                for reg in data[self.username]:
                     if reg['nomor antrian'] == no_antrian:
                         # Update status to "Dibatalkan"
                         reg['status'] = 'Dibatalkan'
@@ -308,7 +324,7 @@ class Ui_Dialog(object):
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     Dialog = QtWidgets.QDialog()
-    ui = Ui_Dialog()
+    ui = Ui_Dialog("test")  # For testing, pass a sample username
     ui.setupUi(Dialog)
     Dialog.setFixedSize(1598, 900)  # Window fixed size
     Dialog.show()
