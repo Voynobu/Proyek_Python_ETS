@@ -85,14 +85,14 @@ class Ui_WindowEditDokter(object):
             """
             QTableView {
                 gridline-color: gray;
-                font-size: 28px;
+                font-size: 24px;
             }
             QHeaderView::section {
                 background-color: #0cc0df;
                 color: white;
                 padding: 8px;
                 font-weight: bold;
-                font-size: 28px;
+                font-size: 24px;
             }
             """
         )
@@ -112,8 +112,11 @@ class Ui_WindowEditDokter(object):
         header = self.tableView.horizontalHeader()
         header.setSectionsMovable(False)
         header.setDefaultAlignment(QtCore.Qt.AlignCenter)
-        header.setFixedHeight(100)
-        self.tableView.verticalHeader().setDefaultSectionSize(100)
+        # Jika ingin mengatur tinggi header sesuai konten, Anda bisa menghilangkan atau menyesuaikan fixedHeight
+        # header.setFixedHeight(100)
+
+        # Gunakan Stretch pada vertical header untuk mengisi seluruh area tabel secara dinamis
+        self.tableView.verticalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
 
         header.setSectionResizeMode(0, QtWidgets.QHeaderView.Fixed)
         self.tableView.setColumnWidth(0, 70)
