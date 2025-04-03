@@ -49,6 +49,7 @@ class Ui_Dialog(object):
         self.last_modified = 0
         self.setupAutoRefresh()
         self.username = username
+
     def setupAutoRefresh(self):
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.checkFileAndTimeChanges)
@@ -168,18 +169,18 @@ class Ui_Dialog(object):
         )
         self.tableView.setObjectName("tableView")
         
-        # Pengaturan untuk mencegah teks terpotong
         self.tableView.setWordWrap(True)
         self.tableView.setTextElideMode(QtCore.Qt.ElideNone)
         self.tableView.verticalHeader().setVisible(False)
         self.tableView.verticalHeader().setDefaultSectionSize(60)
         
-        # Konfigurasi tabel
         self.tableView.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.tableView.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
         self.tableView.setFocusPolicy(QtCore.Qt.NoFocus)
         self.tableView.horizontalHeader().setDefaultAlignment(QtCore.Qt.AlignCenter)
         self.tableView.setShowGrid(True)
+        
+        self.tableView.verticalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
         
         self.label.raise_()
         self.pushButton_3.raise_()
@@ -212,7 +213,6 @@ class Ui_Dialog(object):
         ])
         self.tableView.setModel(self.model)
         
-        # Atur lebar kolom dan resize mode
         header = self.tableView.horizontalHeader()
         self.tableView.setColumnWidth(0, 60)
         self.tableView.setColumnWidth(1, 200)
@@ -261,7 +261,6 @@ class Ui_Dialog(object):
                             "\n".join(status_list)
                         )
             
-            # Sesuaikan tinggi baris
             self.adjustRowHeights()
             self.last_modified = os.path.getmtime(self.json_file)
             
@@ -302,7 +301,7 @@ if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
     Dialog = QtWidgets.QDialog()
-    ui = Ui_Dialog()
+    ui = Ui_Dialog("user1")
     ui.setupUi(Dialog)
     Dialog.show()
     sys.exit(app.exec_())

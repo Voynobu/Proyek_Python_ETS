@@ -136,22 +136,33 @@ class Ui_Dialog(object):
         header = self.tableView.horizontalHeader()
         header.setSectionsMovable(False)
         header.setDefaultAlignment(QtCore.Qt.AlignCenter)
+
+        # Header height (untuk baris header saja)
         header.setFixedHeight(100)
-        self.tableView.verticalHeader().setDefaultSectionSize(100)
+
+        # KOMENTAR atau HAPUS setDefaultSectionSize agar stretch benar-benar berfungsi
+        # self.tableView.verticalHeader().setDefaultSectionSize(100)
+
+        # -- Inilah kunci agar baris mengisi area tabel secara dinamis --
+        self.tableView.verticalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
 
         # Set column widths
-        header.setSectionResizeMode(0, QtWidgets.QHeaderView.Fixed)
-        self.tableView.setColumnWidth(0, 50)  # NO
-        header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)  # POLI
-        header.setSectionResizeMode(2, QtWidgets.QHeaderView.Stretch)  # DOKTER
-        header.setSectionResizeMode(3, QtWidgets.QHeaderView.Stretch)  # JADWAL
-        header.setSectionResizeMode(4, QtWidgets.QHeaderView.Fixed)    # STATUS
+        header.setSectionResizeMode(0, QtWidgets.QHeaderView.Fixed)   # NO
+        self.tableView.setColumnWidth(0, 50)
+        header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch) # POLI
+        header.setSectionResizeMode(2, QtWidgets.QHeaderView.Stretch) # DOKTER
+        header.setSectionResizeMode(3, QtWidgets.QHeaderView.Stretch) # JADWAL
+
+        # STATUS (4) dan KUOTA (5) dipertahankan fixed
+        header.setSectionResizeMode(4, QtWidgets.QHeaderView.Fixed)
         self.tableView.setColumnWidth(4, 150)
-        header.setSectionResizeMode(5, QtWidgets.QHeaderView.Fixed)   # KUOTA
+        header.setSectionResizeMode(5, QtWidgets.QHeaderView.Fixed)
         self.tableView.setColumnWidth(5, 120)
 
+        # Load data awal
         self.loadData()
 
+        # Timer untuk update date/time + status
         self.timer = QtCore.QTimer(Dialog)
         self.timer.timeout.connect(self.updateDateTimeAndStatus)
         self.timer.start(1000)
@@ -160,13 +171,13 @@ class Ui_Dialog(object):
     def initTable(self):
         self.model = QStandardItemModel()
         self.model.setHorizontalHeaderLabels([
-            "NO", "POLI", "DOKTER", "JADWAL", "STATUS", "KUOTA"  # Removed "TERSEDIA"
+            "NO", "POLI", "DOKTER", "JADWAL", "STATUS", "KUOTA"
         ])
         self.tableView.setModel(self.model)
 
     def checkScheduleStatus(self, jadwal_list):
         now = datetime.datetime.now()
-        current_day = now.strftime("%A")  # Full day name (e.g. "Thursday")
+        current_day = now.strftime("%A")  # e.g. "Thursday"
         current_time = now.time()
         
         status_list = []
@@ -227,7 +238,7 @@ class Ui_Dialog(object):
                         dokter_str, 
                         jadwal_str, 
                         status_str, 
-                        kuota  # Only showing max quota
+                        kuota
                     ]
                     
                     items = []
