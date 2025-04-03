@@ -38,12 +38,15 @@ class HoverButton(QtWidgets.QPushButton):
         super().leaveEvent(event)
 
 class Ui_Dialog(object):
-    def setupUi(self, Dialog, username):
+    def __init__(self, username):
+        self.username = username  # Simpan username untuk digunakan nanti
+
+    def setupUi(self, Dialog):
         self.dialog = Dialog  # simpan referensi dialog untuk nanti digunakan di method backToMenu
         Dialog.setObjectName("Dialog")
         Dialog.resize(1598, 900)
         Dialog.setWindowFlags(QtCore.Qt.FramelessWindowHint)
-        
+
         # Tombol Back menggunakan HoverButton
         self.pushButton_3 = HoverButton(Dialog, image_path="C:/ASSETS/BUTTON/BACK.png")
         self.pushButton_3.setGeometry(QtCore.QRect(10, 20, 111, 101))
@@ -83,67 +86,121 @@ class Ui_Dialog(object):
         # Inisialisasi model tabel dan load data (sesuaikan dengan kebutuhan Anda)
         self.initModel()
         self.loadData()
-        self.username = username
 
     def initModel(self):
         self.model = QStandardItemModel()
-        self.model.setHorizontalHeaderLabels(["NAMA PASIEN", "POLI", "DOKTER", "JADWAL", "TANGGAL TEMU", "STATUS"])
+        self.model.setHorizontalHeaderLabels(["Jadwal Check-Up", "Nomor Antrian", "Status", "Lihat Detail"])
         self.tableView.setModel(self.model)
+
+        # Mengatur font header kolom
+        header = self.tableView.horizontalHeader()
+        header.setFont(QtGui.QFont("Arial", 15, QtGui.QFont.Bold))  # Gaya font header
+
+        # Menyesuaikan ukuran kolom agar sesuai dengan isi data
+        self.tableView.resizeColumnsToContents()  # Sesuaikan lebar kolom dengan isi
     
     def loadData(self):
-        file_path = "data/riwayat.json"
-    
+        file_path = "Data/riwayat.json"
         try:
             with open(file_path, "r") as file:
-                riwayat_data = json.load(file)
+                data = json.load(file)
 
-            today = QtCore.QDate.currentDate()
-            self.model.setRowCount(0)
+            if not isinstance(data, dict):  # Pastikan format JSON benar
+                data = {}
+            
+            # Ambil username pengguna yang login
+            username_login = self.username  
 
-            for username, records in riwayat_data.items():
-                for entry in records:
-                    nama = entry.get("nama", "Unknown")
-                    poli = entry.get("poli", "Unknown")
-                    dokter = entry.get("dokter", "Unknown")
-                    jadwal = entry.get("jadwal", "Unknown")
-                    tanggal_temu = entry.get("tanggal_temu", "Unknown")
-                    status = entry.get("status", "Ongoing")  # Default: Ongoing
+            for nama, riwayat_list in data.items():
+                if nama == username_login: # Filter berdasarkan username login
+                    for riwayat in riwayat_list:
+                        tanggal_temu = riwayat.get("tanggal_temu", "N/A")
+                        jadwal = riwayat.get("jadwal", "N/A")
+                        nomor_antrian = riwayat.get("nomor antrian", "N/A")
+                        status = riwayat.get("status", "N/A")
 
-                    # Hitung status berdasarkan tanggal temu
-                    try:
-                        temu_date = QtCore.QDate.fromString(tanggal_temu, "dd-MM-yyyy")
-                        if temu_date.isValid():
-                            if temu_date < today:
-                                status = "Finished"
-                            elif temu_date > today:
-                                status = "On going"
-                        else:
-                            status = "Invalid Date"
-                    except ValueError:
-                        status = "Invalid Date"
+                        # Format teks dengan font tebal dan menarik
+                        item_jadwal = QStandardItem(f"{tanggal_temu} - {jadwal}")
+                        item_jadwal.setTextAlignment(QtCore.Qt.AlignCenter)
+                        item_jadwal.setFont(QtGui.QFont("Arial", 8))
 
-                    # Simpan status terbaru ke riwayat.json
-                    entry["status"] = status
+                        item_antrian = QStandardItem(nomor_antrian)
+                        item_antrian.setTextAlignment(QtCore.Qt.AlignCenter)
+                        item_antrian.setFont(QtGui.QFont("Verdana", 8, QtGui.QFont.Bold))
 
-                    # Buat item tabel
-                    item_nama = QStandardItem(nama)
-                    item_poli = QStandardItem(poli)
-                    item_dokter = QStandardItem(dokter)
-                    item_jadwal = QStandardItem(jadwal)
-                    item_tanggal = QStandardItem(tanggal_temu)
-                    item_status = QStandardItem(status)
+                        item_status = QStandardItem(status)
+                        item_status.setTextAlignment(QtCore.Qt.AlignCenter)
+                        item_status.setFont(QtGui.QFont("Roboto", 10))
 
-                    # Tambahkan ke model tabel
-                    self.model.appendRow([item_nama, item_poli, item_dokter, item_jadwal, item_tanggal, item_status])
+                        # Tambahkan baris baru tanpa menghapus data lama
+                        row_index = self.model.rowCount()
+                        self.model.setRowCount(row_index + 1)
 
-                    # Simpan perubahan status ke riwayat.json
-                    with open(file_path, "w") as file:
-                        json.dump(riwayat_data, file, indent=4)
+                        self.model.setItem(row_index, 0, item_jadwal)
+                        self.model.setItem(row_index, 1, item_antrian)
+                        self.model.setItem(row_index, 2, item_status)
+
+                        # Buat tombol "Detail"
+                        btn_detail = QtWidgets.QPushButton("Detail")
+                        btn_detail.setStyleSheet(
+                            "QPushButton { background-color: #5ce1e6; color: black; font-weight: bold; padding: 5px; }"
+                            "QPushButton:hover { background-color: #3caea3; color: white; }"
+                        )
+                        btn_detail.clicked.connect(lambda checked, r=riwayat: self.openDetail(r))
+
+                        # Masukkan tombol ke dalam tabel
+                        index = self.model.index(row_index, 3)
+                        self.tableView.setIndexWidget(index, btn_detail)
 
         except Exception as e:
             print("Error membaca file JSON:", e)
+            data = {}
 
-    
+    def openDetail(self, riwayat):
+        if not riwayat:
+            print("Error: Data riwayat kosong!")
+            return
+
+        try:
+            # Menambahkan impor dan pembukaan window detail
+            from WindowLihatDetail import Ui_Dialog as WindowLihatDetail
+            self.dialogDetail = QtWidgets.QDialog()
+
+            # Buat objek Ui_Dialog dengan username sebagai parameter
+            self.uiDetail = WindowLihatDetail(self.username)  
+
+            # Panggil setupUi TANPA username
+            self.uiDetail.setupUi(self.dialogDetail)
+
+            # Masukkan data riwayat ke dalam field di WindowLihatDetail
+            self.uiDetail.lineEdit_1.setText(riwayat.get("nama", "N/A"))
+            self.uiDetail.lineEdit_2.setText(riwayat.get("dokter", "N/A"))
+            self.uiDetail.lineEdit_3.setText(riwayat.get("jadwal", "N/A"))
+            self.uiDetail.lineEdit_4.setText(riwayat.get("keluhan", "N/A"))
+            self.uiDetail.lineEdit_5.setText(riwayat.get("nomor antrian", "N/A"))
+
+            # Set lineEdit fields to read-only to prevent editing
+            self.uiDetail.lineEdit_1.setReadOnly(True)
+            self.uiDetail.lineEdit_2.setReadOnly(True)
+            self.uiDetail.lineEdit_3.setReadOnly(True)
+            self.uiDetail.lineEdit_4.setReadOnly(True)
+            self.uiDetail.lineEdit_5.setReadOnly(True)
+
+            # Tambahkan fungsi untuk tombol "Back"
+            self.uiDetail.pushButton_4.clicked.connect(self.closeDetail)
+
+            # Tampilkan detail dialog
+            self.dialogDetail.show()
+
+        except ImportError as e:
+            print(f"Error saat mengimpor WindowLihatDetail: {e}")
+        except Exception as e:
+            print(f"Error saat membuka detail riwayat: {e}")
+
+    def closeDetail(self):
+        # Menutup dialog detail dan kembali ke window sebelumnya
+        self.dialogDetail.close()
+
     def backToMenu(self):
         # Import dan buka WindowMenuUser ketika tombol back diklik
         from WindowMenuUser import WindowMenuUser
