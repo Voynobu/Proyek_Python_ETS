@@ -103,9 +103,9 @@
             "jadwal_list": [
                 {
                     "dokter": "Dr. Admin",
-                    "hari": "Thursday",
-                    "jam_awal": "23:00",
-                    "jam_akhir": "23:59",
+                    "hari": "Friday",
+                    "jam_awal": "00:00",
+                    "jam_akhir": "05:00",
                     "status": "AVAILABLE"
                 }
             ]

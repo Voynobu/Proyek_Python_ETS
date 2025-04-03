@@ -3,14 +3,12 @@
 # Kelas: 1A - D4
 # NIM: 241524026
 # Desc: - Program ini digunakan untuk membatalkan pendaftaran pasien di rumah sakit.
-
+#
 # Nama : Muhamad Dino Dermawan
 # NIM  : 241524015
 # - Menampilkan tabel yang memungkinkan melakukan pembatalan pendaftaran
 # - saat melakukan pembatalan, pendaftaran yang dari ongoing, berubah menjadi dibatalkan
 
-# WindowCancel.py - Modified Version (Non-Interactive Table)
-# WindowCancel.py - Modified Version (Non-Interactive Table)
 import sys
 import json
 import os
@@ -50,12 +48,12 @@ class Ui_Dialog(object):
         current_dir = os.path.dirname(os.path.abspath(__file__))
         parent_dir = os.path.dirname(current_dir)
         self.riwayat_path = os.path.join(parent_dir, "Data", "riwayat.json")
-        self.username = username  # Store the username
+        self.username = username  # Simpan username
 
     def setupUi(self, Dialog):
         self.dialog = Dialog
         Dialog.setObjectName("Dialog")
-        Dialog.setFixedSize(1598, 900)  # Window fixed size
+        Dialog.setFixedSize(1598, 900)  # Ukuran window fixed
         Dialog.setWindowFlags(QtCore.Qt.FramelessWindowHint)
         
         # Tombol Back
@@ -75,21 +73,22 @@ class Ui_Dialog(object):
         
         # Tabel dengan ukuran tepat sampai batas kanan
         self.tableView = QtWidgets.QTableView(Dialog)
-        self.tableView.setGeometry(QtCore.QRect(100, 180, 1398, 650))  # Lebar 1398 untuk pas di kanan
+        self.tableView.setGeometry(QtCore.QRect(100, 180, 1398, 650))
         self.tableView.setStyleSheet("""
             QTableView {
                 font-size: 12pt;
                 background-color: white;
                 gridline-color: #dddddd;
-                border: 2px solid #0cc0df;
+                border: 2px solid #ffbd59;
                 selection-background-color: transparent;
                 selection-color: black;
             }
             QHeaderView::section {
-                background-color: #0cc0df;
+                background-color: #ffbd59;
                 color: white;
                 padding: 12px;
-                font-size: 12pt;
+                /* Atur font header secara langsung */
+                font: bold 12pt "Garet";
                 border: none;
             }
             QTableView::item {
@@ -108,8 +107,9 @@ class Ui_Dialog(object):
         self.tableView.setObjectName("tableView")
         self.tableView.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.tableView.verticalHeader().setVisible(False)
-        self.tableView.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
-        self.tableView.setFixedSize(1398, 650)  # Ukuran fixed
+        # Hapus pengaturan stretch default agar kita atur mode resize secara custom
+        # self.tableView.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.tableView.setFixedSize(1398, 650)  # Ukuran fixed untuk tabel
         self.tableView.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
         self.tableView.setFocusPolicy(QtCore.Qt.NoFocus)
         
@@ -129,22 +129,28 @@ class Ui_Dialog(object):
         self.model.setHorizontalHeaderLabels(headers)
         self.tableView.setModel(self.model)
         
-        # Lebar kolom disesuaikan untuk memenuhi lebar tabel (total 1398)
-        column_widths = [60, 200, 200, 200, 150, 250, 120, 118]  # Adjusted for new STATUS column
-        for i, width in enumerate(column_widths):
-            self.tableView.setColumnWidth(i, width)
-        
-        # Tinggi baris
+        # Atur tinggi baris
         self.tableView.verticalHeader().setDefaultSectionSize(45)
+        
+        # Jika menggunakan style sheet untuk header, hapus pengaturan font di kode agar tidak bentrok:
+        # header_font = QtGui.QFont("Garet", 12, QtGui.QFont.Bold)
+        # self.tableView.horizontalHeader().setFont(header_font)
+        
+        # Atur mode resize tiap kolom:
+        # Untuk kolom 0 sampai 6 (sesuai konten) gunakan ResizeToContents
+        for col in range(self.model.columnCount() - 1):
+            self.tableView.horizontalHeader().setSectionResizeMode(col, QtWidgets.QHeaderView.ResizeToContents)
+        # Kolom terakhir (AKSI) di-stretch agar mengisi sisa ruang
+        self.tableView.horizontalHeader().setSectionResizeMode(self.model.columnCount() - 1, QtWidgets.QHeaderView.Stretch)
     
     def loadData(self):
         try:
-            # Check if file exists
+            # Cek apakah file riwayat.json ada
             if not os.path.exists(self.riwayat_path):
                 QtWidgets.QMessageBox.critical(self.dialog, "Error", "File riwayat.json tidak ditemukan!")
                 return
                 
-            # Check if username is provided
+            # Pastikan username ada
             if not self.username:
                 QtWidgets.QMessageBox.warning(self.dialog, "Warning", "Username tidak terdeteksi!")
                 return
@@ -155,17 +161,16 @@ class Ui_Dialog(object):
             self.model.setRowCount(0)
             row_count = 0
             
-            # Check if user has records
+            # Jika data tidak ada untuk user, tampilkan pesan informasi
             if self.username not in data:
                 QtWidgets.QMessageBox.information(self.dialog, "Info", "Tidak ada pendaftaran untuk user ini")
                 return
 
             for reg in data[self.username]:
-                # Get status (case-insensitive check)
                 status = reg.get('status', 'On going')
                 normalized_status = status.lower().replace(" ", "")
                 
-                # Only show ongoing registrations
+                # Tampilkan hanya pendaftaran yang masih ongoing
                 if normalized_status in ['ongoing', 'on-going', 'on going']:
                     row = [
                         QStandardItem(str(row_count + 1)),
@@ -177,7 +182,7 @@ class Ui_Dialog(object):
                         QStandardItem(status)
                     ]
                     
-                    # Set red color for cancelled status
+                    # Jika status sudah "Dibatalkan", set warna teks merah
                     if normalized_status == 'dibatalkan':
                         row[6].setForeground(QtGui.QColor(255, 0, 0))
                     
@@ -239,7 +244,7 @@ class Ui_Dialog(object):
             self.tableView.setIndexWidget(self.model.index(row, 7), btn)
 
     def confirmCancel(self, row):
-        no_antrian = self.model.item(row, 5).text()  # NO. ANTRIAN is at index 5
+        no_antrian = self.model.item(row, 5).text()  # NO. ANTRIAN pada index 5
         nama_pasien = self.model.item(row, 1).text()
         
         reply = QtWidgets.QMessageBox.question(
@@ -260,21 +265,17 @@ class Ui_Dialog(object):
             with open(self.riwayat_path, 'r') as file:
                 data = json.load(file)
             
-            # Only check the current user's registrations
             if self.username in data:
                 for reg in data[self.username]:
                     if reg['nomor antrian'] == no_antrian:
-                        # Update status to "Dibatalkan"
                         reg['status'] = 'Dibatalkan'
-                        
                         with open(self.riwayat_path, 'w') as file:
                             json.dump(data, file, indent=4)
                         
-                        # Update the table view
+                        # Update tampilan tabel
                         self.model.item(row, 6).setText("Dibatalkan")
                         self.model.item(row, 6).setForeground(QtGui.QColor(255, 0, 0))
                         
-                        # Update the cancel button
                         btn = self.tableView.indexWidget(self.model.index(row, 7))
                         btn.setText("Dibatalkan")
                         btn.setStyleSheet("""
@@ -324,8 +325,8 @@ class Ui_Dialog(object):
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     Dialog = QtWidgets.QDialog()
-    ui = Ui_Dialog("test")  # For testing, pass a sample username
+    ui = Ui_Dialog("test")  # Ganti dengan username yang sesuai
     ui.setupUi(Dialog)
-    Dialog.setFixedSize(1598, 900)  # Window fixed size
+    Dialog.setFixedSize(1598, 900)
     Dialog.show()
     sys.exit(app.exec_())

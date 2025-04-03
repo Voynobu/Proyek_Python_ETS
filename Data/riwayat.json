@@ -74,6 +74,18 @@
             "tanggal_temu": "08-04-2025",
             "keluhan": "asdfsadf",
             "nomor antrian": "MNDR-Poli Jantung-1",
+            "status": "Dibatalkan"
+        },
+        {
+            "nama": "Rangga Muhamad Fajar",
+            "jenis_kelamin": "Pria",
+            "jenis_layanan": "Mandiri",
+            "poli": "Poli Gigi",
+            "dokter": "Dr. Admin",
+            "jadwal": "00:00 - 05:00",
+            "tanggal_temu": "11-04-2025",
+            "keluhan": "sakit giginyooo",
+            "nomor antrian": "MNDR-Poli Gigi-1",
             "status": "On going"
         }
     ]

@@ -3,7 +3,7 @@
 # Kelas: 1A - D4
 # NIM: 241524026
 # Desc: - Program ini digunakan untuk melihat daftar poli di rumah sakit.
-
+#
 # Nama : Muhamad Dino Dermawan
 # Nim  : 241524015
 # - Menghubungkan dengan file JadwalPoli.json kemudian menampilkannya menjadi tabel
@@ -72,18 +72,14 @@ class Ui_Dialog(object):
         current_time = now.time()
         
         status_list = []
-        
         for jadwal in jadwal_list:
             schedule_day = jadwal.get("hari", "")
-            
             if schedule_day.lower() != current_day.lower():
                 status_list.append("UNAVAILABLE")
                 continue
-                
             try:
                 start_time = datetime.datetime.strptime(jadwal.get("jam_awal", "00:00"), "%H:%M").time()
                 end_time = datetime.datetime.strptime(jadwal.get("jam_akhir", "00:00"), "%H:%M").time()
-                
                 if start_time <= current_time <= end_time:
                     status_list.append("AVAILABLE")
                 else:
@@ -91,35 +87,30 @@ class Ui_Dialog(object):
             except Exception as e:
                 print(f"Error parsing time: {e}")
                 status_list.append("UNAVAILABLE")
-        
         return status_list
 
     def updateStatuses(self):
         try:
             with open(self.json_file, "r", encoding='utf-8') as file:
                 data = json.load(file)
-            
             row_index = 0
             for poli in data.get("daftar_poli", []):
                 for dokter in poli.get("dokter_list", []):
                     nama_dokter = dokter.get("nama", "")
                     jadwal_list = []
-                    
                     for jadwal in poli.get("jadwal_list", []):
                         if jadwal.get("dokter", "") == nama_dokter:
                             jadwal_list.append(jadwal)
-                    
                     if jadwal_list:
                         status_list = self.checkScheduleStatus(jadwal_list)
                         status_item = QStandardItem("\n".join(status_list))
                         status_item.setTextAlignment(QtCore.Qt.AlignCenter)
                         font = QtGui.QFont()
-                        font.setPointSize(14)
+                        font.setPointSize(10)
                         status_item.setFont(font)
                         status_item.setFlags(QtCore.Qt.ItemIsEnabled)
                         self.model.setItem(row_index, 6, status_item)
                         row_index += 1
-            
         except Exception as e:
             print(f"Error updating statuses: {e}")
 
@@ -143,23 +134,23 @@ class Ui_Dialog(object):
         self.label.setScaledContents(True)
         self.label.setObjectName("label")
         
-        # Tabel View dengan pengaturan untuk teks lengkap
+        # Tabel View dengan geometry (258, 163, 1069, 698)
         self.tableView = QtWidgets.QTableView(Dialog)
-        self.tableView.setGeometry(QtCore.QRect(30, 120, 1540, 740))
+        self.tableView.setGeometry(QtCore.QRect(258, 163, 1069, 698))
         self.tableView.setStyleSheet(
             """
             QTableView {
                 gridline-color: gray;
-                font-size: 16px;
+                font-size: 20px;
                 background-color: white;
-                border: 2px solid #0cc0df;
+                border: 2px solid #ffbd59;
             }
             QHeaderView::section {
-                background-color: #0cc0df; 
+                background-color: #ffbd59; 
                 color: white; 
-                padding: 12px;
+                padding: 20px;
                 font-weight: bold;
-                font-size: 18px;
+                font-size: 20px;
                 border: none;
             }
             QTableView::item {
@@ -172,15 +163,17 @@ class Ui_Dialog(object):
         self.tableView.setWordWrap(True)
         self.tableView.setTextElideMode(QtCore.Qt.ElideNone)
         self.tableView.verticalHeader().setVisible(False)
+        font = QtGui.QFont("Garet", 12, QtGui.QFont.Bold)
+        self.tableView.horizontalHeader().setFont(font)
         self.tableView.verticalHeader().setDefaultSectionSize(60)
+        self.tableView.verticalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
         
         self.tableView.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.tableView.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
         self.tableView.setFocusPolicy(QtCore.Qt.NoFocus)
+        
         self.tableView.horizontalHeader().setDefaultAlignment(QtCore.Qt.AlignCenter)
         self.tableView.setShowGrid(True)
-        
-        self.tableView.verticalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
         
         self.label.raise_()
         self.pushButton_3.raise_()
@@ -214,13 +207,15 @@ class Ui_Dialog(object):
         self.tableView.setModel(self.model)
         
         header = self.tableView.horizontalHeader()
-        self.tableView.setColumnWidth(0, 60)
-        self.tableView.setColumnWidth(1, 200)
-        self.tableView.setColumnWidth(2, 80)
-        self.tableView.setColumnWidth(3, 220)
-        header.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeToContents)
-        header.setSectionResizeMode(5, QtWidgets.QHeaderView.ResizeToContents)
-        header.setSectionResizeMode(6, QtWidgets.QHeaderView.Stretch)
+        # Lebar kolom disesuaikan agar total mendekati 1069
+        self.tableView.setGeometry(QtCore.QRect(138, 163, 1331, 698))
+        self.tableView.setColumnWidth(0, 40)   # NO
+        self.tableView.setColumnWidth(1, 200)  # NAMA POLI
+        self.tableView.setColumnWidth(2, 100)  # KUOTA
+        self.tableView.setColumnWidth(3, 190)  # DOKTER
+        self.tableView.setColumnWidth(4, 250)  # SPESIALISASI
+        self.tableView.setColumnWidth(5, 260)  # JADWAL PRAKTEK
+        self.tableView.setColumnWidth(6, 251)  # STATUS
     
     def loadData(self):
         try:
@@ -238,7 +233,6 @@ class Ui_Dialog(object):
                     nama_dokter = dokter.get("nama", "")
                     spesialisasi = dokter.get("spesialis", "")
                     
-                    # Kumpulkan semua jadwal
                     jadwal_list = []
                     jadwal_details = []
                     
@@ -286,7 +280,7 @@ class Ui_Dialog(object):
         for item in items:
             item.setTextAlignment(QtCore.Qt.AlignCenter)
             font = QtGui.QFont()
-            font.setPointSize(14)
+            font.setPointSize(10)
             item.setFont(font)
             item.setFlags(QtCore.Qt.ItemIsEnabled)
             item.setToolTip(item.text())
