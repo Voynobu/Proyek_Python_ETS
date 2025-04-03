@@ -4,7 +4,6 @@
 # NIM: 241524026
 # Desc: - Program ini digunakan untuk mengelola dokter yang ada di rumah sakit.
 #       - Admin dapat menambah dan menghapus dokter secara interaktif.
-
 import json
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
@@ -38,8 +37,18 @@ class HoverButton(QtWidgets.QPushButton):
         super().leaveEvent(event)
 
 class Ui_WindowEditDokter(object):
-    def __init__(self, parent_window=None):
+    def __init__(self, parent_window=None, json_data=None):
         self.parent_window = parent_window
+        self.json_data = json_data if json_data else self.load_data()
+        self.data_updated = False
+        self.updated_data = None
+
+    def load_data(self):
+        try:
+            with open("JadwalPoli.json", "r") as file:
+                return json.load(file)
+        except:
+            return {"daftar_poli": []}
 
     def setupUi(self, Dialog):
         self.dialog = Dialog
@@ -85,14 +94,14 @@ class Ui_WindowEditDokter(object):
             """
             QTableView {
                 gridline-color: gray;
-                font-size: 24px;
+                font-size: 28px;
             }
             QHeaderView::section {
                 background-color: #0cc0df;
                 color: white;
                 padding: 8px;
                 font-weight: bold;
-                font-size: 24px;
+                font-size: 28px;
             }
             """
         )
@@ -112,11 +121,8 @@ class Ui_WindowEditDokter(object):
         header = self.tableView.horizontalHeader()
         header.setSectionsMovable(False)
         header.setDefaultAlignment(QtCore.Qt.AlignCenter)
-        # Jika ingin mengatur tinggi header sesuai konten, Anda bisa menghilangkan atau menyesuaikan fixedHeight
-        # header.setFixedHeight(100)
-
-        # Gunakan Stretch pada vertical header untuk mengisi seluruh area tabel secara dinamis
-        self.tableView.verticalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        header.setFixedHeight(100)
+        self.tableView.verticalHeader().setDefaultSectionSize(100)
 
         header.setSectionResizeMode(0, QtWidgets.QHeaderView.Fixed)
         self.tableView.setColumnWidth(0, 70)
@@ -146,12 +152,9 @@ class Ui_WindowEditDokter(object):
 
     def loadData(self):
         try:
-            with open("JadwalPoli.json", "r") as file:
-                data = json.load(file)
-            
             self.model.setRowCount(0)
             row_num = 0
-            for poli in data["daftar_poli"]:
+            for poli in self.json_data["daftar_poli"]:
                 for dokter in poli["dokter_list"]:
                     item_no = QStandardItem(str(row_num + 1))
                     item_no.setTextAlignment(QtCore.Qt.AlignCenter)
@@ -169,15 +172,12 @@ class Ui_WindowEditDokter(object):
                     row_num += 1
                     
         except Exception as e:
-            print("Error membaca file JSON:", e)
+            print("Error membaca data:", e)
 
     def loadComboData(self):
         try:
-            with open("JadwalPoli.json", "r") as file:
-                data = json.load(file)
-            
             self.comboBox_2.clear()
-            for poli in data["daftar_poli"]:
+            for poli in self.json_data["daftar_poli"]:
                 self.comboBox_2.addItem(poli["nama_poli"])
                 
         except Exception as e:
@@ -192,38 +192,31 @@ class Ui_WindowEditDokter(object):
             QtWidgets.QMessageBox.warning(self.dialog, "Error", "Semua field harus diisi!")
             return
             
-        try:
-            with open("JadwalPoli.json", "r") as file:
-                data = json.load(file)
-                
-            # Cari poli dan tambahkan dokter
-            for poli in data["daftar_poli"]:
-                if poli["nama_poli"] == nama_poli:
-                    # Cek apakah dokter sudah ada
-                    for dokter in poli["dokter_list"]:
-                        if dokter["nama"].lower() == nama_dokter.lower():
-                            QtWidgets.QMessageBox.warning(self.dialog, "Error", "Dokter sudah ada di poli ini!")
-                            return
-                            
-                    # Tambahkan dokter baru
-                    poli["dokter_list"].append({
-                        "nama": nama_dokter,
-                        "spesialis": spesialis
-                    })
-                    
-                    with open("JadwalPoli.json", "w") as file:
-                        json.dump(data, file, indent=4)
+        # Cari poli dan tambahkan dokter
+        for poli in self.json_data["daftar_poli"]:
+            if poli["nama_poli"] == nama_poli:
+                # Cek apakah dokter sudah ada
+                for dokter in poli["dokter_list"]:
+                    if dokter["nama"].lower() == nama_dokter.lower():
+                        QtWidgets.QMessageBox.warning(self.dialog, "Error", "Dokter sudah ada di poli ini!")
+                        return
                         
-                    QtWidgets.QMessageBox.information(self.dialog, "Sukses", "Dokter berhasil ditambahkan!")
-                    self.loadData()
-                    self.lineEdit_1.clear()
-                    self.lineEdit_2.clear()
-                    return
-                    
-            QtWidgets.QMessageBox.warning(self.dialog, "Error", "Poli tidak ditemukan!")
-            
-        except Exception as e:
-            QtWidgets.QMessageBox.warning(self.dialog, "Error", f"Terjadi kesalahan: {str(e)}")
+                # Tambahkan dokter baru
+                poli["dokter_list"].append({
+                    "nama": nama_dokter,
+                    "spesialis": spesialis
+                })
+                
+                self.data_updated = True
+                self.updated_data = self.json_data
+                
+                QtWidgets.QMessageBox.information(self.dialog, "Sukses", "Dokter berhasil ditambahkan!")
+                self.loadData()
+                self.lineEdit_1.clear()
+                self.lineEdit_2.clear()
+                return
+                
+        QtWidgets.QMessageBox.warning(self.dialog, "Error", "Poli tidak ditemukan!")
 
     def hapus_dokter(self):
         nama_dokter = self.lineEdit_1.text().strip()
@@ -232,31 +225,28 @@ class Ui_WindowEditDokter(object):
             QtWidgets.QMessageBox.warning(self.dialog, "Error", "Nama Dokter harus diisi!")
             return
             
-        try:
-            with open("JadwalPoli.json", "r") as file:
-                data = json.load(file)
-                
-            # Cari dan hapus dokter
-            for poli in data["daftar_poli"]:
-                for i, dokter in enumerate(poli["dokter_list"]):
-                    if dokter["nama"].lower() == nama_dokter.lower():
-                        poli["dokter_list"].pop(i)
-                        
-                        with open("JadwalPoli.json", "w") as file:
-                            json.dump(data, file, indent=4)
-                            
-                        QtWidgets.QMessageBox.information(self.dialog, "Sukses", "Dokter berhasil dihapus!")
-                        self.loadData()
-                        self.lineEdit_1.clear()
-                        return
-                        
-            QtWidgets.QMessageBox.warning(self.dialog, "Error", "Dokter tidak ditemukan!")
-            
-        except Exception as e:
-            QtWidgets.QMessageBox.warning(self.dialog, "Error", f"Terjadi kesalahan: {str(e)}")
+        # Cari dan hapus dokter
+        for poli in self.json_data["daftar_poli"]:
+            for i, dokter in enumerate(poli["dokter_list"]):
+                if dokter["nama"].lower() == nama_dokter.lower():
+                    poli["dokter_list"].pop(i)
+                    
+                    self.data_updated = True
+                    self.updated_data = self.json_data
+                    
+                    QtWidgets.QMessageBox.information(self.dialog, "Sukses", "Dokter berhasil dihapus!")
+                    self.loadData()
+                    self.lineEdit_1.clear()
+                    return
+                    
+        QtWidgets.QMessageBox.warning(self.dialog, "Error", "Dokter tidak ditemukan!")
 
     def backToJadwalPoliDokter(self):
         if self.parent_window:
+            if hasattr(self.parent_window, 'ui'):
+                if self.data_updated:
+                    self.parent_window.ui.data = self.updated_data
+                    self.parent_window.ui.loadData()
             self.parent_window.show()
         self.dialog.close()
 

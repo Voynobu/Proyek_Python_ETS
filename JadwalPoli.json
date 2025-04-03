@@ -35,14 +35,14 @@
                     "hari": "Tuesday",
                     "jam_awal": "11:00",
                     "jam_akhir": "18:00",
-                    "status": "AVAILABLE"
+                    "status": "UNAVAILABLE"
                 },
                 {
                     "dokter": "Dr. Messi",
                     "hari": "Wednesday",
                     "jam_awal": "18:00",
                     "jam_akhir": "21:00",
-                    "status": "AVAILABLE"
+                    "status": "UNAVAILABLE"
                 }
             ]
         },
@@ -61,7 +61,7 @@
                     "hari": "Tuesday",
                     "jam_awal": "08:00",
                     "jam_akhir": "13:00",
-                    "status": "AVAILABLE"
+                    "status": "UNAVAILABLE"
                 },
                 {
                     "dokter": "Dr. Jajang",
@@ -87,7 +87,7 @@
                     "hari": "Thursday",
                     "jam_awal": "10:00",
                     "jam_akhir": "17:00",
-                    "status": "AVAILABLE"
+                    "status": "UNAVAILABLE"
                 }
             ]
         },
@@ -96,17 +96,17 @@
             "kuota": 5,
             "dokter_list": [
                 {
-                    "nama": "Dr. Zaidan",
+                    "nama": "Dr. Admin",
                     "spesialis": "Gigi"
                 }
             ],
             "jadwal_list": [
                 {
-                    "dokter": "Dr. Zaidan",
-                    "hari": "Monday",
-                    "jam_awal": "08:00",
-                    "jam_akhir": "13:00",
-                    "status": "UNAVAILABLE"
+                    "dokter": "Dr. Admin",
+                    "hari": "Thursday",
+                    "jam_awal": "23:00",
+                    "jam_akhir": "23:59",
+                    "status": "AVAILABLE"
                 }
             ]
         }

@@ -3,9 +3,9 @@
 # Kelas: 1A - D4
 # NIM: 241524026
 # Desc: Program untuk mengelola jadwal layanan poli di rumah sakit
-
 import json
 import datetime
+import copy
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox
 
@@ -38,9 +38,11 @@ class HoverButton(QtWidgets.QPushButton):
         super().leaveEvent(event)
 
 class Ui_Dialog(object):
-    def __init__(self, parent_window=None):
+    def __init__(self, parent_window=None, json_data=None):
         self.parent_window = parent_window
-        self.current_data = self.load_data()
+        self.original_data = json_data if json_data else self.load_data()
+        self.updated_data = copy.deepcopy(self.original_data)
+        self.data_updated = False
         self.selected_poli_index = -1
         self.selected_jadwal_index = -1
 
@@ -171,7 +173,7 @@ class Ui_Dialog(object):
         self.comboBox_2.model().item(0).setEnabled(False)
         
         # Load poli data from JSON
-        for poli in self.current_data["daftar_poli"]:
+        for poli in self.updated_data["daftar_poli"]:
             self.comboBox_2.addItem(poli["nama_poli"])
         
         self.comboBox_2.currentIndexChanged.connect(self.update_dokter_combo)
@@ -228,13 +230,11 @@ class Ui_Dialog(object):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "Window Edit Jadwal"))
     
-    # ================ FUNGSI UTAMA ================
     def load_data(self):
         try:
             with open("JadwalPoli.json", "r", encoding="utf-8") as file:
                 return json.load(file)
         except:
-            # Fallback data jika file tidak ditemukan
             return {
                 "daftar_poli": [
                     {
@@ -273,26 +273,25 @@ class Ui_Dialog(object):
     def save_data(self):
         try:
             with open("JadwalPoli.json", "w", encoding="utf-8") as file:
-                json.dump(self.current_data, file, indent=4)
+                json.dump(self.updated_data, file, indent=4)
+            self.data_updated = True
             return True
         except Exception as e:
             QMessageBox.critical(self.dialog, "Error", f"Gagal menyimpan data: {str(e)}")
             return False
 
     def update_dokter_combo(self):
-        """Update dokter combo box based on selected poli"""
         self.comboBox_3.clear()
         self.comboBox_3.addItem("Pilih Dokter")
         self.comboBox_3.model().item(0).setEnabled(False)
         
         poli_index = self.comboBox_2.currentIndex() - 1
-        if 0 <= poli_index < len(self.current_data["daftar_poli"]):
-            selected_poli = self.current_data["daftar_poli"][poli_index]
+        if 0 <= poli_index < len(self.updated_data["daftar_poli"]):
+            selected_poli = self.updated_data["daftar_poli"][poli_index]
             for dokter in selected_poli["dokter_list"]:
                 self.comboBox_3.addItem(f"{dokter['nama']} ({dokter['spesialis']})")
 
     def validate_input(self):
-        # Validasi combobox
         if self.comboBox_2.currentIndex() == 0:
             QMessageBox.warning(self.dialog, "Peringatan", "Pilih poli terlebih dahulu!")
             return False
@@ -301,7 +300,6 @@ class Ui_Dialog(object):
             QMessageBox.warning(self.dialog, "Peringatan", "Pilih dokter terlebih dahulu!")
             return False
         
-        # Validasi field input
         if not self.lineEdit_1.text().strip():
             QMessageBox.warning(self.dialog, "Peringatan", "Masukkan hari terlebih dahulu!")
             return False
@@ -314,7 +312,6 @@ class Ui_Dialog(object):
             QMessageBox.warning(self.dialog, "Peringatan", "Masukkan jam akhir terlebih dahulu!")
             return False
             
-        # Validasi format waktu
         if not self.validate_time_format(self.lineEdit_2.text()):
             QMessageBox.warning(self.dialog, "Peringatan", "Format jam awal tidak valid! Gunakan HH:MM")
             return False
@@ -333,7 +330,7 @@ class Ui_Dialog(object):
             return False
 
     def find_poli_index(self, poli_name):
-        for index, poli in enumerate(self.current_data["daftar_poli"]):
+        for index, poli in enumerate(self.updated_data["daftar_poli"]):
             if poli["nama_poli"] == poli_name:
                 return index
         return -1
@@ -344,18 +341,15 @@ class Ui_Dialog(object):
         self.lineEdit_3.clear()
 
     def get_dokter_name(self):
-        """Extract doctor name from combobox text"""
         dokter_text = self.comboBox_3.currentText()
         return dokter_text.split(" (")[0] if " (" in dokter_text else dokter_text
 
     def get_jadwal_status(self, hari, jam_awal, jam_akhir):
-        """Determine status based on current time"""
         try:
             now = datetime.datetime.now()
             current_day = now.strftime("%A")
             current_time = now.time()
             
-            # Convert schedule time to time objects
             start = datetime.datetime.strptime(jam_awal, "%H:%M").time()
             end = datetime.datetime.strptime(jam_akhir, "%H:%M").time()
             
@@ -385,7 +379,7 @@ class Ui_Dialog(object):
             "status": self.get_jadwal_status(hari, jam_awal, jam_akhir)
         }
 
-        self.current_data["daftar_poli"][poli_index]["jadwal_list"].append(new_jadwal)
+        self.updated_data["daftar_poli"][poli_index]["jadwal_list"].append(new_jadwal)
         if self.save_data():
             QMessageBox.information(self.dialog, "Sukses", "Jadwal berhasil ditambahkan!")
             self.clear_input_fields()
@@ -401,7 +395,7 @@ class Ui_Dialog(object):
         if self.selected_jadwal_index == -1:
             jadwal_items = [
                 f"{j['hari']} ({j['jam_awal']}-{j['jam_akhir']}) - {j.get('status', 'Available')}"
-                for j in self.current_data["daftar_poli"][poli_index]["jadwal_list"]
+                for j in self.updated_data["daftar_poli"][poli_index]["jadwal_list"]
             ]
             
             if not jadwal_items:
@@ -422,7 +416,7 @@ class Ui_Dialog(object):
         jam_awal = self.lineEdit_2.text()
         jam_akhir = self.lineEdit_3.text()
 
-        self.current_data["daftar_poli"][poli_index]["jadwal_list"][self.selected_jadwal_index] = {
+        self.updated_data["daftar_poli"][poli_index]["jadwal_list"][self.selected_jadwal_index] = {
             "dokter": self.get_dokter_name(),
             "hari": hari,
             "jam_awal": jam_awal,
@@ -441,11 +435,10 @@ class Ui_Dialog(object):
             QMessageBox.warning(self.dialog, "Peringatan", "Pilih poli terlebih dahulu!")
             return
 
-        # Jika belum memilih jadwal, tampilkan dialog pilihan
         if self.selected_jadwal_index == -1:
             jadwal_items = [
                 f"{j['hari']} ({j['jam_awal']}-{j['jam_akhir']})"
-                for j in self.current_data["daftar_poli"][poli_index]["jadwal_list"]
+                for j in self.updated_data["daftar_poli"][poli_index]["jadwal_list"]
             ]
             
             if not jadwal_items:
@@ -462,7 +455,6 @@ class Ui_Dialog(object):
                 
             self.selected_jadwal_index = jadwal_items.index(item)
 
-        # Konfirmasi penghapusan
         reply = QMessageBox.question(
             self.dialog, 'Konfirmasi',
             'Yakin ingin menghapus jadwal ini?', 
@@ -470,7 +462,7 @@ class Ui_Dialog(object):
         )
         
         if reply == QMessageBox.Yes:
-            self.current_data["daftar_poli"][poli_index]["jadwal_list"].pop(self.selected_jadwal_index)
+            self.updated_data["daftar_poli"][poli_index]["jadwal_list"].pop(self.selected_jadwal_index)
             if self.save_data():
                 QMessageBox.information(self.dialog, "Sukses", "Jadwal berhasil dihapus!")
                 self.clear_input_fields()
@@ -478,6 +470,9 @@ class Ui_Dialog(object):
 
     def backToParent(self):
         if self.parent_window:
+            if hasattr(self.parent_window, 'ui') and self.data_updated:
+                self.parent_window.ui.data = self.updated_data
+                self.parent_window.ui.loadData()
             self.parent_window.show()
         self.dialog.close()
 

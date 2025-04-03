@@ -39,8 +39,18 @@ class HoverButton(QtWidgets.QPushButton):
         super().leaveEvent(event)
 
 class Ui_Dialog(object):
-    def __init__(self, parent_window=None):
+    def __init__(self, parent_window=None, json_data=None):
         self.parent_window = parent_window
+        self.json_data = json_data if json_data else self.load_data()
+        self.data_updated = False
+        self.updated_data = None
+
+    def load_data(self):
+        try:
+            with open("JadwalPoli.json", "r") as file:
+                return json.load(file)
+        except:
+            return {"daftar_poli": []}
 
     def setupUi(self, Dialog):
         self.dialog = Dialog
@@ -142,11 +152,8 @@ class Ui_Dialog(object):
 
     def loadData(self):
         try:
-            with open("JadwalPoli.json", "r") as file:
-                data = json.load(file)
-            
             self.model.setRowCount(0)
-            for idx, poli in enumerate(data["daftar_poli"], start=1):
+            for idx, poli in enumerate(self.json_data["daftar_poli"], start=1):
                 item_no = QStandardItem(str(idx))
                 item_no.setTextAlignment(QtCore.Qt.AlignCenter)
                 
@@ -156,7 +163,7 @@ class Ui_Dialog(object):
                 self.model.appendRow([item_no, item_poli])
                 
         except Exception as e:
-            print("Error membaca file JSON:", e)
+            print("Error membaca data:", e)
 
     def tambah_poli(self):
         nama_poli = self.lineEdit_1.text().strip()
@@ -165,30 +172,24 @@ class Ui_Dialog(object):
             QtWidgets.QMessageBox.warning(self.dialog, "Error", "Nama Poli harus diisi!")
             return
             
-        try:
-            with open("JadwalPoli.json", "r") as file:
-                data = json.load(file)
-        except:
-            data = {"daftar_poli": []}
-            
         # Cek apakah poli sudah ada
-        for poli in data["daftar_poli"]:
+        for poli in self.json_data["daftar_poli"]:
             if poli["nama_poli"].lower() == nama_poli.lower():
                 QtWidgets.QMessageBox.warning(self.dialog, "Error", "Poli sudah ada!")
                 return
                 
-        # Tambahkan poli baru dengan kuota default 20
+        # Tambahkan poli baru dengan kuota default 5
         new_poli = {
             "nama_poli": nama_poli,
             "kuota": 5,
             "dokter_list": [],
             "jadwal_list": []
         }
-        data["daftar_poli"].append(new_poli)
+        self.json_data["daftar_poli"].append(new_poli)
         
-        with open("JadwalPoli.json", "w") as file:
-            json.dump(data, file, indent=4)
-            
+        self.data_updated = True
+        self.updated_data = self.json_data
+        
         QtWidgets.QMessageBox.information(self.dialog, "Sukses", "Poli berhasil ditambahkan!")
         self.loadData()
         self.lineEdit_1.clear()
@@ -200,19 +201,14 @@ class Ui_Dialog(object):
             QtWidgets.QMessageBox.warning(self.dialog, "Error", "Nama Poli harus diisi!")
             return
             
-        try:
-            with open("JadwalPoli.json", "r") as file:
-                data = json.load(file)
-        except:
-            QtWidgets.QMessageBox.warning(self.dialog, "Error", "Data poli tidak ditemukan!")
-            return
-            
         # Cari dan hapus poli
-        for i, poli in enumerate(data["daftar_poli"]):
+        for i, poli in enumerate(self.json_data["daftar_poli"]):
             if poli["nama_poli"].lower() == nama_poli.lower():
-                data["daftar_poli"].pop(i)
-                with open("JadwalPoli.json", "w") as file:
-                    json.dump(data, file, indent=4)
+                self.json_data["daftar_poli"].pop(i)
+                
+                self.data_updated = True
+                self.updated_data = self.json_data
+                
                 QtWidgets.QMessageBox.information(self.dialog, "Sukses", "Poli berhasil dihapus!")
                 self.loadData()
                 self.lineEdit_1.clear()
@@ -222,6 +218,10 @@ class Ui_Dialog(object):
 
     def backToParent(self):
         if self.parent_window:
+            if hasattr(self.parent_window, 'ui'):
+                if self.data_updated:
+                    self.parent_window.ui.data = self.updated_data
+                    self.parent_window.ui.loadData()
             self.parent_window.show()
         self.dialog.close()
 

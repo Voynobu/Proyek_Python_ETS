@@ -5,10 +5,10 @@
 # Desc: Program ini menampilkan dan mengatur jadwal layanan poli beserta dokter di rumah sakit.
 #       Admin dapat melihat, menambah, mengubah, dan menghapus jadwal dokter (termasuk status dan kuota).
 #       Tabel menampilkan informasi lengkap: nomor, poli, dokter (spesialisasi), jadwal, status, serta kuota maksimum.
-
 import sys
 import json
 import datetime
+import copy
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 
@@ -41,6 +41,47 @@ class HoverButton(QtWidgets.QPushButton):
 class Ui_Dialog(object):
     def __init__(self, parent_window=None):
         self.parent_window = parent_window
+        self.json_file = "JadwalPoli.json"
+        self.data = self.load_json_data()
+
+    def load_json_data(self):
+        try:
+            with open(self.json_file, "r", encoding="utf-8") as file:
+                return json.load(file)
+        except Exception as e:
+            print(f"Error loading JSON file: {e}")
+            return {"nama": "Jadwal Poli", "daftar_poli": []}
+
+    def save_json_data(self):
+        try:
+            with open(self.json_file, "w", encoding="utf-8") as file:
+                json.dump(self.data, file, indent=4, ensure_ascii=False)
+            return True
+        except Exception as e:
+            print(f"Error saving JSON file: {e}")
+            QtWidgets.QMessageBox.critical(None, "Error", f"Gagal menyimpan data: {str(e)}")
+            return False
+
+    def update_status_in_json(self):
+        """Update status in JSON data based on current time"""
+        now = datetime.datetime.now()
+        current_day = now.strftime("%A")
+        current_time = now.time()
+
+        for poli in self.data["daftar_poli"]:
+            for jadwal in poli["jadwal_list"]:
+                try:
+                    if jadwal["hari"].lower() == current_day.lower():
+                        start_time = datetime.datetime.strptime(jadwal["jam_awal"], "%H:%M").time()
+                        end_time = datetime.datetime.strptime(jadwal["jam_akhir"], "%H:%M").time()
+                        jadwal["status"] = "AVAILABLE" if start_time <= current_time <= end_time else "UNAVAILABLE"
+                    else:
+                        jadwal["status"] = "UNAVAILABLE"
+                except Exception as e:
+                    print(f"Error updating status: {e}")
+                    jadwal["status"] = "UNAVAILABLE"
+        
+        return self.save_json_data()
 
     def setupUi(self, Dialog):
         self.dialog = Dialog
@@ -177,21 +218,21 @@ class Ui_Dialog(object):
 
     def checkScheduleStatus(self, jadwal_list):
         now = datetime.datetime.now()
-        current_day = now.strftime("%A")  # e.g. "Thursday"
+        current_day = now.strftime("%A")
         current_time = now.time()
         
         status_list = []
         
         for jadwal in jadwal_list:
-            schedule_day = jadwal["hari"]
+            schedule_day = jadwal.get("hari", "")
             
             if schedule_day.lower() != current_day.lower():
                 status_list.append("UNAVAILABLE")
                 continue
                 
             try:
-                start_time = datetime.datetime.strptime(jadwal["jam_awal"], "%H:%M").time()
-                end_time = datetime.datetime.strptime(jadwal["jam_akhir"], "%H:%M").time()
+                start_time = datetime.datetime.strptime(jadwal.get("jam_awal", "00:00"), "%H:%M").time()
+                end_time = datetime.datetime.strptime(jadwal.get("jam_akhir", "00:00"), "%H:%M").time()
                 
                 if start_time <= current_time <= end_time:
                     status_list.append("AVAILABLE")
@@ -205,51 +246,50 @@ class Ui_Dialog(object):
 
     def loadData(self):
         try:
-            with open("JadwalPoli.json", "r", encoding="utf-8") as file:
-                data = json.load(file)
-                self.model.setRowCount(0)
+            self.data = self.load_json_data()
+            self.model.setRowCount(0)
+            
+            for idx, poli in enumerate(self.data["daftar_poli"], start=1):
+                nama_poli = poli.get("nama_poli", "").upper()
+                kuota = str(poli.get("kuota", "N/A"))
                 
-                for idx, poli in enumerate(data["daftar_poli"], start=1):
-                    nama_poli = poli["nama_poli"].upper()
-                    kuota = str(poli.get("kuota", "N/A"))
-                    
-                    # Format doctors
-                    dokter_str = "\n".join([
-                        f"{dokter['nama']} ({dokter['spesialis']})" 
-                        for dokter in poli["dokter_list"]
-                    ])
-                    
-                    # Format schedules and get current statuses
-                    jadwal_entries = []
-                    status_list = self.checkScheduleStatus(poli["jadwal_list"])
-                    
-                    for jadwal, status in zip(poli["jadwal_list"], status_list):
-                        hari = jadwal["hari"].upper()
-                        jam = f"{jadwal['jam_awal']} - {jadwal['jam_akhir']}"
-                        jadwal_entries.append(f"{hari} ({jam})")
-                    
-                    jadwal_str = "\n".join(jadwal_entries)
-                    status_str = "\n".join(status_list)
-                    
-                    # Add row to table
-                    row_data = [
-                        str(idx), 
-                        nama_poli, 
-                        dokter_str, 
-                        jadwal_str, 
-                        status_str, 
-                        kuota
-                    ]
-                    
-                    items = []
-                    for value in row_data:
-                        item = QStandardItem(str(value))
-                        item.setTextAlignment(QtCore.Qt.AlignCenter)
-                        items.append(item)
-                    self.model.appendRow(items)
-                    
+                # Format doctors
+                dokter_str = "\n".join([
+                    f"{dokter.get('nama', '')} ({dokter.get('spesialis', '')})" 
+                    for dokter in poli.get("dokter_list", [])
+                ])
+                
+                # Format schedules and get current statuses
+                jadwal_entries = []
+                status_list = self.checkScheduleStatus(poli.get("jadwal_list", []))
+                
+                for jadwal, status in zip(poli.get("jadwal_list", []), status_list):
+                    hari = jadwal.get("hari", "").upper()
+                    jam = f"{jadwal.get('jam_awal', '')} - {jadwal.get('jam_akhir', '')}"
+                    jadwal_entries.append(f"{hari} ({jam})")
+                
+                jadwal_str = "\n".join(jadwal_entries)
+                status_str = "\n".join(status_list)
+                
+                # Add row to table
+                row_data = [
+                    str(idx), 
+                    nama_poli, 
+                    dokter_str, 
+                    jadwal_str, 
+                    status_str, 
+                    kuota
+                ]
+                
+                items = []
+                for value in row_data:
+                    item = QStandardItem(str(value))
+                    item.setTextAlignment(QtCore.Qt.AlignCenter)
+                    items.append(item)
+                self.model.appendRow(items)
+                
         except Exception as e:
-            print(f"Error loading JSON data: {e}")
+            print(f"Error loading data: {e}")
             self.loadFallbackData()
 
     def loadFallbackData(self):
@@ -277,8 +317,9 @@ class Ui_Dialog(object):
         time_str = now.toString("HH:mm:ss")
         self.label_datetime.setText(f"{day_of_week} | {date_str} | {time_str}")
         
-        # Reload data to update statuses
-        self.loadData()
+        # Update status in JSON and reload data
+        if self.update_status_in_json():
+            self.loadData()
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
@@ -293,27 +334,51 @@ class Ui_Dialog(object):
         self.dialog.hide()
         from WindowEditJadwal import Ui_Dialog as Ui_WindowEditJadwal
         self.edit_jadwal_dialog = QtWidgets.QDialog()
-        self.ui_edit_jadwal = Ui_WindowEditJadwal(parent_window=self.dialog)
+        self.ui_edit_jadwal = Ui_WindowEditJadwal(parent_window=self.dialog, json_data=copy.deepcopy(self.data))
         self.ui_edit_jadwal.setupUi(self.edit_jadwal_dialog)
-        self.edit_jadwal_dialog.finished.connect(self.loadData)
+        
+        def on_dialog_finished():
+            if hasattr(self.ui_edit_jadwal, 'data_updated') and self.ui_edit_jadwal.data_updated:
+                self.data = copy.deepcopy(self.ui_edit_jadwal.updated_data)
+                if self.save_json_data():
+                    self.loadData()
+            self.dialog.show()
+            
+        self.edit_jadwal_dialog.finished.connect(on_dialog_finished)
         self.edit_jadwal_dialog.show()
 
     def openEditPoli(self):
         self.dialog.hide()
         from WindowEditPoli import Ui_Dialog as Ui_WindowEditPoli
         self.edit_poli_dialog = QtWidgets.QDialog()
-        self.ui_edit_poli = Ui_WindowEditPoli(parent_window=self.dialog)
+        self.ui_edit_poli = Ui_WindowEditPoli(parent_window=self.dialog, json_data=copy.deepcopy(self.data))
         self.ui_edit_poli.setupUi(self.edit_poli_dialog)
-        self.edit_poli_dialog.finished.connect(self.loadData)
+        
+        def on_dialog_finished():
+            if hasattr(self.ui_edit_poli, 'data_updated') and self.ui_edit_poli.data_updated:
+                self.data = copy.deepcopy(self.ui_edit_poli.updated_data)
+                if self.save_json_data():
+                    self.loadData()
+            self.dialog.show()
+            
+        self.edit_poli_dialog.finished.connect(on_dialog_finished)
         self.edit_poli_dialog.show()
 
     def openEditDokter(self):
         self.dialog.hide()
         from WindowEditDokter import Ui_WindowEditDokter
         self.edit_dokter_dialog = QtWidgets.QDialog()
-        self.ui_edit_dokter = Ui_WindowEditDokter(parent_window=self.dialog)
+        self.ui_edit_dokter = Ui_WindowEditDokter(parent_window=self.dialog, json_data=copy.deepcopy(self.data))
         self.ui_edit_dokter.setupUi(self.edit_dokter_dialog)
-        self.edit_dokter_dialog.finished.connect(self.loadData)
+        
+        def on_dialog_finished():
+            if hasattr(self.ui_edit_dokter, 'data_updated') and self.ui_edit_dokter.data_updated:
+                self.data = copy.deepcopy(self.ui_edit_dokter.updated_data)
+                if self.save_json_data():
+                    self.loadData()
+            self.dialog.show()
+            
+        self.edit_dokter_dialog.finished.connect(on_dialog_finished)
         self.edit_dokter_dialog.show()
 
 if __name__ == "__main__":
