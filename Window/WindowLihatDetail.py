@@ -1,7 +1,7 @@
 # WindowLihatDetail.py
-# Nama: Rangga Muhamad Fajar
+# Nama: Rangga Muhamad Fajar & Nauval Khairiyan
 # Kelas: 1A - D4
-# NIM: 241524026
+# NIM: 241524026 / 241524021
 # Desc: - Program ini berfungsi untuk melihat resi hasil pendaftaran, window ini letaknya ada di WindowRiwayat.
 
 import sys
@@ -36,6 +36,9 @@ class HoverButton(QtWidgets.QPushButton):
         super().leaveEvent(event)
 
 class Ui_Dialog(object):
+    def __init__(self, username):
+        self.username = username  # Simpan username untuk digunakan nanti  
+
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
         Dialog.resize(1600, 900)
@@ -146,9 +149,10 @@ class Ui_Dialog(object):
         Dialog.setWindowTitle(_translate("Dialog", "Lihat Detail Resi Pendaftaran"))
 
 if __name__ == "__main__":
+    import sys
     app = QtWidgets.QApplication(sys.argv)
-    Dialog = QtWidgets.QDialog()
+    dialog = QtWidgets.QDialog()
     ui = Ui_Dialog()
-    ui.setupUi(Dialog)
-    Dialog.show()
-    sys.exit(app.exec_())
+    ui.setupUi(dialog)
+    dialog.exec_()  # Gunakan exec_() agar hanya menampilkan dialog tanpa menutup aplikasi utama
+
