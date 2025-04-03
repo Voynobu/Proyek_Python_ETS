@@ -123,14 +123,17 @@ class Ui_Dialog(object):
                         item_jadwal = QStandardItem(f"{tanggal_temu} - {jadwal}")
                         item_jadwal.setTextAlignment(QtCore.Qt.AlignCenter)
                         item_jadwal.setFont(QtGui.QFont("Arial", 8))
+                        item_jadwal.setFlags(item_jadwal.flags() & ~QtCore.Qt.ItemIsEditable)
 
                         item_antrian = QStandardItem(nomor_antrian)
                         item_antrian.setTextAlignment(QtCore.Qt.AlignCenter)
                         item_antrian.setFont(QtGui.QFont("Verdana", 8, QtGui.QFont.Bold))
+                        item_antrian.setFlags(item_antrian.flags() & ~QtCore.Qt.ItemIsEditable)
 
                         item_status = QStandardItem(status)
                         item_status.setTextAlignment(QtCore.Qt.AlignCenter)
                         item_status.setFont(QtGui.QFont("Roboto", 10))
+                        item_status.setFlags(item_status.flags() & ~QtCore.Qt.ItemIsEditable)
 
                         # Tambahkan baris baru tanpa menghapus data lama
                         row_index = self.model.rowCount()
