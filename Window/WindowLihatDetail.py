@@ -101,10 +101,10 @@ class Ui_Dialog(object):
         self.lineEdit_3.setText("")
         self.lineEdit_3.setObjectName("lineEdit_3")
         
-        self.lineEdit_4 = QtWidgets.QLineEdit(Dialog)
-        self.lineEdit_4.setGeometry(QtCore.QRect(814, 488, 373, 317))
-        self.lineEdit_4.setStyleSheet(
-            "QLineEdit {"
+        self.textEdit_4 = QtWidgets.QTextEdit(Dialog)
+        self.textEdit_4.setGeometry(QtCore.QRect(814, 488, 373, 317))
+        self.textEdit_4.setStyleSheet(
+            "QTextEdit {"
             "    background-color: white;"
             "    border-radius: 20px;"
             "    border: 4px solid #5ce1e6;"
@@ -112,8 +112,8 @@ class Ui_Dialog(object):
             "    font-size: 15px;"
             "}"
         )
-        self.lineEdit_4.setText("")
-        self.lineEdit_4.setObjectName("lineEdit_4")
+        self.textEdit_4.setText("")
+        self.textEdit_4.setObjectName("textEdit_4")
         
         self.lineEdit_5 = QtWidgets.QLineEdit(Dialog)
         self.lineEdit_5.setGeometry(QtCore.QRect(596, 350, 391, 51))
@@ -138,7 +138,7 @@ class Ui_Dialog(object):
         self.lineEdit_1.raise_()
         self.lineEdit_2.raise_()
         self.lineEdit_3.raise_()
-        self.lineEdit_4.raise_()
+        self.textEdit_4.raise_()
         self.lineEdit_5.raise_()
 
         self.retranslateUi(Dialog)

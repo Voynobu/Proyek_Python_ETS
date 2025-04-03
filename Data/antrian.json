@@ -16,5 +16,13 @@
         "BPJS": {
             "Poli Jantung": 1
         }
+    },
+    "09-04-2025": {
+        "Asuransi": {
+            "Poli THT-KL": 2
+        },
+        "Mandiri": {
+            "Poli THT-KL": 1
+        }
     }
 }

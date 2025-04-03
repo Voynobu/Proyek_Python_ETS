@@ -86,8 +86,8 @@ class WindowMenuUser(QtWidgets.QDialog):
     def open_Riwayat(self):
         from WindowRiwayat import Ui_Dialog  # Pastikan nama file dan class sesuai
         self.riwayat_dialog = QtWidgets.QDialog()
-        self.ui_riwayat = Ui_Dialog()
-        self.ui_riwayat.setupUi(self.riwayat_dialog, self.username)
+        self.ui_riwayat = Ui_Dialog(self.username)
+        self.ui_riwayat.setupUi(self.riwayat_dialog)
         self.riwayat_dialog.show()
         self.close()
 

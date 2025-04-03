@@ -176,14 +176,14 @@ class Ui_Dialog(object):
             self.uiDetail.lineEdit_1.setText(riwayat.get("nama", "N/A"))
             self.uiDetail.lineEdit_2.setText(riwayat.get("dokter", "N/A"))
             self.uiDetail.lineEdit_3.setText(riwayat.get("jadwal", "N/A"))
-            self.uiDetail.lineEdit_4.setText(riwayat.get("keluhan", "N/A"))
+            self.uiDetail.textEdit_4.setText(riwayat.get("keluhan", "N/A"))
             self.uiDetail.lineEdit_5.setText(riwayat.get("nomor antrian", "N/A"))
 
             # Set lineEdit fields to read-only to prevent editing
             self.uiDetail.lineEdit_1.setReadOnly(True)
             self.uiDetail.lineEdit_2.setReadOnly(True)
             self.uiDetail.lineEdit_3.setReadOnly(True)
-            self.uiDetail.lineEdit_4.setReadOnly(True)
+            self.uiDetail.textEdit_4.setReadOnly(True)
             self.uiDetail.lineEdit_5.setReadOnly(True)
 
             # Tambahkan fungsi untuk tombol "Back"
@@ -216,7 +216,7 @@ if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
     Dialog = QtWidgets.QDialog()
-    ui = Ui_Dialog()
-    ui.setupUi(Dialog, "test")
+    ui = Ui_Dialog("test")
+    ui.setupUi(Dialog)
     Dialog.show()
     sys.exit(app.exec_())
