@@ -2,6 +2,8 @@
 # NIM/Kelas   : 241524012
 # Kelas       : 1-A D4 Teknik Informatika
 # Description : Window untuk pendaftaran pasien
+
+import os
 import sys
 import json
 import datetime
@@ -11,6 +13,8 @@ from PyQt5.QtCore import QDate
 from Pasien import simpan_data
 from Register import load_users
 from Antrian import ambil_nomor_antrian, is_antrian_penuh
+from Utils.SoundManager import SoundManager
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 POLIKLINIK_FILE = "JadwalPoli.json"
 with open(POLIKLINIK_FILE, "r", encoding="utf-8") as file:
@@ -81,6 +85,7 @@ class WindowPendaftaranPasien(QDialog):
         self.setupUi()
     
     def setupUi(self):
+        SoundManager.play("interface")
         self.setObjectName("Form")
         self.setFixedSize(1600, 900)  # Ukuran window disamakan dengan WindowMenuAdmin/User
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint)

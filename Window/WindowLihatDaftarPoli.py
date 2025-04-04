@@ -2,10 +2,14 @@
 #NIM/Kelas : 241524031/1A-D4
 #Deskripsi : Window yang muncul ketika kita memilih opsi jadwal poli(versi admin)
 
+import json
+import os
+import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt, QTimer
 from Models import Dokter, Jadwal, Poli, JadwalPoli
-import json  
+from Utils.SoundManager import SoundManager
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))) 
 
 # File to save and load data
 DATA_FILE = "jadwal_poli_data.json"

@@ -6,9 +6,13 @@
 #       di aplikasi pendaftaran rumah sakit. Tabel poli bersifat read-only dan 
 #       dapat diperbarui hanya melalui tombol tambah atau hapus.
 
+import os
+import sys
 import json
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
+from Utils.SoundManager import SoundManager
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 class HoverButton(QtWidgets.QPushButton):
     def __init__(self, parent=None, image_path=""):
@@ -53,6 +57,7 @@ class Ui_Dialog(object):
             return {"daftar_poli": []}
 
     def setupUi(self, Dialog):
+        SoundManager.play("interface")
         self.dialog = Dialog
         Dialog.setObjectName("Dialog")
         Dialog.resize(1600, 900)

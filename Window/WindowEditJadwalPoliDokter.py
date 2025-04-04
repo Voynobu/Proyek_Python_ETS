@@ -5,12 +5,16 @@
 # Desc: Program ini menampilkan dan mengatur jadwal layanan poli beserta dokter di rumah sakit.
 #       Admin dapat melihat, menambah, mengubah, dan menghapus jadwal dokter (termasuk status dan kuota).
 #       Tabel menampilkan informasi lengkap: nomor, poli, dokter (spesialisasi), jadwal, status, serta kuota maksimum.
+
+import os
 import sys
 import json
 import datetime
 import copy
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
+from Utils.SoundManager import SoundManager
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 class HoverButton(QtWidgets.QPushButton):
     def __init__(self, parent=None, image_path=""):
@@ -84,6 +88,7 @@ class Ui_Dialog(object):
         return self.save_json_data()
 
     def setupUi(self, Dialog):
+        SoundManager.play("interface")
         self.dialog = Dialog
         Dialog.setObjectName("Dialog")
         Dialog.resize(1600, 900)

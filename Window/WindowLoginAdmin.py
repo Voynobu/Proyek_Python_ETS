@@ -13,7 +13,10 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 import json
 import os
+import sys
 from WindowMenuAdmin import Ui_WindowMenuAdmin
+from Utils.SoundManager import SoundManager
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 class HoverButton(QtWidgets.QPushButton):
     def __init__(self, parent=None, image_path=""):
@@ -44,6 +47,7 @@ class HoverButton(QtWidgets.QPushButton):
 
 class Ui_Dialog(object):
     def setupUi(self, windowLoginAdmin):
+        SoundManager.play("interface")
         windowLoginAdmin.setObjectName("windowLoginAdmin")
         windowLoginAdmin.resize(1600, 900)
         windowLoginAdmin.setWindowFlags(QtCore.Qt.FramelessWindowHint)

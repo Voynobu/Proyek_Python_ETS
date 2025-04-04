@@ -4,9 +4,13 @@
 # NIM: 241524026 dan 241524021
 # Desc: - Program ini digunakan untuk melihat detail riwayat pendaftaran pasien di rumah sakit.
 
+import os
+import sys
 import json
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
+from Utils.SoundManager import SoundManager
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 class HoverButton(QtWidgets.QPushButton):
     def __init__(self, parent=None, image_path=""):
@@ -41,6 +45,7 @@ class Ui_Dialog(object):
         self.username = username  # Simpan username untuk digunakan nanti
 
     def setupUi(self, Dialog):
+        SoundManager.play("interface")
         self.dialog = Dialog
         Dialog.setObjectName("Dialog")
         Dialog.resize(1598, 900)

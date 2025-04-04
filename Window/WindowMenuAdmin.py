@@ -10,10 +10,14 @@
 #Desc : 
 
 # WindowMenuAdmin.py
+import os
+import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QGraphicsOpacityEffect
 from PyQt5.QtCore import QPropertyAnimation
 from WindowTambahAdmin import Ui_WindowTambahAdmin
+from Utils.SoundManager import SoundManager
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 class HoverButton(QtWidgets.QPushButton):
     def __init__(self, parent=None, image_path=""):
@@ -43,6 +47,7 @@ class HoverButton(QtWidgets.QPushButton):
 
 class Ui_WindowMenuAdmin(object):
     def setupUi(self, windowMenuAdmin):
+        SoundManager.play("interface")
         self.windowMenuAdmin = windowMenuAdmin
         windowMenuAdmin.setObjectName("windowMenuAdmin")
         windowMenuAdmin.resize(1600, 900)

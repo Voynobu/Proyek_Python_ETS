@@ -11,9 +11,12 @@
 
 import json
 import os
+import sys
 import datetime
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
+from Utils.SoundManager import SoundManager
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 class HoverButton(QtWidgets.QPushButton):
     def __init__(self, parent=None, image_path=""):
@@ -115,6 +118,7 @@ class Ui_Dialog(object):
             print(f"Error updating statuses: {e}")
 
     def setupUi(self, Dialog):
+        SoundManager.play("interface")
         Dialog.setObjectName("Dialog")
         Dialog.resize(1600, 900)
         Dialog.setWindowFlags(QtCore.Qt.FramelessWindowHint)

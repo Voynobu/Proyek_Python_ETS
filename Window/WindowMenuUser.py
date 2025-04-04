@@ -8,7 +8,12 @@
 #         membatalkan pendaftaran dalam sistem rumah sakit.
 
 # WindowMenuUser.py
+
+import os
+import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from Utils.SoundManager import SoundManager
 
 class HoverButton(QtWidgets.QPushButton):
     def __init__(self, parent=None, image_path=""):
@@ -45,6 +50,7 @@ class WindowMenuUser(QtWidgets.QDialog):
         self.username = username
         self.initUI()
         self.oldPos = None  # Untuk mendukung dragging window
+        SoundManager.play("interface")
 
     def initUI(self):
         # Background

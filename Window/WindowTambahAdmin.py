@@ -21,12 +21,16 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 import json
 import os
+import sys
+from Utils.SoundManager import SoundManager
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 class Ui_WindowTambahAdmin(object):
     def __init__(self, parent_window=None):
         self.parent_window = parent_window
 
     def setupUi(self, windowTambahAdmin):
+        SoundManager.play("interface")
         self.windowTambahAdmin = windowTambahAdmin
         windowTambahAdmin.setObjectName("windowTambahAdmin")
         windowTambahAdmin.resize(1600, 900)
