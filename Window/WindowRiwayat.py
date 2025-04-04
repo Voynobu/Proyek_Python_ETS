@@ -118,11 +118,21 @@ class Ui_Dialog(object):
 
     def initTable(self):
         self.model = QStandardItemModel()
-        # Header seperti semula
         self.model.setHorizontalHeaderLabels(["JADWAL CHECK-UP", "NOMOR ANTRIAN", "STATUS", "LIHAT DETAIL"])
         self.tableView.setModel(self.model)
-        # Jika diinginkan, pengaturan lebar kolom juga dapat ditetapkan secara manual
-        # Namun di sini kita biarkan stretch agar kolom menyesuaikan dengan lebar total tabel
+
+        header = self.tableView.horizontalHeader()
+        header.setSectionResizeMode(QtWidgets.QHeaderView.Fixed)  # Pastikan pakai ukuran tetap
+
+        # Atur ukuran kolom secara manual
+        self.tableView.setColumnWidth(0, 366)  # JADWAL CHECK-UP diperbesar
+        self.tableView.setColumnWidth(1, 310)  # NOMOR ANTRIAN default
+        self.tableView.setColumnWidth(2, 180)  # STATUS diperkecil
+        self.tableView.setColumnWidth(3, 250)  # LIHAT DETAIL
+
+        # Tambahan biar user nggak resize kolom sendiri
+        header.setSectionsMovable(False)
+        header.setStretchLastSection(False)
 
     def loadData(self):
         file_path = "Data/riwayat.json"
@@ -174,7 +184,7 @@ class Ui_Dialog(object):
                     "    border-radius: 4px;"
                     "    padding: 6px 10px;"
                     "    font-weight: bold;"
-                    "    font-size: 11pt;"
+                    "    font-size: 8pt;"
                     "    min-width: 90px;"
                     "    border: none;"
                     "    background-color: #0cc0df;"
