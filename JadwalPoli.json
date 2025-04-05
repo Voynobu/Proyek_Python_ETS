@@ -13,9 +13,9 @@
             "jadwal_list": [
                 {
                     "dokter": "Dr. Ahmad",
-                    "hari": "Thursday",
-                    "jam_awal": "07:00",
-                    "jam_akhir": "12:00",
+                    "hari": "Saturday",
+                    "jam_awal": "08:00",
+                    "jam_akhir": "10:00",
                     "status": "UNAVAILABLE"
                 }
             ]
@@ -107,6 +107,7 @@
                     "jam_awal": "00:00",
                     "jam_akhir": "05:00",
                     "status": "UNAVAILABLE"
+<<<<<<< HEAD
                 }
             ]
         },
@@ -133,6 +134,8 @@
                     "jam_awal": "21:00",
                     "jam_akhir": "23:00",
                     "status": "UNAVAILABLE"
+=======
+>>>>>>> c9b02518b3845a7c2e5ab961010f1d7d4fa51684
                 }
             ]
         }
