@@ -21,7 +21,7 @@ with open(POLIKLINIK_FILE, "r", encoding="utf-8") as file:
     data = json.load(file)
 
 def get_poli_list():
-        return [poli["nama_poli"] for poli in data["daftar_poli"]]
+    return [poli["nama_poli"] for poli in data["daftar_poli"]]
 
 def get_doctor_list(poli_name):
     for poli in data["daftar_poli"]:
@@ -30,7 +30,6 @@ def get_doctor_list(poli_name):
     return []
 
 def get_schedule(doctor_name, selected_date):
-    selected_day = selected_date.toString("dddd")
     schedules = []
     
     for poli in data["daftar_poli"]:
@@ -72,11 +71,27 @@ class WindowPendaftaranPasien(QDialog):
         super().__init__()
         self.username = username
         self.setupUi()
+        self.refresh_data()
     
+    def showEvent(self, event):
+        """Override method yang dijalankan ketika window ditampilkan"""
+        self.refresh_data()
+        super().showEvent(event)
+    
+    def refresh_data(self):
+        """Memuat ulang data dari file JSON"""
+        try:
+            with open(POLIKLINIK_FILE, "r", encoding="utf-8") as file:
+                global data
+                data = json.load(file)
+            self.update_doctor_list()
+        except Exception as e:
+            QMessageBox.warning(self, "Error", f"Gagal memuat data jadwal: {str(e)}")
+
     def setupUi(self):
         SoundManager.play("interface")
         self.setObjectName("Form")
-        self.setFixedSize(1600, 900)  # Ukuran window disamakan dengan WindowMenuAdmin/User
+        self.setFixedSize(1600, 900)
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
         
         # Label background
@@ -105,13 +120,13 @@ class WindowPendaftaranPasien(QDialog):
         self.poli.setStyleSheet("""
             QComboBox {
                 background: transparent;
-                color: black; /* Atur warna teks agar tetap terlihat */
+                color: black;
                 border: none;
             }
             QComboBox QAbstractItemView {
-                background: white; /* Latar belakang dropdown tetap terlihat */
-                color: black; /* Warna teks item dropdown */
-                selection-background-color: gray; /* Warna saat item dipilih */
+                background: white;
+                color: black;
+                selection-background-color: gray;
             }
         """)
 
@@ -121,13 +136,13 @@ class WindowPendaftaranPasien(QDialog):
         self.dokter.setStyleSheet("""
             QComboBox {
                 background: transparent;
-                color: black; /* Atur warna teks agar tetap terlihat */
+                color: black;
                 border: none;
             }
             QComboBox QAbstractItemView {
-                background: white; /* Latar belakang dropdown tetap terlihat */
-                color: black; /* Warna teks item dropdown */
-                selection-background-color: gray; /* Warna saat item dipilih */
+                background: white;
+                color: black;
+                selection-background-color: gray;
             }
         """)
 
@@ -137,13 +152,13 @@ class WindowPendaftaranPasien(QDialog):
         self.pilih_jadwal.setStyleSheet("""
             QComboBox {
                 background: transparent;
-                color: black; /* Atur warna teks agar tetap terlihat */
+                color: black;
                 border: none;
             }
             QComboBox QAbstractItemView {
-                background: white; /* Latar belakang dropdown tetap terlihat */
-                color: black; /* Warna teks item dropdown */
-                selection-background-color: gray; /* Warna saat item dipilih */
+                background: white;
+                color: black;
+                selection-background-color: gray;
             }
         """)
 
@@ -172,13 +187,13 @@ class WindowPendaftaranPasien(QDialog):
         self.jenis_layanan.setStyleSheet("""
             QComboBox {
                 background: transparent;
-                color: black; /* Atur warna teks agar tetap terlihat */
+                color: black;
                 border: none;
             }
             QComboBox QAbstractItemView {
-                background: white; /* Latar belakang dropdown tetap terlihat */
-                color: black; /* Warna teks item dropdown */
-                selection-background-color: gray; /* Warna saat item dipilih */
+                background: white;
+                color: black;
+                selection-background-color: gray;
             }
         """)
 
@@ -193,7 +208,6 @@ class WindowPendaftaranPasien(QDialog):
         self.daftar.clicked.connect(self.daftar_pasien)
         
         self.update_doctor_list()
-    
 
     def update_doctor_list(self):
         self.dokter.clear()
