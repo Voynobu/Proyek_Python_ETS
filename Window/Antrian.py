@@ -95,7 +95,7 @@ def is_antrian_penuh(tanggal_temu, tipe_layanan, poli):
         tipe_layanan in antrian_data[tanggal_temu] and
         poli in antrian_data[tanggal_temu][tipe_layanan]
     ):
-        return antrian_data[tanggal_temu][tipe_layanan][poli] >= 40
+        return antrian_data[tanggal_temu][tipe_layanan][poli] >= 5
     
     return False
 
