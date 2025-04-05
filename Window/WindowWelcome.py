@@ -7,6 +7,8 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 import os
+import sys 
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 class HoverButton(QtWidgets.QPushButton):
     def __init__(self, parent=None, image_path=""):

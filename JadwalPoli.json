@@ -106,7 +106,33 @@
                     "hari": "Friday",
                     "jam_awal": "00:00",
                     "jam_akhir": "05:00",
-                    "status": "AVAILABLE"
+                    "status": "UNAVAILABLE"
+                }
+            ]
+        },
+        {
+            "nama_poli": "Poli Penyakit Dalam",
+            "kuota": 5,
+            "dokter_list": [
+                {
+                    "nama": "Dr. Muti",
+                    "spesialis": "Kardiovaskular"
+                }
+            ],
+            "jadwal_list": [
+                {
+                    "dokter": "Dr. Muti",
+                    "hari": "Friday",
+                    "jam_awal": "21:00",
+                    "jam_akhir": "23:30",
+                    "status": "UNAVAILABLE"
+                },
+                {
+                    "dokter": "Dr. Muti",
+                    "hari": "Saturday",
+                    "jam_awal": "21:00",
+                    "jam_akhir": "23:00",
+                    "status": "UNAVAILABLE"
                 }
             ]
         }

@@ -48,7 +48,7 @@
             "tanggal_temu": "09-04-2025",
             "keluhan": "Sopo keselek bakso.",
             "nomor antrian": "MNDR-Poli THT-KL-1",
-            "status": "On going"
+            "status": "Dibatalkan"
         },
         {
             "nama": "Pak Haji Udin",
@@ -60,6 +60,18 @@
             "tanggal_temu": "09-04-2025",
             "keluhan": "Pak Haji Udin tenggorokannya gatal setelah minum minuman kemasan.",
             "nomor antrian": "ASRI-Poli THT-KL-2",
+            "status": "On going"
+        },
+        {
+            "nama": "Eci Aja",
+            "jenis_kelamin": "Wanita",
+            "jenis_layanan": "BPJS",
+            "poli": "Poli Penyakit Dalam",
+            "dokter": "Dr. Muti",
+            "jadwal": "21:00 - 23:30",
+            "tanggal_temu": "11-04-2025",
+            "keluhan": "Eci pengen ketemu Dr. Muti",
+            "nomor antrian": "BPJS-Poli Penyakit Dalam-1",
             "status": "On going"
         }
     ],

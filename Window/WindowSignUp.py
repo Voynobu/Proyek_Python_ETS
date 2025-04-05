@@ -8,8 +8,8 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from Register import register_user 
-import os
 import sys
+import os
 from Utils.SoundManager import SoundManager
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
