@@ -96,16 +96,23 @@
             "kuota": 5,
             "dokter_list": [
                 {
-                    "nama": "Dr. Admin",
-                    "spesialis": "Gigi"
+                    "nama": "Dr.Tooth",
+                    "spesialis": "GigiBelobang"
                 }
             ],
             "jadwal_list": [
                 {
-                    "dokter": "Dr. Admin",
-                    "hari": "Friday",
-                    "jam_awal": "00:00",
-                    "jam_akhir": "05:00",
+                    "dokter": "Dr.Tooth",
+                    "hari": "Saturday",
+                    "jam_awal": "20:00",
+                    "jam_akhir": "23:00",
+                    "status": "AVAILABLE"
+                },
+                {
+                    "dokter": "Dr. Gigi",
+                    "hari": "Saturday",
+                    "jam_awal": "08:00",
+                    "jam_akhir": "10:00",
                     "status": "UNAVAILABLE"
 <<<<<<< HEAD
                 }
