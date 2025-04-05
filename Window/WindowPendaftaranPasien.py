@@ -31,25 +31,14 @@ def get_doctor_list(poli_name):
 
 def get_schedule(doctor_name, selected_date):
     selected_day = selected_date.toString("dddd")
-    current_time = datetime.datetime.now().time()
-    available_schedules = []
+    schedules = []
     
     for poli in data["daftar_poli"]:
         for jadwal in poli["jadwal_list"]:
-            if jadwal["dokter"] == doctor_name and jadwal["hari"] == selected_day:
-                try:
-                    # Parse waktu jadwal
-                    start_time = datetime.datetime.strptime(jadwal["jam_awal"], "%H:%M").time()
-                    end_time = datetime.datetime.strptime(jadwal["jam_akhir"], "%H:%M").time()
-                    
-                    # Check jika jadwal available atau tidak
-                    if (jadwal["status"] == "AVAILABLE" and 
-                        start_time <= current_time <= end_time):
-                        available_schedules.append(f"{jadwal['jam_awal']} - {jadwal['jam_akhir']}")
-                except ValueError:
-                    continue
+            if jadwal["dokter"] == doctor_name:
+                schedules.append(f"{jadwal['jam_awal']} - {jadwal['jam_akhir']}")
     
-    return available_schedules if available_schedules else ["Tidak Tersedia"]
+    return schedules if schedules else ["Tidak Tersedia"]
 
 class HoverButton(QtWidgets.QPushButton):
     def __init__(self, parent=None, image_path=""):
